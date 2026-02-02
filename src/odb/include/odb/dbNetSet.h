@@ -17,6 +17,19 @@ class dbNet;
 template <>
 class dbSetIterator<dbNet>
 {
+  friend class dbSet<dbNet>;
+
+  dbIterator* _itr;
+  uint _cur;
+  dbObject* _parent;
+
+  dbSetIterator(dbIterator* itr, uint id, dbObject* parent)
+  {
+    _itr = itr;
+    _cur = id;
+    _parent = parent;
+  }
+
  public:
   using value_type = dbNet*;
   using difference_type = std::ptrdiff_t;
@@ -26,129 +39,114 @@ class dbSetIterator<dbNet>
 
   dbSetIterator()
   {
-    itr_ = nullptr;
-    cur_ = 0;
-    parent_ = nullptr;
+    _itr = nullptr;
+    _cur = 0;
+    _parent = nullptr;
   }
 
   dbSetIterator(const dbSetIterator& it)
   {
-    itr_ = it.itr_;
-    cur_ = it.cur_;
-    parent_ = it.parent_;
+    _itr = it._itr;
+    _cur = it._cur;
+    _parent = it._parent;
   }
 
   bool operator==(const dbSetIterator<dbNet>& it)
   {
-    return (itr_ == it.itr_) && (cur_ == it.cur_) && (parent_ == it.parent_);
+    return (_itr == it._itr) && (_cur == it._cur) && (_parent == it._parent);
   }
 
   bool operator!=(const dbSetIterator<dbNet>& it)
   {
-    return (itr_ != it.itr_) || (cur_ != it.cur_) || (parent_ != it.parent_);
+    return (_itr != it._itr) || (_cur != it._cur) || (_parent != it._parent);
   }
 
-  dbNet* operator*() { return (dbNet*) itr_->getObject(cur_, parent_); }
+  dbNet* operator*() { return (dbNet*) _itr->getObject(_cur, _parent); }
 
-  dbNet* operator->() { return (dbNet*) itr_->getObject(cur_, parent_); }
+  dbNet* operator->() { return (dbNet*) _itr->getObject(_cur, _parent); }
 
   dbSetIterator<dbNet>& operator++()
   {
-    cur_ = itr_->next(cur_);
+    _cur = _itr->next(_cur);
     return *this;
   }
 
   dbSetIterator<dbNet> operator++(int)
   {
     dbSetIterator it(*this);
-    cur_ = itr_->next(cur_);
+    _cur = _itr->next(_cur);
     return it;
   }
-
- private:
-  friend class dbSet<dbNet>;
-
-  dbSetIterator(dbIterator* itr, uint id, dbObject* parent)
-  {
-    itr_ = itr;
-    cur_ = id;
-    parent_ = parent;
-  }
-
-  dbIterator* itr_;
-  uint cur_;
-  dbObject* parent_;
 };
 
 template <>
 class dbSet<dbNet>
 {
+  dbIterator* _itr;
+  dbObject* _parent;
+
  public:
   using iterator = dbSetIterator<dbNet>;
 
   dbSet()
   {
-    itr_ = nullptr;
-    parent_ = nullptr;
+    _itr = nullptr;
+    _parent = nullptr;
   }
 
   dbSet(dbObject* parent, dbIterator* itr)
   {
-    parent_ = parent;
-    itr_ = itr;
+    _parent = parent;
+    _itr = itr;
   }
 
   dbSet(const dbSet<dbNet>& c)
   {
-    itr_ = c.itr_;
-    parent_ = c.parent_;
+    _itr = c._itr;
+    _parent = c._parent;
   }
 
   ///
   /// Returns the number of items in this set.
   ///
-  uint size() { return itr_->size(parent_); }
+  uint size() { return _itr->size(_parent); }
 
   ///
   /// Return a begin() iterator.
   ///
-  iterator begin() { return iterator(itr_, itr_->begin(parent_), parent_); }
+  iterator begin() { return iterator(_itr, _itr->begin(_parent), _parent); }
 
   ///
   /// Return an end() iterator.
   ///
-  iterator end() { return iterator(itr_, itr_->end(parent_), parent_); }
+  iterator end() { return iterator(_itr, _itr->end(_parent), _parent); }
 
   ///
   /// Returns the maximum number sequential elements the this set
   /// may iterate.
   ///
-  uint sequential() { return itr_->sequential(); }
+  uint sequential() { return _itr->sequential(); }
 
   ///
   /// Returns true if this set is reversible.
   ///
-  bool reversible() { return itr_->reversible(); }
+  bool reversible() { return _itr->reversible(); }
 
   ///
   /// Returns true if the is iterated in the reverse order that
   /// it was created.
   ///
-  bool orderReversed() { return itr_->orderReversed(); }
+  bool orderReversed() { return _itr->orderReversed(); }
 
   ///
   /// Reverse the order of this set.
   ///
-  void reverse() { itr_->reverse(parent_); }
+  void reverse() { _itr->reverse(_parent); }
 
   ///
   /// Returns true if set is empty
   ///
   bool empty() { return begin() == end(); }
-
- private:
-  dbIterator* itr_;
-  dbObject* parent_;
 };
 
 }  // namespace odb

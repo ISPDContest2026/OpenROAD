@@ -27,11 +27,11 @@
     },
     {
       "type": "bit",
-      "name": "length_valid"
+      "name": "length_valid_"
     },
     {
       "type": "bit",
-      "name": "cuts_valid"
+      "name": "cuts_valid_"
     }
   ],
   "cpp_includes": [

@@ -98,8 +98,7 @@ class PdnGen
                     const std::vector<odb::dbTechLayer*>& generate_obstructions,
                     PowerCell* powercell,
                     odb::dbNet* powercontrol,
-                    const char* powercontrolnetwork,
-                    const std::vector<odb::dbTechLayer*>& pad_pin_layers);
+                    const char* powercontrolnetwork);
   void makeInstanceGrid(
       VoltageDomain* domain,
       const std::string& name,
@@ -143,8 +142,7 @@ class PdnGen
                  bool snap,
                  StartsWith starts_with,
                  ExtensionMode extend,
-                 const std::vector<odb::dbNet*>& nets,
-                 bool allow_out_of_core);
+                 const std::vector<odb::dbNet*>& nets);
   void makeConnect(
       Grid* grid,
       odb::dbTechLayer* layer0,

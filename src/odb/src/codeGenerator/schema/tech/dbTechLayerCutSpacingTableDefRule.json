@@ -3,95 +3,95 @@
   "type": "dbObject",
   "fields": [
     {
-      "name": "default_valid",
+      "name": "default_valid_",
       "type": "bit"
     },
     {
-      "name": "same_mask",
+      "name": "same_mask_",
       "type": "bit"
     },
     {
-      "name": "same_net",
+      "name": "same_net_",
       "type": "bit"
     },
     {
-      "name": "same_metal",
+      "name": "same_metal_",
       "type": "bit"
     },
     {
-      "name": "same_via",
+      "name": "same_via_",
       "type": "bit"
     },
     {
-      "name": "layer_valid",
+      "name": "layer_valid_",
       "type": "bit"
     },
     {
-      "name": "no_stack",
+      "name": "no_stack_",
       "type": "bit"
     },
     {
-      "name": "non_zero_enclosure",
+      "name": "non_zero_enclosure_",
       "type": "bit"
     },
     {
-      "name": "prl_for_aligned_cut",
+      "name": "prl_for_aligned_cut_",
       "type": "bit"
     },
     {
-      "name": "center_to_center_valid",
+      "name": "center_to_center_valid_",
       "type": "bit"
     },
     {
-      "name": "center_and_edge_valid",
+      "name": "center_and_edge_valid_",
       "type": "bit"
     },
     {
-      "name": "no_prl",
+      "name": "no_prl_",
       "type": "bit"
     },
     {
-      "name": "prl_valid",
+      "name": "prl_valid_",
       "type": "bit"
     },
     {
-      "name": "max_x_y",
+      "name": "max_x_y_",
       "type": "bit"
     },
     {
-      "name": "end_extension_valid",
+      "name": "end_extension_valid_",
       "type": "bit"
     },
     {
-      "name": "side_extension_valid",
+      "name": "side_extension_valid_",
       "type": "bit"
     },
     {
-      "name": "exact_aligned_spacing_valid",
+      "name": "exact_aligned_spacing_valid_",
       "type": "bit"
     },
     {
-      "name": "horizontal",
+      "name": "horizontal_",
       "type": "bit"
     },
     {
-      "name": "prl_horizontal",
+      "name": "prl_horizontal_",
       "type": "bit"
     },
     {
-      "name": "vertical",
+      "name": "vertical_",
       "type": "bit"
     },
     {
-      "name": "prl_vertical",
+      "name": "prl_vertical_",
       "type": "bit"
     },
     {
-      "name": "non_opposite_enclosure_spacing_valid",
+      "name": "non_opposite_enclosure_spacing_valid_",
       "type": "bit"
     },
     {
-      "name": "opposite_enclosure_resize_spacing_valid",
+      "name": "opposite_enclosure_resize_spacing_valid_",
       "type": "bit"
     },
     {

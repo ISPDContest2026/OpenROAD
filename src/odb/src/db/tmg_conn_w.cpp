@@ -19,7 +19,7 @@ void tmg_conn::checkConnOrdered()
   std::unordered_set<dbBTerm*> bterms;
   _connected = true;
   dbWirePathItr pitr;
-  pitr.begin(net_->getWire());
+  pitr.begin(_net->getWire());
   dbWirePath path;
   bool first = true;
   while (pitr.getNextPath(path)) {
@@ -60,8 +60,8 @@ void tmg_conn::checkConnOrdered()
     }
   }
   if (!_connected) {
-    net_->setDisconnected(true);
-    logger_->info(utl::ODB, 15, "disconnected net {}", net_->getName());
+    _net->setDisconnected(true);
+    logger_->info(utl::ODB, 15, "disconnected net {}", _net->getName());
   }
 }
 

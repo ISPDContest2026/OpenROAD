@@ -55,34 +55,34 @@ class dbWireGraph
       VARIABLE   // segment extended variable amount
     };
 
-    Type getType() const { return type_; }
-    int getExt() const { return ext_; }
+    Type getType() const { return _type; }
+    int getExt() const { return _ext; }
 
     void setExtended()
     {
-      type_ = EXTENDED;
-      ext_ = 0;
+      _type = EXTENDED;
+      _ext = 0;
     }
 
     void setVariable(int ext)
     {
-      type_ = VARIABLE;
-      ext_ = ext;
+      _type = VARIABLE;
+      _ext = ext;
     }
 
     bool operator==(const EndStyle& s) const
     {
-      return (type_ == s.type_) && (ext_ == s.ext_);
+      return (_type == s._type) && (_ext == s._ext);
     }
 
     bool operator!=(const EndStyle& s) const
     {
-      return (type_ != s.type_) || (ext_ != s.ext_);
+      return (_type != s._type) || (_ext != s._ext);
     }
 
    private:
-    Type type_{EXTENDED};
-    int ext_{0};
+    Type _type{EXTENDED};
+    int _ext{0};
   };
 
   class Node;
@@ -102,36 +102,36 @@ class dbWireGraph
 
     virtual ~Edge() = default;
 
-    Type type() const { return type_; }
-    Node* source() const { return src_; }
-    Node* target() const { return tgt_; }
-    dbWireType::Value wireType() const { return wire_type_; }
-    dbTechLayerRule* nonDefaultRule() const { return non_default_rule_; }
+    Type type() const { return _type; }
+    Node* source() const { return _src; }
+    Node* target() const { return _tgt; }
+    dbWireType::Value wireType() const { return _wire_type; }
+    dbTechLayerRule* nonDefaultRule() const { return _non_default_rule; }
 
    protected:
     Edge(Type type, dbWireType::Value wire_type, dbTechLayerRule* rule)
-        : type_(type), wire_type_(wire_type), non_default_rule_(rule)
+        : _type(type), _wire_type(wire_type), _non_default_rule(rule)
     {
     }
 
    private:
     static DListEntry<Edge>* edgeEntry(Edge* edge)
     {
-      return &edge->edge_entry_;
+      return &edge->_edge_entry;
     }
 
     static DListEntry<Edge>* outEdgeEntry(Edge* edge)
     {
-      return &edge->_out_edge_entry_;
+      return &edge->_out_edge_entry;
     }
 
-    const Type type_;
-    Node* src_{nullptr};
-    Node* tgt_{nullptr};
-    dbWireType::Value wire_type_;
-    dbTechLayerRule* non_default_rule_;
-    DListEntry<Edge> edge_entry_;
-    DListEntry<Edge> _out_edge_entry_;
+    const Type _type;
+    Node* _src{nullptr};
+    Node* _tgt{nullptr};
+    dbWireType::Value _wire_type;
+    dbTechLayerRule* _non_default_rule;
+    DListEntry<Edge> _edge_entry;
+    DListEntry<Edge> _out_edge_entry;
 
     friend class dbWireGraph;
   };
@@ -142,35 +142,35 @@ class dbWireGraph
    public:
     using edge_iterator = DList<Edge, &Edge::outEdgeEntry>::iterator;
 
-    Node(int x, int y, dbTechLayer* layer) : x_(x), y_(y), layer_(layer) {}
+    Node(int x, int y, dbTechLayer* layer) : _x(x), _y(y), _layer(layer) {}
 
     void xy(int& x, int& y) const
     {
-      x = x_;
-      y = y_;
+      x = _x;
+      y = _y;
     }
-    Point point() const { return {x_, y_}; }
-    dbTechLayer* layer() const { return layer_; }
-    Edge* in_edge() const { return in_edge_; }
-    edge_iterator begin() { return out_edges_.begin(); }
-    edge_iterator end() { return out_edges_.end(); }
-    dbObject* object() const { return object_; }
-    void setObject(dbObject* obj) { object_ = obj; }
+    Point point() const { return {_x, _y}; }
+    dbTechLayer* layer() const { return _layer; }
+    Edge* in_edge() const { return _in_edge; }
+    edge_iterator begin() { return _out_edges.begin(); }
+    edge_iterator end() { return _out_edges.end(); }
+    dbObject* object() const { return _object; }
+    void setObject(dbObject* obj) { _object = obj; }
 
    private:
     static DListEntry<Node>* nodeEntry(Node* node)
     {
-      return &node->node_entry_;
+      return &node->_node_entry;
     }
 
-    int x_;
-    int y_;
-    int jct_id_{-1};
-    dbTechLayer* layer_;
-    Edge* in_edge_{nullptr};
-    dbObject* object_{nullptr};
-    DList<Edge, &Edge::outEdgeEntry> out_edges_;
-    DListEntry<Node> node_entry_;
+    int _x;
+    int _y;
+    int _jct_id{-1};
+    dbTechLayer* _layer;
+    Edge* _in_edge{nullptr};
+    dbObject* _object{nullptr};
+    DList<Edge, &Edge::outEdgeEntry> _out_edges;
+    DListEntry<Node> _node_entry;
 
     friend class dbWireGraph;
   };
@@ -180,14 +180,14 @@ class dbWireGraph
   {
    public:
     Via(dbVia* via, dbWireType::Value wire_type, dbTechLayerRule* rule)
-        : Edge(VIA, wire_type, rule), via_(via)
+        : Edge(VIA, wire_type, rule), _via(via)
     {
     }
 
-    dbVia* via() const { return via_; }
+    dbVia* via() const { return _via; }
 
    private:
-    dbVia* via_;
+    dbVia* _via;
     friend class dbWireGraph;
   };
 
@@ -196,14 +196,14 @@ class dbWireGraph
   {
    public:
     TechVia(dbTechVia* via, dbWireType::Value wire_type, dbTechLayerRule* rule)
-        : Edge(TECH_VIA, wire_type, rule), via_(via)
+        : Edge(TECH_VIA, wire_type, rule), _via(via)
     {
     }
 
-    dbTechVia* via() const { return via_; }
+    dbTechVia* via() const { return _via; }
 
    private:
-    dbTechVia* via_;
+    dbTechVia* _via;
     friend class dbWireGraph;
   };
 
@@ -215,13 +215,13 @@ class dbWireGraph
             EndStyle tgt,
             dbWireType::Value wire_type,
             dbTechLayerRule* rule)
-        : Edge(SEGMENT, wire_type, rule), src_style_(src), tgt_style_(tgt)
+        : Edge(SEGMENT, wire_type, rule), _src_style(src), _tgt_style(tgt)
     {
     }
 
    private:
-    EndStyle src_style_;
-    EndStyle tgt_style_;
+    EndStyle _src_style;
+    EndStyle _tgt_style;
     friend class dbWireGraph;
   };
 
@@ -328,13 +328,13 @@ class dbWireGraph
 
   // Edge iterator
   using node_iterator = DList<Node, &Node::nodeEntry>::iterator;
-  node_iterator begin_nodes() { return nodes_.begin(); }
-  node_iterator end_nodes() { return nodes_.end(); }
+  node_iterator begin_nodes() { return _nodes.begin(); }
+  node_iterator end_nodes() { return _nodes.end(); }
 
   // Node iterator
   using edge_iterator = DList<Edge, &Edge::edgeEntry>::iterator;
-  edge_iterator begin_edges() { return edges_.begin(); }
-  edge_iterator end_edges() { return edges_.end(); }
+  edge_iterator begin_edges() { return _edges.begin(); }
+  edge_iterator end_edges() { return _edges.end(); }
 
   // Delete Node
   // The deletion of a node WILL delete the connected edges.
@@ -356,9 +356,9 @@ class dbWireGraph
                   dbTechLayerRule* cur_rule);
   void encodePath(dbWireEncoder& encoder, std::vector<Edge*>& path);
 
-  std::vector<Node*> junction_map_;
-  DList<Node, &Node::nodeEntry> nodes_;
-  DList<Edge, &Edge::edgeEntry> edges_;
+  std::vector<Node*> _junction_map;
+  DList<Node, &Node::nodeEntry> _nodes;
+  DList<Edge, &Edge::edgeEntry> _edges;
 };
 
 inline dbWireGraph::Segment* dbWireGraph::createSegment(Node* src,

@@ -12,16 +12,15 @@
 #include "dbTable.h"
 #include "dbTable.hpp"
 #include "odb/dbObject.h"
-#include "odb/odb.h"
 
 namespace odb {
 
-bool dbGroupGroundNetItr::reversible() const
+bool dbGroupGroundNetItr::reversible()
 {
   return true;
 }
 
-bool dbGroupGroundNetItr::orderReversed() const
+bool dbGroupGroundNetItr::orderReversed()
 {
   return false;
 }
@@ -29,32 +28,32 @@ bool dbGroupGroundNetItr::orderReversed() const
 void dbGroupGroundNetItr::reverse(dbObject* parent)
 {
   _dbGroup* group = (_dbGroup*) parent;
-  std::reverse(group->ground_nets_.begin(), group->ground_nets_.end());
+  std::reverse(group->_ground_nets.begin(), group->_ground_nets.end());
 }
 
-uint dbGroupGroundNetItr::sequential() const
+uint dbGroupGroundNetItr::sequential()
 {
   return 0;
 }
 
-uint dbGroupGroundNetItr::size(dbObject* parent) const
+uint dbGroupGroundNetItr::size(dbObject* parent)
 {
   _dbGroup* group = (_dbGroup*) parent;
-  return group->ground_nets_.size();
+  return group->_ground_nets.size();
 }
 
-uint dbGroupGroundNetItr::begin(dbObject*) const
+uint dbGroupGroundNetItr::begin(dbObject*)
 {
   return 0;
 }
 
-uint dbGroupGroundNetItr::end(dbObject* parent) const
+uint dbGroupGroundNetItr::end(dbObject* parent)
 {
   _dbGroup* group = (_dbGroup*) parent;
-  return group->ground_nets_.size();
+  return group->_ground_nets.size();
 }
 
-uint dbGroupGroundNetItr::next(uint id, ...) const
+uint dbGroupGroundNetItr::next(uint id, ...)
 {
   return ++id;
 }
@@ -65,8 +64,8 @@ dbObject* dbGroupGroundNetItr::getObject(uint id, ...)
   va_start(ap, id);
   _dbGroup* parent = (_dbGroup*) va_arg(ap, dbObject*);
   va_end(ap);
-  uint nid = parent->ground_nets_[id];
-  return net_tbl_->getPtr(nid);
+  uint nid = parent->_ground_nets[id];
+  return _net_tbl->getPtr(nid);
 }
 
 }  // namespace odb

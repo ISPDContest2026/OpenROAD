@@ -118,28 +118,28 @@
       "schema": "db_schema_chip_extended"
     },
     {
-      "name": "top_",
+      "name": "_top",
       "type": "dbId<_dbBlock>",
       "flags": ["private", "cmpgt"],
       "parent": "dbBlock"
     },
     {
-      "name": "block_tbl_",
+      "name": "_block_tbl",
       "type": "dbTable<_dbBlock>*",
       "flags": ["private", "no-serial"]
     },
     {
-      "name": "name_cache_",
+      "name": "_name_cache",
       "type": "_dbNameCache*",
       "flags": ["private", "no-cmp", "no-serial"]
     },
     {
-      "name": "block_itr_",
+      "name": "_block_itr",
       "type": "dbBlockItr*", 
       "flags": ["private", "no-cmp", "no-serial"]
     },
     {
-      "name": "prop_itr_",
+      "name": "_prop_itr",
       "type": "dbPropertyItr*",
       "flags": ["private", "no-cmp", "no-serial"]
     },

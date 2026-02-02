@@ -19,13 +19,13 @@ template class dbTable<_dbTechLayerEolKeepOutRule>;
 bool _dbTechLayerEolKeepOutRule::operator==(
     const _dbTechLayerEolKeepOutRule& rhs) const
 {
-  if (flags_.class_valid != rhs.flags_.class_valid) {
+  if (flags_.class_valid_ != rhs.flags_.class_valid_) {
     return false;
   }
-  if (flags_.corner_only != rhs.flags_.corner_only) {
+  if (flags_.corner_only_ != rhs.flags_.corner_only_) {
     return false;
   }
-  if (flags_.except_within != rhs.flags_.except_within) {
+  if (flags_.except_within_ != rhs.flags_.except_within_) {
     return false;
   }
   if (eol_width_ != rhs.eol_width_) {
@@ -214,42 +214,42 @@ void dbTechLayerEolKeepOutRule::setClassValid(bool class_valid)
 {
   _dbTechLayerEolKeepOutRule* obj = (_dbTechLayerEolKeepOutRule*) this;
 
-  obj->flags_.class_valid = class_valid;
+  obj->flags_.class_valid_ = class_valid;
 }
 
 bool dbTechLayerEolKeepOutRule::isClassValid() const
 {
   _dbTechLayerEolKeepOutRule* obj = (_dbTechLayerEolKeepOutRule*) this;
 
-  return obj->flags_.class_valid;
+  return obj->flags_.class_valid_;
 }
 
 void dbTechLayerEolKeepOutRule::setCornerOnly(bool corner_only)
 {
   _dbTechLayerEolKeepOutRule* obj = (_dbTechLayerEolKeepOutRule*) this;
 
-  obj->flags_.corner_only = corner_only;
+  obj->flags_.corner_only_ = corner_only;
 }
 
 bool dbTechLayerEolKeepOutRule::isCornerOnly() const
 {
   _dbTechLayerEolKeepOutRule* obj = (_dbTechLayerEolKeepOutRule*) this;
 
-  return obj->flags_.corner_only;
+  return obj->flags_.corner_only_;
 }
 
 void dbTechLayerEolKeepOutRule::setExceptWithin(bool except_within)
 {
   _dbTechLayerEolKeepOutRule* obj = (_dbTechLayerEolKeepOutRule*) this;
 
-  obj->flags_.except_within = except_within;
+  obj->flags_.except_within_ = except_within;
 }
 
 bool dbTechLayerEolKeepOutRule::isExceptWithin() const
 {
   _dbTechLayerEolKeepOutRule* obj = (_dbTechLayerEolKeepOutRule*) this;
 
-  return obj->flags_.except_within;
+  return obj->flags_.except_within_;
 }
 
 // User Code Begin dbTechLayerEolKeepOutRulePublicMethods

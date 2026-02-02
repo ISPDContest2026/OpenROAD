@@ -14,52 +14,52 @@
       "flags":["no-set","no-get"]
     },
     {
-      "name":"elements_",
+      "name":"_elements",
       "type":"dbVector<std::string>",
       "flags":["no-set","no-get"]
     },
     {
-      "name":"power_switch_",
+      "name":"_power_switch",
       "type":"dbVector<dbId<_dbPowerSwitch>>",
       "flags":["no-set","no-get"],
       "parent":"dbBlock"
     },
     {
-      "name":"isolation_",
+      "name":"_isolation",
       "type":"dbVector<dbId<_dbIsolation>>",
       "flags":["no-set","no-get"],
       "parent":"dbBlock"
     },
     {
-      "name":"group_",
+      "name":"_group",
       "type":"dbId<_dbGroup>",
       "flags":["no-set"],
       "parent":"dbBlock"
     },
     {
-      "name":"top_",
+      "name":"_top",
       "type":"bool",
       "default": "false",
       "flags":[]
     },
     {
-      "name": "parent_",
+      "name": "_parent",
       "type": "dbId<_dbPowerDomain>",
       "parent":"dbBlock"
     },
     {
-      "name": "area_",
+      "name": "_area",
       "type": "Rect",
       "flags":["no-set","no-get"]
     },
     {
-      "name":"levelshifters_",
+      "name":"_levelshifters",
       "type":"dbVector<dbId<_dbLevelShifter>>",
       "flags":["no-set","no-get", "no-serial"],
       "parent":"dbBlock"
     } ,
     {
-      "name": "voltage_",
+      "name": "_voltage",
       "type": "float",
       "default": "0",
       "flags":["no-serial"]

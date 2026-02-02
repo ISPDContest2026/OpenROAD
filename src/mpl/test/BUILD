@@ -35,7 +35,6 @@ COMPULSORY_TESTS = [
     "clocked_macro",
     "keep_clustering_data",
     "fixed_macros",
-    "fixed_covers",
 ]
 
 # Disabled in CMakeLists.txt

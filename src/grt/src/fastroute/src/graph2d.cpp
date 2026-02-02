@@ -21,6 +21,8 @@ namespace grt {
 // Initializes the 2D graph with grid dimensions, capacities, and layers.
 void Graph2D::init(const int x_grid,
                    const int y_grid,
+                   const int h_capacity,
+                   const int v_capacity,
                    const int num_layers,
                    utl::Logger* logger)
 {
@@ -35,7 +37,7 @@ void Graph2D::init(const int x_grid,
   for (int x = 0; x < x_grid - 1; x++) {
     for (int y = 0; y < y_grid; y++) {
       // Edge initialization
-      h_edges_[x][y].cap = 0;
+      h_edges_[x][y].cap = h_capacity;
       h_edges_[x][y].usage = 0;
       h_edges_[x][y].est_usage = 0;
       h_edges_[x][y].red = 0;
@@ -46,7 +48,7 @@ void Graph2D::init(const int x_grid,
   for (int x = 0; x < x_grid; x++) {
     for (int y = 0; y < y_grid - 1; y++) {
       // Edge initialization
-      v_edges_[x][y].cap = 0;
+      v_edges_[x][y].cap = v_capacity;
       v_edges_[x][y].usage = 0;
       v_edges_[x][y].est_usage = 0;
       v_edges_[x][y].red = 0;

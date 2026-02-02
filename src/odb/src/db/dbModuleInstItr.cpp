@@ -8,7 +8,6 @@
 #include "dbModule.h"
 #include "dbTable.h"
 #include "dbTable.hpp"
-#include "odb/odb.h"
 
 namespace odb {
 
@@ -18,12 +17,12 @@ namespace odb {
 //
 ////////////////////////////////////////////////////////////////////
 
-bool dbModuleInstItr::reversible() const
+bool dbModuleInstItr::reversible()
 {
   return true;
 }
 
-bool dbModuleInstItr::orderReversed() const
+bool dbModuleInstItr::orderReversed()
 {
   return true;
 }
@@ -32,27 +31,27 @@ void dbModuleInstItr::reverse(dbObject* parent)
 {
   // User Code Begin reverse
   _dbModule* module = (_dbModule*) parent;
-  uint id = module->insts_;
+  uint id = module->_insts;
   uint list = 0;
 
   while (id != 0) {
-    _dbInst* inst = inst_tbl_->getPtr(id);
-    uint n = inst->module_prev_;
-    inst->module_prev_ = inst->module_next_;
-    inst->module_next_ = n;
+    _dbInst* inst = _inst_tbl->getPtr(id);
+    uint n = inst->_module_prev;
+    inst->_module_prev = inst->_module_next;
+    inst->_module_next = n;
     list = id;
-    id = inst->module_prev_;
+    id = inst->_module_prev;
   }
-  module->insts_ = list;
+  module->_insts = list;
   // User Code End reverse
 }
 
-uint dbModuleInstItr::sequential() const
+uint dbModuleInstItr::sequential()
 {
   return 0;
 }
 
-uint dbModuleInstItr::size(dbObject* parent) const
+uint dbModuleInstItr::size(dbObject* parent)
 {
   uint id;
   uint cnt = 0;
@@ -65,30 +64,30 @@ uint dbModuleInstItr::size(dbObject* parent) const
   return cnt;
 }
 
-uint dbModuleInstItr::begin(dbObject* parent) const
+uint dbModuleInstItr::begin(dbObject* parent)
 {
   // User Code Begin begin
   _dbModule* module = (_dbModule*) parent;
-  return module->insts_;
+  return module->_insts;
   // User Code End begin
 }
 
-uint dbModuleInstItr::end(dbObject* /* unused: parent */) const
+uint dbModuleInstItr::end(dbObject* /* unused: parent */)
 {
   return 0;
 }
 
-uint dbModuleInstItr::next(uint id, ...) const
+uint dbModuleInstItr::next(uint id, ...)
 {
   // User Code Begin next
-  _dbInst* inst = inst_tbl_->getPtr(id);
-  return inst->module_next_;
+  _dbInst* inst = _inst_tbl->getPtr(id);
+  return inst->_module_next;
   // User Code End next
 }
 
 dbObject* dbModuleInstItr::getObject(uint id, ...)
 {
-  return inst_tbl_->getPtr(id);
+  return _inst_tbl->getPtr(id);
 }
 }  // namespace odb
    // Generator Code End Cpp

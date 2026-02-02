@@ -820,8 +820,7 @@ bool RenderThread::drawTextInBBox(const QColor& text_color,
 
 void RenderThread::drawBlockages(QPainter* painter,
                                  odb::dbBlock* block,
-                                 const Rect& bounds,
-                                 const std::vector<odb::dbInst*>& insts)
+                                 const Rect& bounds)
 {
   if (!viewer_->options_->areBlockagesVisible()) {
     return;
@@ -844,23 +843,6 @@ void RenderThread::drawBlockages(QPainter* painter,
     }
     Rect bbox = blockage->getBBox()->getBox();
     painter->drawRect(bbox.xMin(), bbox.yMin(), bbox.dx(), bbox.dy());
-  }
-
-  for (odb::dbInst* inst : insts) {
-    if (restart_) {
-      break;
-    }
-    odb::dbBox* halo = inst->getHalo();
-    if (halo != nullptr) {
-      Rect instbox = inst->getBBox()->getBox();
-      Rect halobox = halo->getBox();
-      instbox.set_xlo(instbox.xMin() - halobox.xMin());
-      instbox.set_ylo(instbox.yMin() - halobox.yMin());
-      instbox.set_xhi(instbox.xMax() + halobox.xMax());
-      instbox.set_yhi(instbox.yMax() + halobox.yMax());
-      painter->drawRect(
-          instbox.xMin(), instbox.yMin(), instbox.dx(), instbox.dy());
-    }
   }
 }
 
@@ -1216,7 +1198,7 @@ void RenderThread::drawChip(QPainter* painter,
 
   // draw blockages
   utl::Timer inst_blockages;
-  drawBlockages(painter, block, bounds, insts);
+  drawBlockages(painter, block, bounds);
   debugPrint(logger_, GUI, "draw", 1, "blockages {}", inst_blockages);
 
   dbTech* tech = block->getTech();

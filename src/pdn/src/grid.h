@@ -27,7 +27,6 @@ class Straps;
 class Connect;
 class GridComponent;
 class GridSwitchedPower;
-class PadDirectConnectionStraps;
 
 class PdnGen;
 

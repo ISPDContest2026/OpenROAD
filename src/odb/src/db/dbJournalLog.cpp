@@ -48,25 +48,25 @@ void dbJournalLog::clear()
 
 void dbJournalLog::push(bool value)
 {
-  set_type(kLogBool);
+  set_type(LOG_BOOL);
   data_.push_back((value == true) ? 1 : 0);
 }
 
 void dbJournalLog::push(char value)
 {
-  set_type(kLogChar);
+  set_type(LOG_CHAR);
   data_.push_back(value);
 }
 
 void dbJournalLog::push(unsigned char value)
 {
-  set_type(kLogUChar);
+  set_type(LOG_UCHAR);
   data_.push_back(value);
 }
 
 void dbJournalLog::push(int value)
 {
-  set_type(kLogInt);
+  set_type(LOG_INT);
   unsigned char* v = (unsigned char*) &value;
   data_.push_back(v[0]);
   data_.push_back(v[1]);
@@ -76,7 +76,7 @@ void dbJournalLog::push(int value)
 
 void dbJournalLog::push(unsigned int value)
 {
-  set_type(kLogUInt);
+  set_type(LOG_UINT);
   unsigned char* v = (unsigned char*) &value;
   data_.push_back(v[0]);
   data_.push_back(v[1]);
@@ -86,7 +86,7 @@ void dbJournalLog::push(unsigned int value)
 
 void dbJournalLog::push(float value)
 {
-  set_type(kLogFloat);
+  set_type(LOG_FLOAT);
   unsigned char* v = (unsigned char*) &value;
   data_.push_back(v[0]);
   data_.push_back(v[1]);
@@ -96,7 +96,7 @@ void dbJournalLog::push(float value)
 
 void dbJournalLog::push(double value)
 {
-  set_type(kLogDouble);
+  set_type(LOG_DOUBLE);
   unsigned char* v = (unsigned char*) &value;
   data_.push_back(v[0]);
   data_.push_back(v[1]);
@@ -110,7 +110,7 @@ void dbJournalLog::push(double value)
 
 void dbJournalLog::push(const char* value)
 {
-  set_type(kLogString);
+  set_type(LOG_STRING);
   if (value == nullptr) {
     push(-1);
   } else {
@@ -138,25 +138,25 @@ void dbJournalLog::moveToEnd()
 
 void dbJournalLog::pop(bool& value)
 {
-  check_type(kLogBool);
+  check_type(LOG_BOOL);
   value = (next() == 1) ? true : false;
 }
 
 void dbJournalLog::pop(char& value)
 {
-  check_type(kLogChar);
+  check_type(LOG_CHAR);
   value = next();
 }
 
 void dbJournalLog::pop(unsigned char& value)
 {
-  check_type(kLogUChar);
+  check_type(LOG_UCHAR);
   value = next();
 }
 
 void dbJournalLog::pop(int& value)
 {
-  check_type(kLogInt);
+  check_type(LOG_INT);
   unsigned char* v = (unsigned char*) &value;
   v[0] = next();
   v[1] = next();
@@ -166,7 +166,7 @@ void dbJournalLog::pop(int& value)
 
 void dbJournalLog::pop(unsigned int& value)
 {
-  check_type(kLogUInt);
+  check_type(LOG_UINT);
   unsigned char* v = (unsigned char*) &value;
   v[0] = next();
   v[1] = next();
@@ -176,7 +176,7 @@ void dbJournalLog::pop(unsigned int& value)
 
 void dbJournalLog::pop(float& value)
 {
-  check_type(kLogFloat);
+  check_type(LOG_FLOAT);
   unsigned char* v = (unsigned char*) &value;
   v[0] = next();
   v[1] = next();
@@ -186,7 +186,7 @@ void dbJournalLog::pop(float& value)
 
 void dbJournalLog::pop(double& value)
 {
-  check_type(kLogDouble);
+  check_type(LOG_DOUBLE);
   unsigned char* v = (unsigned char*) &value;
   v[0] = next();
   v[1] = next();
@@ -200,7 +200,7 @@ void dbJournalLog::pop(double& value)
 
 void dbJournalLog::pop(char*& value)
 {
-  check_type(kLogString);
+  check_type(LOG_STRING);
   int len;
   pop(len);
 
@@ -221,7 +221,7 @@ void dbJournalLog::pop(char*& value)
 
 void dbJournalLog::pop(std::string& value)
 {
-  check_type(kLogString);
+  check_type(LOG_STRING);
   int len;
   pop(len);
 
@@ -287,7 +287,7 @@ void dbJournalLog::append(dbJournalLog& other)
     unsigned int action_idx;
     other.pop(end_action);
     other.pop(action_idx);
-    if (end_action != dbJournal::Action::kEndAction
+    if (end_action != dbJournal::Action::END_ACTION
         || action_idx != current_idx) {
       logger_->critical(
           utl::ODB, 459, "In append, didn't see an expected END_ACTION.");
@@ -301,21 +301,21 @@ void dbJournalLog::append(dbJournalLog& other)
 std::string dbJournalLog::to_string(LogDataType type)
 {
   switch (type) {
-    case kLogBool:
+    case LOG_BOOL:
       return "BOOL";
-    case kLogChar:
+    case LOG_CHAR:
       return "CHAR";
-    case kLogUChar:
+    case LOG_UCHAR:
       return "UCHAR";
-    case kLogInt:
+    case LOG_INT:
       return "INT";
-    case kLogUInt:
+    case LOG_UINT:
       return "UINT";
-    case kLogFloat:
+    case LOG_FLOAT:
       return "FLOAT";
-    case kLogDouble:
+    case LOG_DOUBLE:
       return "DOUBLE";
-    case kLogString:
+    case LOG_STRING:
       return "STRING";
   }
   return fmt::format("UNKNOWN ({})", type);

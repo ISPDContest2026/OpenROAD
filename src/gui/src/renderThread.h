@@ -103,8 +103,7 @@ class RenderThread : public QThread
 
   void drawBlockages(QPainter* painter,
                      odb::dbBlock* block,
-                     const odb::Rect& bounds,
-                     const std::vector<odb::dbInst*>& insts);
+                     const odb::Rect& bounds);
   void drawObstructions(odb::dbBlock* block,
                         odb::dbTechLayer* layer,
                         QPainter* painter,

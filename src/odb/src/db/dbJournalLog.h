@@ -54,14 +54,14 @@ class dbJournalLog
  private:
   enum LogDataType
   {
-    kLogBool,
-    kLogChar,
-    kLogUChar,
-    kLogInt,
-    kLogUInt,
-    kLogFloat,
-    kLogDouble,
-    kLogString
+    LOG_BOOL,
+    LOG_CHAR,
+    LOG_UCHAR,
+    LOG_INT,
+    LOG_UINT,
+    LOG_FLOAT,
+    LOG_DOUBLE,
+    LOG_STRING
   };
 
   void set_type(LogDataType type);

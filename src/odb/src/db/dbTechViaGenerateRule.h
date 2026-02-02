@@ -26,12 +26,17 @@ class dbOStream;
 struct _dbTechViaGenerateRuleFlags
 {
   uint _default : 1;
-  uint spare_bits : 31;
+  uint _spare_bits : 31;
 };
 
 class _dbTechViaGenerateRule : public _dbObject
 {
  public:
+  // PERSISTANT-MEMBERS
+  _dbTechViaGenerateRuleFlags flags_;
+  char* name_;
+  dbVector<uint> _layer_rules;
+
   _dbTechViaGenerateRule(_dbDatabase*, const _dbTechViaGenerateRule& v);
   _dbTechViaGenerateRule(_dbDatabase*);
   ~_dbTechViaGenerateRule();
@@ -47,11 +52,6 @@ class _dbTechViaGenerateRule : public _dbObject
   }
 
   void collectMemInfo(MemInfo& info);
-
-  // PERSISTANT-MEMBERS
-  _dbTechViaGenerateRuleFlags flags_;
-  char* name_;
-  dbVector<uint> layer_rules_;
 };
 
 dbOStream& operator<<(dbOStream& stream, const _dbTechViaGenerateRule& v);

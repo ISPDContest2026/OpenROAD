@@ -31,7 +31,6 @@ target_include_directories(CUGR
 
 target_link_libraries(CUGR
   PRIVATE
-    dbSta_lib
     utl_lib
     stt_lib
     odb

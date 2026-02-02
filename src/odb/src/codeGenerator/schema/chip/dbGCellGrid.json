@@ -58,14 +58,14 @@
       ]
     },
     {
-      "name": "x_grid_valid",
+      "name": "x_grid_valid_",
       "flags": [
         "private"
       ],
       "type": "bit"
     },
     {
-      "name": "y_grid_valid",
+      "name": "y_grid_valid_",
       "flags": [
         "private"
       ],

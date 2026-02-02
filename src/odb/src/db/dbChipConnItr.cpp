@@ -8,7 +8,6 @@
 #include "dbChipConn.h"
 #include "dbTable.h"
 #include "dbTable.hpp"
-#include "odb/odb.h"
 
 namespace odb {
 
@@ -18,12 +17,12 @@ namespace odb {
 //
 ////////////////////////////////////////////////////////////////////
 
-bool dbChipConnItr::reversible() const
+bool dbChipConnItr::reversible()
 {
   return true;
 }
 
-bool dbChipConnItr::orderReversed() const
+bool dbChipConnItr::orderReversed()
 {
   return true;
 }
@@ -36,7 +35,7 @@ void dbChipConnItr::reverse(dbObject* parent)
   uint list = 0;
 
   while (id != 0) {
-    _dbChipConn* chipconn = chip_conn_tbl_->getPtr(id);
+    _dbChipConn* chipconn = _chip_conn_tbl->getPtr(id);
     uint n = chipconn->chip_conn_next_;
     chipconn->chip_conn_next_ = list;
     list = id;
@@ -46,12 +45,12 @@ void dbChipConnItr::reverse(dbObject* parent)
   // User Code End reverse
 }
 
-uint dbChipConnItr::sequential() const
+uint dbChipConnItr::sequential()
 {
   return 0;
 }
 
-uint dbChipConnItr::size(dbObject* parent) const
+uint dbChipConnItr::size(dbObject* parent)
 {
   uint id;
   uint cnt = 0;
@@ -64,7 +63,7 @@ uint dbChipConnItr::size(dbObject* parent) const
   return cnt;
 }
 
-uint dbChipConnItr::begin(dbObject* parent) const
+uint dbChipConnItr::begin(dbObject* parent)
 {
   // User Code Begin begin
   _dbChip* chip = (_dbChip*) parent;
@@ -72,22 +71,22 @@ uint dbChipConnItr::begin(dbObject* parent) const
   // User Code End begin
 }
 
-uint dbChipConnItr::end(dbObject* /* unused: parent */) const
+uint dbChipConnItr::end(dbObject* /* unused: parent */)
 {
   return 0;
 }
 
-uint dbChipConnItr::next(uint id, ...) const
+uint dbChipConnItr::next(uint id, ...)
 {
   // User Code Begin next
-  _dbChipConn* chipconn = chip_conn_tbl_->getPtr(id);
+  _dbChipConn* chipconn = _chip_conn_tbl->getPtr(id);
   return chipconn->chip_conn_next_;
   // User Code End next
 }
 
 dbObject* dbChipConnItr::getObject(uint id, ...)
 {
-  return chip_conn_tbl_->getPtr(id);
+  return _chip_conn_tbl->getPtr(id);
 }
 }  // namespace odb
 // Generator Code End Cpp

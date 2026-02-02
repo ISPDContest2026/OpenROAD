@@ -46,9 +46,7 @@ class RamGen
                 int read_ports,
                 odb::dbMaster* storage_cell,
                 odb::dbMaster* tristate_cell,
-                odb::dbMaster* inv_cell,
-                odb::dbMaster* tapcell,
-                int max_tap_dist);
+                odb::dbMaster* inv_cell);
 
  private:
   void findMasters();
@@ -86,8 +84,6 @@ class RamGen
 
   odb::dbBTerm* makeBTerm(const std::string& name, odb::dbIoType io_type);
 
-  std::unique_ptr<Layout> generateTapColumn(int word_count, int tapcell_col);
-
   std::unique_ptr<Cell> makeDecoder(const std::string& prefix,
                                     int num_word,
                                     int read_ports,
@@ -108,7 +104,6 @@ class RamGen
   odb::dbMaster* and2_cell_{nullptr};
   odb::dbMaster* clock_gate_cell_{nullptr};
   odb::dbMaster* buffer_cell_{nullptr};
-  odb::dbMaster* tapcell_{nullptr};
 };
 
 }  // namespace ram

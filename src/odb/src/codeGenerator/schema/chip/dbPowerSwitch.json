@@ -14,47 +14,47 @@
       "flags":["no-set","no-get"]
     },
     {
-      "name":"in_supply_port_",
+      "name":"_in_supply_port",
       "type":"dbVector<dbPowerSwitch::UPFIOSupplyPort>",
       "flags":["no-set", "no-get", "no-serial"]
     },
     {
-      "name":"out_supply_port_",
+      "name":"_out_supply_port",
       "type":"dbPowerSwitch::UPFIOSupplyPort",
       "flags":["no-set", "no-get", "no-serial"]
     },
     {
-      "name":"control_port_",
+      "name":"_control_port",
       "type":"dbVector<dbPowerSwitch::UPFControlPort>",
       "flags":["no-set", "no-get", "no-serial"]
     },
     {
-      "name":"acknowledge_port_",
+      "name":"_acknowledge_port",
       "type":"dbVector<dbPowerSwitch::UPFAcknowledgePort>",
       "flags":["no-set", "no-get", "no-serial"]
     },
     {
-      "name":"on_state_",
+      "name":"_on_state",
       "type":"dbVector<dbPowerSwitch::UPFOnState>",
       "flags":["no-set", "no-get", "no-serial"]
     },
     {
-      "name": "lib_cell_",
+      "name": "_lib_cell",
       "type": "dbId<_dbMaster>",
       "flags": ["no-set", "no-get", "no-serial"]
     },
     {
-      "name": "lib_",
+      "name": "_lib",
       "type": "dbId<_dbLib>",
       "flags": ["no-set", "no-get", "no-serial"]
     },
     {
-      "name": "port_map_",
+      "name": "_port_map",
       "type": "std::map<std::string, dbId<_dbMTerm>>",
       "flags": ["no-set", "no-get", "no-serial"]
     },
     {
-      "name":"power_domain_",
+      "name":"_power_domain",
       "type":"dbId<_dbPowerDomain>",
       "flags":["no-serial"],
       "parent":"dbBlock"

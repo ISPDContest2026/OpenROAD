@@ -9,7 +9,6 @@
 #include "dbModule.h"
 #include "dbTable.h"
 #include "dbTable.hpp"
-#include "odb/odb.h"
 
 namespace odb {
 
@@ -19,12 +18,12 @@ namespace odb {
 //
 ////////////////////////////////////////////////////////////////////
 
-bool dbModuleBusPortModBTermItr::reversible() const
+bool dbModuleBusPortModBTermItr::reversible()
 {
   return true;
 }
 
-bool dbModuleBusPortModBTermItr::orderReversed() const
+bool dbModuleBusPortModBTermItr::orderReversed()
 {
   return true;
 }
@@ -33,12 +32,12 @@ void dbModuleBusPortModBTermItr::reverse(dbObject* parent)
 {
 }
 
-uint dbModuleBusPortModBTermItr::sequential() const
+uint dbModuleBusPortModBTermItr::sequential()
 {
   return 0;
 }
 
-uint dbModuleBusPortModBTermItr::size(dbObject* parent) const
+uint dbModuleBusPortModBTermItr::size(dbObject* parent)
 {
   uint id;
   uint cnt = 0;
@@ -52,31 +51,36 @@ uint dbModuleBusPortModBTermItr::size(dbObject* parent) const
   return cnt;
 }
 
-uint dbModuleBusPortModBTermItr::begin(dbObject* parent) const
+uint dbModuleBusPortModBTermItr::begin(dbObject* parent)
 {
   // User Code Begin begin
   _dbBusPort* _busport = (_dbBusPort*) parent;
-  return _busport->members_;
+  _iter = _modbterm_tbl->getPtr(_busport->_members);
+  _size = abs(_busport->_from - _busport->_to) + 1;
+  _ix = 0;
+  return _busport->_members;
   // User Code End begin
 }
 
-uint dbModuleBusPortModBTermItr::end(dbObject* /* unused: parent */) const
+uint dbModuleBusPortModBTermItr::end(dbObject* /* unused: parent */)
 {
   return 0;
 }
 
-uint dbModuleBusPortModBTermItr::next(uint id, ...) const
+uint dbModuleBusPortModBTermItr::next(uint id, ...)
 {
   // User Code Begin next
-  _dbModBTerm* lmodbterm = modbterm_tbl_->getPtr(id);
+  _dbModBTerm* lmodbterm = _modbterm_tbl->getPtr(id);
+  _ix++;
   uint ret = lmodbterm->next_entry_;
+  _iter = _modbterm_tbl->getPtr(ret);
   return ret;
   // User Code End next
 }
 
 dbObject* dbModuleBusPortModBTermItr::getObject(uint id, ...)
 {
-  return modbterm_tbl_->getPtr(id);
+  return _modbterm_tbl->getPtr(id);
 }
 }  // namespace odb
    // Generator Code End Cpp

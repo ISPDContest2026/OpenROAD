@@ -12,34 +12,33 @@ namespace odb {
 template <class T>
 class dbId
 {
+  constexpr static unsigned int invalid = 0;
+  unsigned int _id = invalid;
+
  public:
   using _type = T;
 
   dbId() = default;
   dbId(const dbId<T>& id) = default;
-  dbId(unsigned int id) : id_(id) {}
+  dbId(unsigned int id) : _id(id) {}
 
-  operator unsigned int() const { return id_; }
-  unsigned int id() const { return id_; }
+  operator unsigned int() const { return _id; }
+  unsigned int& id() { return _id; }
 
-  bool isValid() const { return id_ != invalid; }
-  void clear() { id_ = invalid; }
+  bool isValid() const { return _id != invalid; }
+  void clear() { _id = invalid; }
 
   friend dbOStream& operator<<(dbOStream& stream, const dbId<T>& id)
   {
-    stream << id.id_;
+    stream << id._id;
     return stream;
   }
 
   friend dbIStream& operator>>(dbIStream& stream, dbId<T>& id)
   {
-    stream >> id.id_;
+    stream >> id._id;
     return stream;
   }
-
- private:
-  constexpr static unsigned int invalid = 0;
-  unsigned int id_ = invalid;
 };
 
 }  // namespace odb

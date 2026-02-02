@@ -1,13 +1,12 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2019-2025, The OpenROAD Authors
 
-#include <cassert>
-
 #include "dbBlock.h"
 #include "dbNet.h"
 #include "dbTable.h"
 #include "dbWire.h"
 #include "dbWireOpcode.h"
+#include "odb/ZException.h"
 #include "odb/db.h"
 #include "odb/dbShape.h"
 #include "odb/dbTypes.h"
@@ -25,9 +24,9 @@ namespace odb {
 //////////////////////////////////////////////////////////////////////////////////
 dbWireShapeItr::dbWireShapeItr()
 {
-  wire_ = nullptr;
-  block_ = nullptr;
-  tech_ = nullptr;
+  _wire = nullptr;
+  _block = nullptr;
+  _tech = nullptr;
 }
 
 dbWireShapeItr::~dbWireShapeItr()
@@ -36,32 +35,32 @@ dbWireShapeItr::~dbWireShapeItr()
 
 inline unsigned char dbWireShapeItr::nextOp(int& value)
 {
-  assert(idx_ < (int) wire_->length());
-  value = wire_->data_[idx_];
-  return wire_->opcodes_[idx_++];
+  ZASSERT(_idx < (int) _wire->length());
+  value = _wire->_data[_idx];
+  return _wire->_opcodes[_idx++];
 }
 
 inline unsigned char dbWireShapeItr::peekOp()
 {
-  assert(idx_ < (int) wire_->length());
-  return wire_->opcodes_[idx_];
+  ZASSERT(_idx < (int) _wire->length());
+  return _wire->_opcodes[_idx];
 }
 
 void dbWireShapeItr::begin(dbWire* wire)
 {
-  wire_ = (_dbWire*) wire;
-  block_ = wire->getBlock();
-  tech_ = block_->getTech();
-  idx_ = 0;
-  prev_x_ = 0;
-  prev_y_ = 0;
-  prev_ext_ = 0;
-  has_prev_ext_ = false;
-  layer_ = nullptr;
-  via_ = nullptr;
-  dw_ = 0;
-  point_cnt_ = 0;
-  has_width_ = false;
+  _wire = (_dbWire*) wire;
+  _block = wire->getBlock();
+  _tech = _block->getTech();
+  _idx = 0;
+  _prev_x = 0;
+  _prev_y = 0;
+  _prev_ext = 0;
+  _has_prev_ext = false;
+  _layer = nullptr;
+  _via = nullptr;
+  _dw = 0;
+  _point_cnt = 0;
+  _has_width = false;
 }
 
 bool dbWireShapeItr::next(dbShape& shape)
@@ -69,9 +68,9 @@ bool dbWireShapeItr::next(dbShape& shape)
   int operand;
 
 nextOpCode:
-  shape_id_ = idx_;
+  _shape_id = _idx;
 
-  if (idx_ == (int) wire_->opcodes_.size()) {
+  if (_idx == (int) _wire->_opcodes.size()) {
     return false;
   }
 
@@ -81,38 +80,38 @@ nextOpCode:
     case WOP_PATH:
     case WOP_SHORT:
     case WOP_VWIRE: {
-      layer_ = dbTechLayer::getTechLayer(tech_, operand);
-      point_cnt_ = 0;
-      dw_ = layer_->getWidth() >> 1;
+      _layer = dbTechLayer::getTechLayer(_tech, operand);
+      _point_cnt = 0;
+      _dw = _layer->getWidth() >> 1;
       goto nextOpCode;
     }
 
     case WOP_JUNCTION: {
       WirePoint pnt;
       getPrevPoint(
-          tech_, block_, wire_->opcodes_, wire_->data_, operand, true, pnt);
-      layer_ = pnt.layer;
-      prev_x_ = pnt.x;
-      prev_y_ = pnt.y;
-      prev_ext_ = 0;
-      has_prev_ext_ = false;
-      point_cnt_ = 0;
-      dw_ = layer_->getWidth() >> 1;
+          _tech, _block, _wire->_opcodes, _wire->_data, operand, true, pnt);
+      _layer = pnt._layer;
+      _prev_x = pnt._x;
+      _prev_y = pnt._y;
+      _prev_ext = 0;
+      _has_prev_ext = false;
+      _point_cnt = 0;
+      _dw = _layer->getWidth() >> 1;
       goto nextOpCode;
     }
 
     case WOP_RULE: {
       if (opcode & WOP_BLOCK_RULE) {
         dbTechLayerRule* rule
-            = dbTechLayerRule::getTechLayerRule(block_, operand);
-        dw_ = rule->getWidth() >> 1;
+            = dbTechLayerRule::getTechLayerRule(_block, operand);
+        _dw = rule->getWidth() >> 1;
       } else {
         dbTechLayerRule* rule
-            = dbTechLayerRule::getTechLayerRule(tech_, operand);
-        dw_ = rule->getWidth() >> 1;
+            = dbTechLayerRule::getTechLayerRule(_tech, operand);
+        _dw = rule->getWidth() >> 1;
       }
 
-      has_width_ = true;
+      _has_width = true;
       goto nextOpCode;
     }
 
@@ -120,10 +119,10 @@ nextOpCode:
       int cur_x = operand;
       int cur_y;
 
-      if (point_cnt_ == 0) {
+      if (_point_cnt == 0) {
         opcode = nextOp(cur_y);
       } else {
-        cur_y = prev_y_;
+        cur_y = _prev_y;
       }
 
       int cur_ext;
@@ -137,41 +136,41 @@ nextOpCode:
         has_cur_ext = false;
       }
 
-      if (point_cnt_++ == 0) {
-        prev_x_ = cur_x;
-        prev_y_ = cur_y;
-        prev_ext_ = cur_ext;
-        has_prev_ext_ = has_cur_ext;
+      if (_point_cnt++ == 0) {
+        _prev_x = cur_x;
+        _prev_y = cur_y;
+        _prev_ext = cur_ext;
+        _has_prev_ext = has_cur_ext;
         goto nextOpCode;
       }
-      auto dw = dw_;
-      if (!has_width_ && layer_->getDirection() == dbTechLayerDir::VERTICAL) {
-        dw = layer_->getWrongWayWidth() / 2;
+      auto dw = _dw;
+      if (!_has_width && _layer->getDirection() == dbTechLayerDir::VERTICAL) {
+        dw = _layer->getWrongWayWidth() / 2;
       }
 
-      shape.setSegment(prev_x_,
-                       prev_y_,
-                       prev_ext_,
-                       has_prev_ext_,
+      shape.setSegment(_prev_x,
+                       _prev_y,
+                       _prev_ext,
+                       _has_prev_ext,
                        cur_x,
                        cur_y,
                        cur_ext,
                        has_cur_ext,
                        dw,
-                       dw_,
-                       layer_);
-      prev_x_ = cur_x;
-      prev_y_ = cur_y;
-      prev_ext_ = cur_ext;
-      has_prev_ext_ = has_cur_ext;
+                       _dw,
+                       _layer);
+      _prev_x = cur_x;
+      _prev_y = cur_y;
+      _prev_ext = cur_ext;
+      _has_prev_ext = has_cur_ext;
       return true;
     }
 
     case WOP_Y: {
-      assert(point_cnt_ != 0);
-      point_cnt_++;
+      ZASSERT(_point_cnt != 0);
+      _point_cnt++;
       int cur_y = operand;
-      int cur_x = prev_x_;
+      int cur_x = _prev_x;
       int cur_ext;
       bool has_cur_ext;
 
@@ -182,81 +181,81 @@ nextOpCode:
         cur_ext = 0;
         has_cur_ext = false;
       }
-      auto dw = dw_;
+      auto dw = _dw;
 
-      if (!has_width_ && layer_->getDirection() == dbTechLayerDir::HORIZONTAL) {
-        dw = layer_->getWrongWayWidth() / 2;
+      if (!_has_width && _layer->getDirection() == dbTechLayerDir::HORIZONTAL) {
+        dw = _layer->getWrongWayWidth() / 2;
       }
-      shape.setSegment(prev_x_,
-                       prev_y_,
-                       prev_ext_,
-                       has_prev_ext_,
+      shape.setSegment(_prev_x,
+                       _prev_y,
+                       _prev_ext,
+                       _has_prev_ext,
                        cur_x,
                        cur_y,
                        cur_ext,
                        has_cur_ext,
                        dw,
-                       dw_,
-                       layer_);
-      prev_x_ = cur_x;
-      prev_y_ = cur_y;
-      prev_ext_ = cur_ext;
-      has_prev_ext_ = has_cur_ext;
+                       _dw,
+                       _layer);
+      _prev_x = cur_x;
+      _prev_y = cur_y;
+      _prev_ext = cur_ext;
+      _has_prev_ext = has_cur_ext;
       return true;
     }
 
     case WOP_COLINEAR: {
-      point_cnt_++;
+      _point_cnt++;
 
       // A colinear-point with an extension begins a new path-segment
       if (opcode & WOP_EXTENSION) {
-        prev_ext_ = operand;
-        has_prev_ext_ = true;
+        _prev_ext = operand;
+        _has_prev_ext = true;
         goto nextOpCode;
       }
 
       // A colinear-point following an extension cancels the ext
-      if (has_prev_ext_) {
-        prev_ext_ = 0;
-        has_prev_ext_ = false;
+      if (_has_prev_ext) {
+        _prev_ext = 0;
+        _has_prev_ext = false;
         goto nextOpCode;
       }
 
-      if (point_cnt_ > 1) {
-        shape.setSegment(prev_x_,
-                         prev_y_,
-                         prev_ext_,
-                         has_prev_ext_,
-                         prev_x_,
-                         prev_y_,
+      if (_point_cnt > 1) {
+        shape.setSegment(_prev_x,
+                         _prev_y,
+                         _prev_ext,
+                         _has_prev_ext,
+                         _prev_x,
+                         _prev_y,
                          0,
                          false,
-                         dw_,
-                         dw_,
-                         layer_);
-        has_prev_ext_ = false;
+                         _dw,
+                         _dw,
+                         _layer);
+        _has_prev_ext = false;
         return true;
       }
 
-      has_prev_ext_ = false;
+      _has_prev_ext = false;
       goto nextOpCode;
     }
 
     case WOP_VIA: {
-      dbVia* via = dbVia::getVia(block_, operand);
+      dbVia* via = dbVia::getVia(_block, operand);
 
       if (opcode & WOP_VIA_EXIT_TOP) {
-        layer_ = via->getTopLayer();
+        _layer = via->getTopLayer();
       } else {
-        layer_ = via->getBottomLayer();
+        _layer = via->getBottomLayer();
       }
 
-      if (has_width_ == false) {
-        dw_ = layer_->getWidth() >> 1;
+      if (_has_width == false) {
+        _dw = _layer->getWidth() >> 1;
       }
 
-      prev_ext_ = 0;
-      has_prev_ext_ = false;
+      _prev_ext = 0;
+      _has_prev_ext = false;
 
       dbBox* box = via->getBBox();
 
@@ -265,30 +264,30 @@ nextOpCode:
       }
 
       Rect b = box->getBox();
-      int xmin = b.xMin() + prev_x_;
-      int ymin = b.yMin() + prev_y_;
-      int xmax = b.xMax() + prev_x_;
-      int ymax = b.yMax() + prev_y_;
+      int xmin = b.xMin() + _prev_x;
+      int ymin = b.yMin() + _prev_y;
+      int xmax = b.xMax() + _prev_x;
+      int ymax = b.yMax() + _prev_y;
       Rect r(xmin, ymin, xmax, ymax);
       shape.setVia(via, r);
       return true;
     }
 
     case WOP_TECH_VIA: {
-      dbTechVia* via = dbTechVia::getTechVia(tech_, operand);
+      dbTechVia* via = dbTechVia::getTechVia(_tech, operand);
 
       if (opcode & WOP_VIA_EXIT_TOP) {
-        layer_ = via->getTopLayer();
+        _layer = via->getTopLayer();
       } else {
-        layer_ = via->getBottomLayer();
+        _layer = via->getBottomLayer();
       }
 
-      if (has_width_ == false) {
-        dw_ = layer_->getWidth() >> 1;
+      if (_has_width == false) {
+        _dw = _layer->getWidth() >> 1;
       }
 
-      prev_ext_ = 0;
-      has_prev_ext_ = false;
+      _prev_ext = 0;
+      _has_prev_ext = false;
 
       dbBox* box = via->getBBox();
 
@@ -297,10 +296,10 @@ nextOpCode:
       }
 
       Rect b = box->getBox();
-      int xmin = b.xMin() + prev_x_;
-      int ymin = b.yMin() + prev_y_;
-      int xmax = b.xMax() + prev_x_;
-      int ymax = b.yMax() + prev_y_;
+      int xmin = b.xMin() + _prev_x;
+      int ymin = b.yMin() + _prev_y;
+      int xmax = b.xMax() + _prev_x;
+      int ymax = b.yMax() + _prev_y;
       Rect r(xmin, ymin, xmax, ymax);
       shape.setVia(via, r);
       return true;
@@ -314,11 +313,11 @@ nextOpCode:
       nextOp(deltaY1);
       nextOp(deltaX2);
       nextOp(deltaY2);
-      shape.setSegmentFromRect(prev_x_ + deltaX1,
-                               prev_y_ + deltaY1,
-                               prev_x_ + deltaX2,
-                               prev_y_ + deltaY2,
-                               layer_);
+      shape.setSegmentFromRect(_prev_x + deltaX1,
+                               _prev_y + deltaY1,
+                               _prev_x + deltaX2,
+                               _prev_y + deltaY2,
+                               _layer);
       return true;
     }
 
@@ -332,7 +331,7 @@ nextOpCode:
       goto nextOpCode;
 
     default:
-      assert(DB_WIRE_DECODE_INVALID_OPCODE);
+      ZASSERT(DB_WIRE_DECODE_INVALID_OPCODE);
       goto nextOpCode;
   }
 
@@ -341,7 +340,7 @@ nextOpCode:
 
 int dbWireShapeItr::getShapeId()
 {
-  return shape_id_;
+  return _shape_id;
 }
 
 }  // namespace odb

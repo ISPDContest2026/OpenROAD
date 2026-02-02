@@ -132,9 +132,6 @@ void _dbMarkerCategory::collectMemInfo(MemInfo& info)
 
 _dbMarkerCategory::~_dbMarkerCategory()
 {
-  if (name_) {
-    free((void*) name_);
-  }
   delete marker_tbl_;
   delete categories_tbl_;
 }
@@ -788,7 +785,7 @@ dbMarkerCategory* dbMarkerCategory::create(dbChip* chip, const char* name)
 
   _dbBlock* block = (_dbBlock*) chip->getBlock();
   if (block) {
-    for (auto cb : block->callbacks_) {
+    for (auto cb : block->_callbacks) {
       cb->inDbMarkerCategoryCreate((dbMarkerCategory*) _category);
     }
   }
@@ -857,7 +854,7 @@ dbMarkerCategory* dbMarkerCategory::create(dbMarkerCategory* category,
 
   _dbBlock* block = parent->getBlock();
   if (block) {
-    for (auto cb : block->callbacks_) {
+    for (auto cb : block->_callbacks) {
       cb->inDbMarkerCategoryCreate((dbMarkerCategory*) _category);
     }
   }
@@ -896,7 +893,7 @@ void dbMarkerCategory::destroy(dbMarkerCategory* category)
   if (_category->isTopCategory()) {
     _dbChip* _chip = (_dbChip*) _category->getOwner();
     if (_category->getBlock()) {
-      for (auto cb : _category->getBlock()->callbacks_) {
+      for (auto cb : _category->getBlock()->_callbacks) {
         cb->inDbMarkerCategoryDestroy(category);
       }
     }
@@ -908,7 +905,7 @@ void dbMarkerCategory::destroy(dbMarkerCategory* category)
 
     _dbBlock* block = parent->getBlock();
     if (block) {
-      for (auto cb : block->callbacks_) {
+      for (auto cb : block->_callbacks) {
         cb->inDbMarkerCategoryDestroy(category);
       }
     }

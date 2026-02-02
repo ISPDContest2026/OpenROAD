@@ -6,7 +6,6 @@
 #include "{{itr.parentObject}}.h"
 #include "dbTable.h"
 #include "dbTable.hpp"
-#include "odb/odb.h"
 {% for include in itr.includes %}
   #include "{{include}}"
 {% endfor %}
@@ -22,12 +21,12 @@ namespace odb {
 ////////////////////////////////////////////////////////////////////
 
 
-bool {{itr.name}}::reversible() const
+bool {{itr.name}}::reversible()
 {
   return {{itr.reversible}};
 }
 
-bool {{itr.name}}::orderReversed() const
+bool {{itr.name}}::orderReversed()
 {
   return {{itr.orderReversed}};
 }
@@ -38,12 +37,12 @@ void {{itr.name}}::reverse(dbObject* parent)
   //User Code End reverse
 }
 
-uint {{itr.name}}::sequential() const
+uint {{itr.name}}::sequential()
 {
   return {{itr.sequential}};
 }
 
-uint {{itr.name}}::size(dbObject* parent) const
+uint {{itr.name}}::size(dbObject* parent)
 {
   uint id;
   uint cnt = 0;
@@ -56,18 +55,18 @@ uint {{itr.name}}::size(dbObject* parent) const
   return cnt;
 }
 
-uint {{itr.name}}::begin(dbObject* parent) const
+uint {{itr.name}}::begin(dbObject* parent)
 {
   //User Code Begin begin
   //User Code End begin
 }
 
-uint {{itr.name}}::end(dbObject* /* unused: parent */) const
+uint {{itr.name}}::end(dbObject* /* unused: parent */)
 {
   return 0;
 }
 
-uint {{itr.name}}::next(uint id, ...) const
+uint {{itr.name}}::next(uint id, ...)
 {
   //User Code Begin next
   //User Code End next
@@ -75,7 +74,7 @@ uint {{itr.name}}::next(uint id, ...) const
 
 dbObject* {{itr.name}}::getObject(uint id, ...)
 {
-  return {{itr.tableName}}_->getPtr(id);
+  return _{{itr.tableName}}->getPtr(id);
 }
 // User Code Begin Methods
 // User Code End Methods

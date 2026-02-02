@@ -8,19 +8,19 @@
     },
     {
       "type": "bit",
-      "name": "except_non_filler_in_between"
+      "name": "except_non_filler_in_between_"
     },
     {
       "type": "bit",
-      "name": "optional"
+      "name": "optional_"
     },
     {
       "type": "bit",
-      "name": "soft"
+      "name": "soft_"
     },
     {
       "type": "bit",
-      "name": "exact"
+      "name": "exact_"
     },
     {
       "type": "std::string",
@@ -32,7 +32,7 @@
     },
     {
       "type": "int",
-      "name": "spacing_",
+      "name": "spacing",
       "default" : -1
     }
   ],

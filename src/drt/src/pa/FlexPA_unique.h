@@ -75,7 +75,6 @@ class UniqueClass
   frInst* getFirstInst() const;
   bool isSkipTerm(frMTerm* term) const;
   void setSkipTerm(frMTerm* term, bool skip);
-  bool isInitialized() const { return pin_access_idx_ != -1; }
 
  private:
   UniqueClassKey key_;

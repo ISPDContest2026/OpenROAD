@@ -322,13 +322,6 @@ class GlobalRouter
   std::vector<std::pair<int, int>> calcLayerPitches(int max_layer);
   void initRoutingTracks(int max_routing_layer);
   void setCapacities(int min_routing_layer, int max_routing_layer);
-  int computeGCellCapacity(int x,
-                           int y,
-                           int track_init,
-                           int track_pitch,
-                           int track_count,
-                           bool horizontal);
-  odb::Rect getGCellRect(int x, int y);
   void initNetlist(std::vector<Net*>& nets);
   void makeFastrouteNet(Net* net);
   bool pinPositionsChanged(Net* net);
@@ -339,10 +332,11 @@ class GlobalRouter
       std::map<int, std::vector<odb::Rect>>& layer_obs_map);
   void adjustTileSet(const TileSet& tiles_to_reduce,
                      odb::dbTechLayer* tech_layer);
+  void computeGridAdjustments(int min_routing_layer, int max_routing_layer);
+  void computeTrackAdjustments(int min_routing_layer, int max_routing_layer);
   void computeUserGlobalAdjustments(int min_routing_layer,
                                     int max_routing_layer);
-  void computeUserLayerAdjustments(int min_routing_layer,
-                                   int max_routing_layer);
+  void computeUserLayerAdjustments(int max_routing_layer);
   void computeRegionAdjustments(const odb::Rect& region,
                                 int layer,
                                 float reduction_percentage);
@@ -441,10 +435,9 @@ class GlobalRouter
 
   // db functions
   void initGrid(int max_layer);
+  void computeCapacities(int max_layer);
   void findTrackPitches(int max_layer);
   std::vector<Net*> findNets(bool init_clock_nets);
-  void findClockNets(const std::vector<Net*>& nets,
-                     std::set<odb::dbNet*>& clock_nets);
   void computeObstructionsAdjustments();
   void findLayerExtensions(std::vector<int>& layer_extensions);
   int findObstructions(odb::Rect& die_area);
@@ -471,6 +464,7 @@ class GlobalRouter
   void initClockNets();
   bool isClkTerm(odb::dbITerm* iterm, sta::dbNetwork* network);
   void initGridAndNets();
+  void ensureLayerForGuideDimension(int max_routing_layer);
   void configFastRoute();
 
   utl::Logger* logger_;
@@ -494,6 +488,7 @@ class GlobalRouter
   // Flow variables
   bool is_incremental_;
   float adjustment_;
+  int layer_for_guide_dimension_;
   int congestion_iterations_{50};
   int congestion_report_iter_step_;
   bool allow_congestion_;

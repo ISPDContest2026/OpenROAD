@@ -96,11 +96,11 @@ class GDSWriter
   void writeTextPres(const dbGDSTextPres& pres);
 
   /** Output filestream */
-  std::ofstream file_;
+  std::ofstream _file;
   /** Current dbGDSLib object */
-  dbGDSLib* lib_{nullptr};
+  dbGDSLib* _lib{nullptr};
 
-  utl::Logger* logger_{nullptr};
+  utl::Logger* _logger{nullptr};
 };
 
 }  // namespace odb::gds

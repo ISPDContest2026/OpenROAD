@@ -4,18 +4,18 @@
   "fields": [
     {
       "type": "bit",
-      "name": "corner_type",
+      "name": "corner_type_",
       "flags": [
         "private"
       ]
     },
     {
       "type": "bit",
-      "name": "same_mask"
+      "name": "same_mask_"
     },
     {
       "type": "bit",
-      "name": "corner_only"
+      "name": "corner_only_"
     },
     {
       "type": "int",
@@ -24,7 +24,7 @@
     },
     {
       "type": "bit",
-      "name": "except_eol"
+      "name": "except_eol_"
     },
     {
       "type": "int",
@@ -33,7 +33,7 @@
     },
     {
       "type": "bit",
-      "name": "except_jog_length"
+      "name": "except_jog_length_"
     },
     {
       "type": "int",
@@ -42,7 +42,7 @@
     },
     {
       "type": "bit",
-      "name": "edge_length_valid"
+      "name": "edge_length_valid_"
     },
     {
       "type": "int",
@@ -51,11 +51,11 @@
     },
     {
       "type": "bit",
-      "name": "include_shape"
+      "name": "include_shape_"
     },
     {
       "type": "bit",
-      "name": "min_length_valid"
+      "name": "min_length_valid_"
     },
     {
       "type": "int",
@@ -64,11 +64,11 @@
     },
     {
       "type": "bit",
-      "name": "except_notch"
+      "name": "except_notch_"
     },
     {
       "type": "bit",
-      "name": "except_notch_length_valid"
+      "name": "except_notch_length_valid_"
     },
     {
       "type": "int",
@@ -77,15 +77,15 @@
     },
     {
       "type": "bit",
-      "name": "except_same_net"
+      "name": "except_same_net_"
     },
     {
       "type": "bit",
-      "name": "except_same_metal"
+      "name": "except_same_metal_"
     },
     {
       "type": "bit",
-      "name": "corner_to_corner"
+      "name": "corner_to_corner_"
     }
   ],
   "enums": [

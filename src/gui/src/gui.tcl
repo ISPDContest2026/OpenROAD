@@ -142,13 +142,12 @@ sta::define_cmd_args "save_animated_gif" {-start|-add|-end \
                                           [-width width] \
                                           [-resolution microns_per_pixel] \
                                           [-delay delay] \
-                                          [-key key] \
                                           [path]
 }
 
 proc save_animated_gif { args } {
   sta::parse_key_args "save_animated_gif" args \
-    keys {-area -width -resolution -delay -key} flags {-start -end -add}
+    keys {-area -width -resolution -delay} flags {-start -end -add}
 
   set resolution 0
   if { [info exists keys(-resolution)] } {
@@ -190,24 +189,19 @@ proc save_animated_gif { args } {
     set delay $keys(-delay)
   }
 
-  set key -1
-  if { [info exists keys(-key)] } {
-    set key $keys(-key)
-  }
-
   if { [info exists flags(-start)] } {
     sta::check_argc_eq1 "save_animated_gif" $args
     set path [lindex $args 0]
 
-    return [gui::gif_start $path]
+    gui::gif_start $path
   } elseif { [info exists flags(-add)] } {
     sta::check_argc_eq0 "save_animated_gif" $args
 
-    gui::gif_add $key {*}$area $width $resolution $delay
+    gui::gif_add {*}$area $width $resolution $delay
   } elseif { [info exists flags(-end)] } {
     sta::check_argc_eq0 "save_animated_gif" $args
 
-    gui::gif_end $key
+    gui::gif_end
   } else {
     utl::error GUI 106 "-start, -end, or -add is required"
   }

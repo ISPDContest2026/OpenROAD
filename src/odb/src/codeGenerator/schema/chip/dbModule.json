@@ -13,31 +13,31 @@
 	    "flags":["no-set","no-get"]
 	},
 	{
-	    "name":"insts_",
+	    "name":"_insts",
 	    "type":"dbId<_dbInst>",
 	    "flags":["no-set","no-get"],
 	    "parent":"dbBlock"
 	},
 	{
-	    "name":"mod_inst_",
+	    "name":"_mod_inst",
 	    "type":"dbId<_dbModInst>",
 	    "parent":"dbBlock"
 	},
 	{
-	    "name":"modinsts_",
+	    "name":"_modinsts",
 	    "type":"dbId<_dbModInst>",
 	    "flags":["no-set","no-get"],
 	    "parent":"dbBlock"
 	},
 	{
-	    "name":"modnets_",
+	    "name":"_modnets",
 	    "type":"dbId<_dbModNet>",
 	    "flags":["no-set","no-get"],
 	    "schema":"db_schema_update_hierarchy",	    	
 	    "parent":"dbBlock"
 	},
 	{
-	    "name":"modbterms_",
+	    "name":"_modbterms",
 	    "type":"dbId<_dbModBTerm>",
 	    "flags":["no-set","no-get"],
 	    "schema":"db_schema_update_hierarchy"	    	    	

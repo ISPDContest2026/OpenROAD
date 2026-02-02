@@ -18,12 +18,12 @@ namespace odb {
 //
 ////////////////////////////////////////////////////////////////////
 
-bool dbRSegItr::reversible() const
+bool dbRSegItr::reversible()
 {
   return true;
 }
 
-bool dbRSegItr::orderReversed() const
+bool dbRSegItr::orderReversed()
 {
   return true;
 }
@@ -31,26 +31,26 @@ bool dbRSegItr::orderReversed() const
 void dbRSegItr::reverse(dbObject* parent)
 {
   _dbNet* net = (_dbNet*) parent;
-  uint id = net->r_segs_;
+  uint id = net->_r_segs;
   uint list = 0;
 
   while (id != 0) {
     _dbRSeg* seg = _seg_tbl->getPtr(id);
-    uint n = seg->next_;
-    seg->next_ = list;
+    uint n = seg->_next;
+    seg->_next = list;
     list = id;
     id = n;
   }
 
-  net->r_segs_ = list;
+  net->_r_segs = list;
 }
 
-uint dbRSegItr::sequential() const
+uint dbRSegItr::sequential()
 {
   return 0;
 }
 
-uint dbRSegItr::size(dbObject* parent) const
+uint dbRSegItr::size(dbObject* parent)
 {
   uint id;
   uint cnt = 0;
@@ -63,25 +63,25 @@ uint dbRSegItr::size(dbObject* parent) const
   return cnt;
 }
 
-uint dbRSegItr::begin(dbObject* parent) const
+uint dbRSegItr::begin(dbObject* parent)
 {
   _dbNet* net = (_dbNet*) parent;
-  if (net->r_segs_ == 0) {
+  if (net->_r_segs == 0) {
     return 0;
   }
-  _dbRSeg* seg = _seg_tbl->getPtr(net->r_segs_);
-  return seg->next_;
+  _dbRSeg* seg = _seg_tbl->getPtr(net->_r_segs);
+  return seg->_next;
 }
 
-uint dbRSegItr::end(dbObject* /* unused: parent */) const
+uint dbRSegItr::end(dbObject* /* unused: parent */)
 {
   return 0;
 }
 
-uint dbRSegItr::next(uint id, ...) const
+uint dbRSegItr::next(uint id, ...)
 {
   _dbRSeg* seg = _seg_tbl->getPtr(id);
-  return seg->next_;
+  return seg->_next;
 }
 
 dbObject* dbRSegItr::getObject(uint id, ...)

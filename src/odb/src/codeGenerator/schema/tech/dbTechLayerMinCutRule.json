@@ -4,7 +4,7 @@
   "fields": [
     {
       "type": "bit",
-      "name": "per_cut_class"
+      "name": "per_cut_class_"
     },
     {
       "type": "int",
@@ -32,15 +32,15 @@
     },
     {
       "type": "bit",
-      "name": "from_above"
+      "name": "from_above_"
     },
     {
       "type": "bit",
-      "name": "from_below"
+      "name": "from_below_"
     },
     {
       "type": "bit",
-      "name": "length_valid"
+      "name": "length_valid_"
     },
     {
       "type": "int",
@@ -54,7 +54,7 @@
     },
     {
       "type": "bit",
-      "name": "area_valid"
+      "name": "area_valid_"
     },
     {
       "type": "int",
@@ -63,7 +63,7 @@
     },
     {
       "type": "bit",
-      "name": "area_within_dist_valid"
+      "name": "area_within_dist_valid_"
     },
     {
       "type": "int",
@@ -76,7 +76,7 @@
     },
     {
       "type": "bit",
-      "name": "fully_enclosed"
+      "name": "fully_enclosed_"
     }
   ],
   "cpp_includes": [

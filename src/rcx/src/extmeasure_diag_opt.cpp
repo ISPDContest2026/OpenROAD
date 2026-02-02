@@ -3,7 +3,7 @@
 
 #include <cstdio>
 
-#include "rcx/array1.h"
+#include "odb/array1.h"
 #include "rcx/dbUtil.h"
 #include "rcx/extMeasureRC.h"
 #include "rcx/extRCap.h"
@@ -15,6 +15,7 @@
 // #define CHECK_SAME_NET
 // #define MIN_FOR_LOOPS
 
+using odb::Ath__array1D;
 using utl::RCX;
 
 namespace rcx {

@@ -16,21 +16,21 @@ class dbChipConnItr : public dbIterator
  public:
   dbChipConnItr(dbTable<_dbChipConn>* chip_conn_tbl)
   {
-    chip_conn_tbl_ = chip_conn_tbl;
+    _chip_conn_tbl = chip_conn_tbl;
   }
 
-  bool reversible() const override;
-  bool orderReversed() const override;
+  bool reversible() override;
+  bool orderReversed() override;
   void reverse(dbObject* parent) override;
-  uint sequential() const override;
-  uint size(dbObject* parent) const override;
-  uint begin(dbObject* parent) const override;
-  uint end(dbObject* parent) const override;
-  uint next(uint id, ...) const override;
+  uint sequential() override;
+  uint size(dbObject* parent) override;
+  uint begin(dbObject* parent) override;
+  uint end(dbObject* parent) override;
+  uint next(uint id, ...) override;
   dbObject* getObject(uint id, ...) override;
 
  private:
-  dbTable<_dbChipConn>* chip_conn_tbl_;
+  dbTable<_dbChipConn>* _chip_conn_tbl;
 };
 
 }  // namespace odb

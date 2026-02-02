@@ -125,8 +125,6 @@ class dbBlockCallBackObj
 
   // dbBPin Start
   virtual void inDbBPinCreate(dbBPin*) {}
-  virtual void inDbBPinAddBox(dbBox*) {}
-  virtual void inDbBPinRemoveBox(dbBox*) {}
   virtual void inDbBPinDestroy(dbBPin*) {}
   // dbBPin End
 
@@ -203,14 +201,14 @@ class dbBlockCallBackObj
 
   // Manipulate _callback list of owner -- in journal.cpp
   void addOwner(dbBlock* new_owner);
-  bool hasOwner() const { return (owner_ != nullptr); }
+  bool hasOwner() const { return (_owner != nullptr); }
   void removeOwner();
 
-  dbBlockCallBackObj() { owner_ = nullptr; }
+  dbBlockCallBackObj() { _owner = nullptr; }
   virtual ~dbBlockCallBackObj() { removeOwner(); }
 
  private:
-  dbBlock* owner_;
+  dbBlock* _owner;
 };
 
 }  // namespace odb

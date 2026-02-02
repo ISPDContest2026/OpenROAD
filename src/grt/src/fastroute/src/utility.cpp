@@ -6,7 +6,6 @@
 #include <cstdint>
 #include <cstdio>
 #include <limits>
-#include <map>
 #include <ostream>
 #include <queue>
 #include <random>
@@ -340,66 +339,6 @@ void FastRouteCore::fillVIA()
   }
 }
 
-void FastRouteCore::ensurePinCoverage()
-{
-  for (const int& net_id : net_ids_) {
-    auto& treeedges = sttrees_[net_id].edges;
-    const auto& treenodes = sttrees_[net_id].nodes;
-    const int num_edges = sttrees_[net_id].num_edges();
-    const int num_terminals = sttrees_[net_id].num_terminals;
-
-    std::map<odb::Point, std::pair<int16_t, int16_t>> pin_pos_to_layer_range;
-    for (int i = 0; i < num_terminals; i++) {
-      odb::Point pin_pos(treenodes[i].x, treenodes[i].y);
-      pin_pos_to_layer_range[pin_pos] = {num_layers_, -1};
-    }
-
-    for (int edgeID = 0; edgeID < num_edges; edgeID++) {
-      const TreeEdge* treeedge = &(treeedges[edgeID]);
-      if (treeedge->len > 0 || treeedge->route.routelen > 0) {
-        int routeLen = treeedge->route.routelen;
-        const std::vector<GPoint3D>& grids = treeedge->route.grids;
-        for (int i = 0; i <= routeLen; i++) {
-          odb::Point node_pos(grids[i].x, grids[i].y);
-          if (pin_pos_to_layer_range.find(node_pos)
-              != pin_pos_to_layer_range.end()) {
-            pin_pos_to_layer_range[node_pos].first = std::min(
-                pin_pos_to_layer_range[node_pos].first, grids[i].layer);
-            pin_pos_to_layer_range[node_pos].second = std::max(
-                pin_pos_to_layer_range[node_pos].second, grids[i].layer);
-          }
-        }
-      }
-    }
-
-    for (int pin_idx = 0; pin_idx < num_terminals; pin_idx++) {
-      const TreeNode& pin_node = treenodes[pin_idx];
-      odb::Point pin_pos(pin_node.x, pin_node.y);
-      auto [min_layer, max_layer] = pin_pos_to_layer_range[pin_pos];
-      if (pin_node.botL < min_layer || pin_node.botL > max_layer) {
-        Route via_route;
-        via_route.type = RouteType::MazeRoute;
-        if (pin_node.botL < min_layer) {
-          via_route.routelen = min_layer - pin_node.botL;
-          for (int16_t l = pin_node.botL; l <= min_layer; l++) {
-            via_route.grids.push_back({pin_node.x, pin_node.y, l});
-          }
-        } else {
-          via_route.routelen = pin_node.botL - max_layer;
-          for (int16_t l = max_layer; l <= pin_node.botL; l++) {
-            via_route.grids.push_back({pin_node.x, pin_node.y, l});
-          }
-        }
-
-        TreeEdge new_edge;
-        new_edge.assigned = true;
-        new_edge.route = std::move(via_route);
-        treeedges.emplace_back(new_edge);
-      }
-    }
-  }
-}
-
 /*returns the start and end of the stack necessary to reach a node*/
 void FastRouteCore::getViaStackRange(const int netID,
                                      const int nodeID,
@@ -563,11 +502,6 @@ int FastRouteCore::getViaResistance(const int from_layer, const int to_layer)
   return std::ceil(total_via_resistance / default_res);
 }
 
-void FastRouteCore::setIncrementalGrt(bool is_incremental)
-{
-  is_incremental_grt_ = is_incremental;
-}
-
 // Update and sort the nets by the worst slack. Finally pick a percentage of the
 // nets to use the resistance-aware strategy
 void FastRouteCore::updateSlacks(float percentage)
@@ -586,16 +520,10 @@ void FastRouteCore::updateSlacks(float percentage)
 
   for (const int net_id : net_ids_) {
     FrNet* net = nets_[net_id];
-    float slack = 0;
 
-    // TODO: Do not update slack during rsz repair
-    // if (en_estimate_parasitics_) {
-    slack = getNetSlack(net->getDbNet());
-    // }
+    const float slack = getNetSlack(net->getDbNet());
     net->setSlack(slack);
-
-    // Enable res-aware for clock nets by default
-    net->setIsResAware(net->isClock());
+    net->setIsResAware(false);
 
     // Skip positive slacks above threshold
     // TODO: need to check this positive slack threshold
@@ -611,11 +539,6 @@ void FastRouteCore::updateSlacks(float percentage)
         };
 
   std::stable_sort(res_aware_list.begin(), res_aware_list.end(), compareSlack);
-
-  // During incremental grt, enable res-aware for all nets
-  if (is_incremental_grt_) {
-    percentage = 1;
-  }
 
   // Decide the percentage of nets that will use resistance aware
   for (int i = 0; i < res_aware_list.size() * percentage; i++) {
@@ -2892,7 +2815,7 @@ int FastRouteCore::splitEdge(std::vector<TreeEdge>& treeedges,
   new_node.edge[1] = new_edge_id;
   new_node.edge[2] = edge_n1n2;
 
-  treeedges.push_back(std::move(new_edge));
+  treeedges.push_back(new_edge);
   treenodes.push_back(new_node);
 
   return new_node_id;

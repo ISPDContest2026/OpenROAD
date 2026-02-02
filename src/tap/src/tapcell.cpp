@@ -130,7 +130,7 @@ int Tapcell::placeTapcells(odb::dbMaster* tapcell_master, const int dist)
 
   std::vector<odb::dbInst*> fixed_insts;
   for (auto* inst : db_->getChip()->getBlock()->getInsts()) {
-    if (inst->isFixed() && !inst->getMaster()->isCover()) {
+    if (inst->isFixed()) {
       fixed_insts.push_back(inst);
     }
   }

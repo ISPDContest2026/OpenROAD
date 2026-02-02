@@ -27,11 +27,11 @@ template class dbTable<_dbRow>;
 
 bool _dbRow::operator==(const _dbRow& rhs) const
 {
-  if (flags_.orient != rhs.flags_.orient) {
+  if (flags_._orient != rhs.flags_._orient) {
     return false;
   }
 
-  if (flags_.dir != rhs.flags_.dir) {
+  if (flags_._dir != rhs.flags_._dir) {
     return false;
   }
 
@@ -43,27 +43,27 @@ bool _dbRow::operator==(const _dbRow& rhs) const
     return false;
   }
 
-  if (lib_ != rhs.lib_) {
+  if (_lib != rhs._lib) {
     return false;
   }
 
-  if (site_ != rhs.site_) {
+  if (_site != rhs._site) {
     return false;
   }
 
-  if (x_ != rhs.x_) {
+  if (_x != rhs._x) {
     return false;
   }
 
-  if (y_ != rhs.y_) {
+  if (_y != rhs._y) {
     return false;
   }
 
-  if (site_cnt_ != rhs.site_cnt_) {
+  if (_site_cnt != rhs._site_cnt) {
     return false;
   }
 
-  if (spacing_ != rhs.spacing_) {
+  if (_spacing != rhs._spacing) {
     return false;
   }
 
@@ -82,59 +82,59 @@ bool _dbRow::operator<(const _dbRow& rhs) const
     return false;
   }
 
-  if (site_ < rhs.site_) {
+  if (_site < rhs._site) {
     return true;
   }
 
-  if (site_ > rhs.site_) {
+  if (_site > rhs._site) {
     return false;
   }
 
-  if (x_ < rhs.x_) {
+  if (_x < rhs._x) {
     return true;
   }
 
-  if (x_ > rhs.x_) {
+  if (_x > rhs._x) {
     return false;
   }
 
-  if (y_ < rhs.y_) {
+  if (_y < rhs._y) {
     return true;
   }
 
-  if (y_ > rhs.y_) {
+  if (_y > rhs._y) {
     return false;
   }
 
-  if (site_cnt_ < rhs.site_cnt_) {
+  if (_site_cnt < rhs._site_cnt) {
     return true;
   }
 
-  if (site_cnt_ > rhs.site_cnt_) {
+  if (_site_cnt > rhs._site_cnt) {
     return false;
   }
 
-  if (spacing_ < rhs.spacing_) {
+  if (_spacing < rhs._spacing) {
     return true;
   }
 
-  if (spacing_ > rhs.spacing_) {
+  if (_spacing > rhs._spacing) {
     return false;
   }
 
-  if (flags_.orient < rhs.flags_.orient) {
+  if (flags_._orient < rhs.flags_._orient) {
     return true;
   }
 
-  if (flags_.orient > rhs.flags_.orient) {
+  if (flags_._orient > rhs.flags_._orient) {
     return false;
   }
 
-  if (flags_.dir < rhs.flags_.dir) {
+  if (flags_._dir < rhs.flags_._dir) {
     return true;
   }
 
-  if (flags_.dir > rhs.flags_.dir) {
+  if (flags_._dir > rhs.flags_._dir) {
     return false;
   }
 
@@ -163,48 +163,48 @@ dbSite* dbRow::getSite()
 {
   _dbRow* row = (_dbRow*) this;
   _dbDatabase* db = (_dbDatabase*) row->getDatabase();
-  _dbLib* lib = db->lib_tbl_->getPtr(row->lib_);
-  _dbSite* site = lib->site_tbl_->getPtr(row->site_);
+  _dbLib* lib = db->_lib_tbl->getPtr(row->_lib);
+  _dbSite* site = lib->_site_tbl->getPtr(row->_site);
   return (dbSite*) site;
 }
 
 Point dbRow::getOrigin()
 {
   _dbRow* row = (_dbRow*) this;
-  return {row->x_, row->y_};
+  return {row->_x, row->_y};
 }
 
 dbOrientType dbRow::getOrient()
 {
   _dbRow* row = (_dbRow*) this;
-  dbOrientType t(row->flags_.orient);
+  dbOrientType t(row->flags_._orient);
   return t;
 }
 
 dbRowDir dbRow::getDirection()
 {
   _dbRow* row = (_dbRow*) this;
-  dbRowDir d(row->flags_.dir);
+  dbRowDir d(row->flags_._dir);
   return d;
 }
 
 int dbRow::getSiteCount()
 {
   _dbRow* row = (_dbRow*) this;
-  return row->site_cnt_;
+  return row->_site_cnt;
 }
 
 int dbRow::getSpacing()
 {
   _dbRow* row = (_dbRow*) this;
-  return row->spacing_;
+  return row->_spacing;
 }
 
 Rect dbRow::getBBox()
 {
   _dbRow* row = (_dbRow*) this;
 
-  if (row->site_cnt_ == 0) {
+  if (row->_site_cnt == 0) {
     return Rect(0, 0, 0, 0);
   }
 
@@ -218,13 +218,13 @@ Rect dbRow::getBBox()
   int dy = (int) r.dy();
   Point origin = getOrigin();
 
-  if (row->flags_.dir == dbRowDir::HORIZONTAL) {
-    int xMax = origin.x() + (row->site_cnt_ - 1) * row->spacing_ + dx;
+  if (row->flags_._dir == dbRowDir::HORIZONTAL) {
+    int xMax = origin.x() + (row->_site_cnt - 1) * row->_spacing + dx;
     int yMax = origin.y() + dy;
     return Rect(origin.x(), origin.y(), xMax, yMax);
   }
   int xMax = origin.x() + dx;
-  int yMax = origin.y() + (row->site_cnt_ - 1) * row->spacing_ + dy;
+  int yMax = origin.y() + (row->_site_cnt - 1) * row->_spacing + dy;
   return Rect(origin.x(), origin.y(), xMax, yMax);
 }
 
@@ -246,17 +246,17 @@ dbRow* dbRow::create(dbBlock* block_,
   _dbBlock* block = (_dbBlock*) block_;
   _dbSite* site = (_dbSite*) site_;
   _dbLib* lib = (_dbLib*) site->getOwner();
-  _dbRow* row = block->row_tbl_->create();
+  _dbRow* row = block->_row_tbl->create();
   row->name_ = safe_strdup(name);
-  row->lib_ = lib->getOID();
-  row->site_ = site->getOID();
-  row->flags_.orient = orient;
-  row->flags_.dir = direction;
-  row->x_ = origin_x;
-  row->y_ = origin_y;
-  row->site_cnt_ = num_sites;
-  row->spacing_ = spacing;
-  for (auto callback : block->callbacks_) {
+  row->_lib = lib->getOID();
+  row->_site = site->getOID();
+  row->flags_._orient = orient;
+  row->flags_._dir = direction;
+  row->_x = origin_x;
+  row->_y = origin_y;
+  row->_site_cnt = num_sites;
+  row->_spacing = spacing;
+  for (auto callback : block->_callbacks) {
     callback->inDbRowCreate((dbRow*) row);
   }
   return (dbRow*) row;
@@ -266,11 +266,11 @@ void dbRow::destroy(dbRow* row_)
 {
   _dbRow* row = (_dbRow*) row_;
   _dbBlock* block = (_dbBlock*) row->getOwner();
-  for (auto callback : block->callbacks_) {
+  for (auto callback : block->_callbacks) {
     callback->inDbRowDestroy((dbRow*) row);
   }
   dbProperty::destroyProperties(row);
-  block->row_tbl_->destroy(row);
+  block->_row_tbl->destroy(row);
 }
 
 dbSet<dbRow>::iterator dbRow::destroy(dbSet<dbRow>::iterator& itr)
@@ -284,7 +284,7 @@ dbSet<dbRow>::iterator dbRow::destroy(dbSet<dbRow>::iterator& itr)
 dbRow* dbRow::getRow(dbBlock* block_, uint dbid_)
 {
   _dbBlock* block = (_dbBlock*) block_;
-  return (dbRow*) block->row_tbl_->getPtr(dbid_);
+  return (dbRow*) block->_row_tbl->getPtr(dbid_);
 }
 
 void _dbRow::collectMemInfo(MemInfo& info)

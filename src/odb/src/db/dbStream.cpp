@@ -20,22 +20,22 @@ namespace odb {
 void dbOStream::pushScope(const std::string& name)
 {
   int scope_pos = 0;
-  if (db_->getLogger()->debugCheck(utl::ODB, "io_size", 1)) {
+  if (_db->getLogger()->debugCheck(utl::ODB, "io_size", 1)) {
     scope_pos = pos();
   }
-  scopes_.push_back({name, scope_pos});
+  _scopes.push_back({name, scope_pos});
 }
 
 void dbOStream::popScope()
 {
-  auto logger = db_->getLogger();
+  auto logger = _db->getLogger();
   if (logger->debugCheck(utl::ODB, "io_size", 1)) {
-    auto size = pos() - scopes_.back().start_pos;
+    auto size = pos() - _scopes.back().start_pos;
     if (size >= 1024) {  // hide tiny contributors
       std::ostringstream scope_name;
 
-      std::transform(scopes_.begin(),
-                     scopes_.end(),
+      std::transform(_scopes.begin(),
+                     _scopes.end(),
                      std::ostream_iterator<std::string>(scope_name, "/"),
                      [](const Scope& scope) { return scope.name; });
 
@@ -43,7 +43,7 @@ void dbOStream::popScope()
     }
   }
 
-  scopes_.pop_back();
+  _scopes.pop_back();
 }
 
 dbOStream& operator<<(dbOStream& stream, const Rect& r)
@@ -136,32 +136,32 @@ dbIStream& operator>>(dbIStream& stream, Oct& o)
   return stream;
 }
 
-dbOStream::dbOStream(_dbDatabase* db, std::ostream& f) : f_(f)
+dbOStream::dbOStream(_dbDatabase* db, std::ostream& f) : _f(f)
 {
-  db_ = db;
-  lef_dist_factor_ = 0.001;
-  lef_area_factor_ = 0.000001;
+  _db = db;
+  _lef_dist_factor = 0.001;
+  _lef_area_factor = 0.000001;
 
   dbTech* tech = ((dbDatabase*) db)->getTech();
 
   if (tech && tech->getLefUnits() == 2000) {
-    lef_dist_factor_ = 0.0005;
-    lef_area_factor_ = 0.00000025;
+    _lef_dist_factor = 0.0005;
+    _lef_area_factor = 0.00000025;
   }
 }
 
-dbIStream::dbIStream(_dbDatabase* db, std::istream& f) : f_(f)
+dbIStream::dbIStream(_dbDatabase* db, std::istream& f) : _f(f)
 {
-  db_ = db;
+  _db = db;
 
-  lef_dist_factor_ = 0.001;
-  lef_area_factor_ = 0.000001;
+  _lef_dist_factor = 0.001;
+  _lef_area_factor = 0.000001;
 
   dbTech* tech = ((dbDatabase*) db)->getTech();
 
   if (tech && tech->getLefUnits() == 2000) {
-    lef_dist_factor_ = 0.0005;
-    lef_area_factor_ = 0.00000025;
+    _lef_dist_factor = 0.0005;
+    _lef_area_factor = 0.00000025;
   }
 }
 
@@ -181,13 +181,6 @@ std::ostream& operator<<(std::ostream& os, const Point& pIn)
 std::ostream& operator<<(std::ostream& os, const Point3D& pIn)
 {
   os << "( " << pIn.x() << " " << pIn.y() << " " << pIn.z() << " )";
-  return os;
-}
-
-std::ostream& operator<<(std::ostream& os, const Cuboid& cIn)
-{
-  os << "( " << cIn.xMin() << " " << cIn.yMin() << " " << cIn.zMin() << " ) ( "
-     << cIn.xMax() << " " << cIn.yMax() << " " << cIn.zMax() << " )";
   return os;
 }
 

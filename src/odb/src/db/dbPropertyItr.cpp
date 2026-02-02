@@ -16,12 +16,12 @@ namespace odb {
 //
 ////////////////////////////////////////////////////////////////////
 
-bool dbPropertyItr::reversible() const
+bool dbPropertyItr::reversible()
 {
   return true;
 }
 
-bool dbPropertyItr::orderReversed() const
+bool dbPropertyItr::orderReversed()
 {
   return true;
 }
@@ -37,8 +37,8 @@ void dbPropertyItr::reverse(dbObject* parent)
 
     while (id != 0) {
       _dbProperty* p = _prop_tbl->getPtr(id);
-      uint n = p->next_;
-      p->next_ = list;
+      uint n = p->_next;
+      p->_next = list;
       list = id;
       id = n;
     }
@@ -47,12 +47,12 @@ void dbPropertyItr::reverse(dbObject* parent)
   }
 }
 
-uint dbPropertyItr::sequential() const
+uint dbPropertyItr::sequential()
 {
   return 0;
 }
 
-uint dbPropertyItr::size(dbObject* parent) const
+uint dbPropertyItr::size(dbObject* parent)
 {
   uint id;
   uint cnt = 0;
@@ -65,22 +65,22 @@ uint dbPropertyItr::size(dbObject* parent) const
   return cnt;
 }
 
-uint dbPropertyItr::begin(dbObject* parent) const
+uint dbPropertyItr::begin(dbObject* parent)
 {
   dbObjectTable* table = parent->getImpl()->getTable();
   uint id = table->getPropList(parent->getImpl()->getOID());
   return id;
 }
 
-uint dbPropertyItr::end(dbObject* /* unused: parent */) const
+uint dbPropertyItr::end(dbObject* /* unused: parent */)
 {
   return 0;
 }
 
-uint dbPropertyItr::next(uint id, ...) const
+uint dbPropertyItr::next(uint id, ...)
 {
   _dbProperty* prop = _prop_tbl->getPtr(id);
-  return prop->next_;
+  return prop->_next;
 }
 
 dbObject* dbPropertyItr::getObject(uint id, ...)

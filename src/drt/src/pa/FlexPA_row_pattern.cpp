@@ -19,7 +19,6 @@
 #include "distributed/frArchive.h"
 #include "dst/Distributed.h"
 #include "dst/JobMessage.h"
-#include "frBaseTypes.h"
 #include "frProfileTask.h"
 #include "gc/FlexGC.h"
 #include "odb/dbTransform.h"
@@ -98,10 +97,6 @@ bool FlexPA::instancesAreAbuting(frInst* inst_1, frInst* inst_2) const
 std::vector<frInst*> FlexPA::getAdjacentInstancesCluster(frInst* inst) const
 {
   const auto inst_it = insts_set_.find(inst);
-  if (inst_it == insts_set_.end()) {
-    logger_->error(
-        DRT, 9419, "Inst {} not found in insts_set_", inst->getName());
-  }
   std::vector<frInst*> adj_inst_cluster;
 
   adj_inst_cluster.push_back(inst);
@@ -245,10 +240,6 @@ void FlexPA::genInstRowPattern(std::vector<frInst*>& insts)
   genInstRowPatternInit(nodes, insts);
   genInstRowPatternPerform(nodes, insts);
   genInstRowPatternCommit(nodes, insts);
-  for (auto& inst : insts) {
-    inst->setLatestPATransform();
-    inst->setHasPinAccessUpdate(true);
-  }
 }
 
 // init dp node array for valid access patterns

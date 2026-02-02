@@ -13,7 +13,6 @@
 // User Code Begin Includes
 #include "dbBlock.h"
 #include "dbJournal.h"
-#include "utl/Logger.h"
 // User Code End Includes
 namespace odb {
 template class dbTable<_dbGuide>;
@@ -138,7 +137,7 @@ dbNet* dbGuide::getNet() const
 {
   _dbGuide* obj = (_dbGuide*) this;
   _dbBlock* block = (_dbBlock*) obj->getOwner();
-  return (dbNet*) block->net_tbl_->getPtr(obj->net_);
+  return (dbNet*) block->_net_tbl->getPtr(obj->net_);
 }
 
 dbGuide* dbGuide::create(dbNet* net,
@@ -149,22 +148,21 @@ dbGuide* dbGuide::create(dbNet* net,
 {
   _dbNet* owner = (_dbNet*) net;
   _dbBlock* block = (_dbBlock*) owner->getOwner();
-  _dbGuide* guide = block->guide_tbl_->create();
+  _dbGuide* guide = block->_guide_tbl->create();
 
-  debugPrint(block->getImpl()->getLogger(),
-             utl::ODB,
-             "DB_EDIT",
-             2,
-             "EDIT: create dbGuide at id {}, in layer {} box {}",
-             guide->getOID(),
-             layer->getName(),
-             box);
-
-  if (block->journal_) {
-    block->journal_->beginAction(dbJournal::kCreateObject);
-    block->journal_->pushParam(dbGuideObj);
-    block->journal_->pushParam(guide->getOID());
-    block->journal_->endAction();
+  if (block->_journal) {
+    debugPrint(block->getImpl()->getLogger(),
+               utl::ODB,
+               "DB_ECO",
+               1,
+               "ECO: create dbGuide at id {}, in layer {} box {}",
+               guide->getOID(),
+               layer->getName(),
+               box);
+    block->_journal->beginAction(dbJournal::CREATE_OBJECT);
+    block->_journal->pushParam(dbGuideObj);
+    block->_journal->pushParam(guide->getOID());
+    block->_journal->endAction();
   }
 
   guide->layer_ = layer->getImpl()->getOID();
@@ -181,7 +179,7 @@ dbGuide* dbGuide::create(dbNet* net,
 dbGuide* dbGuide::getGuide(dbBlock* block, uint dbid)
 {
   _dbBlock* owner = (_dbBlock*) block;
-  return (dbGuide*) owner->guide_tbl_->getPtr(dbid);
+  return (dbGuide*) owner->_guide_tbl->getPtr(dbid);
 }
 
 void dbGuide::destroy(dbGuide* guide)
@@ -190,34 +188,33 @@ void dbGuide::destroy(dbGuide* guide)
   _dbNet* net = (_dbNet*) guide->getNet();
   _dbGuide* _guide = (_dbGuide*) guide;
 
-  debugPrint(block->getImpl()->getLogger(),
-             utl::ODB,
-             "DB_EDIT",
-             2,
-             "EDIT: delete dbGuide at id {}, in layer {} box {}",
-             guide->getId(),
-             guide->getLayer()->getName(),
-             guide->getBox());
-
-  if (block->journal_) {
-    block->journal_->beginAction(dbJournal::kDeleteObject);
-    block->journal_->pushParam(dbGuideObj);
-    block->journal_->pushParam(net->getOID());
-    block->journal_->pushParam(_guide->box_.xMin());
-    block->journal_->pushParam(_guide->box_.yMin());
-    block->journal_->pushParam(_guide->box_.xMax());
-    block->journal_->pushParam(_guide->box_.yMax());
-    block->journal_->pushParam(_guide->layer_);
-    block->journal_->pushParam(_guide->via_layer_);
-    block->journal_->pushParam(_guide->is_congested_);
-    block->journal_->endAction();
+  if (block->_journal) {
+    debugPrint(block->getImpl()->getLogger(),
+               utl::ODB,
+               "DB_ECO",
+               1,
+               "ECO: delete dbGuide at id {}, in layer {} box {}",
+               guide->getId(),
+               guide->getLayer()->getName(),
+               guide->getBox());
+    block->_journal->beginAction(dbJournal::DELETE_OBJECT);
+    block->_journal->pushParam(dbGuideObj);
+    block->_journal->pushParam(net->getOID());
+    block->_journal->pushParam(_guide->box_.xMin());
+    block->_journal->pushParam(_guide->box_.yMin());
+    block->_journal->pushParam(_guide->box_.xMax());
+    block->_journal->pushParam(_guide->box_.yMax());
+    block->_journal->pushParam(_guide->layer_);
+    block->_journal->pushParam(_guide->via_layer_);
+    block->_journal->pushParam(_guide->is_congested_);
+    block->_journal->endAction();
   }
 
   uint id = _guide->getOID();
   _dbGuide* prev = nullptr;
   uint cur = net->guides_;
   while (cur) {
-    _dbGuide* c = block->guide_tbl_->getPtr(cur);
+    _dbGuide* c = block->_guide_tbl->getPtr(cur);
     if (cur == id) {
       if (prev == nullptr) {
         net->guides_ = _guide->guide_next_;
@@ -231,7 +228,7 @@ void dbGuide::destroy(dbGuide* guide)
   }
 
   dbProperty::destroyProperties(guide);
-  block->guide_tbl_->destroy((_dbGuide*) guide);
+  block->_guide_tbl->destroy((_dbGuide*) guide);
 }
 
 dbSet<dbGuide>::iterator dbGuide::destroy(dbSet<dbGuide>::iterator& itr)

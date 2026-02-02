@@ -20,13 +20,24 @@ class dbOStream;
 
 struct _dbTechLayerRuleFlags
 {
-  uint block_rule : 1;
-  uint spare_bits : 31;
+  uint _block_rule : 1;
+  uint _spare_bits : 31;
 };
 
 class _dbTechLayerRule : public _dbObject
 {
  public:
+  // PERSISTANT-MEMBERS
+  _dbTechLayerRuleFlags flags_;
+  uint _width;
+  uint _spacing;
+  double _resistance;
+  double _capacitance;
+  double _edge_capacitance;
+  uint _wire_extension;
+  dbId<_dbTechNonDefaultRule> _non_default_rule;
+  dbId<_dbTechLayer> _layer;
+
   _dbTechLayerRule(_dbDatabase*);
   _dbTechLayerRule(_dbDatabase*, const _dbTechLayerRule& r);
   ~_dbTechLayerRule();
@@ -41,29 +52,18 @@ class _dbTechLayerRule : public _dbObject
   }
   bool operator<(const _dbTechLayerRule& rhs) const
   {
-    if (layer_ < rhs.layer_) {
+    if (_layer < rhs._layer) {
       return true;
     }
 
-    if (layer_ > rhs.layer_) {
+    if (_layer > rhs._layer) {
       return false;
     }
 
-    return non_default_rule_ < rhs.non_default_rule_;
+    return _non_default_rule < rhs._non_default_rule;
   }
 
   void collectMemInfo(MemInfo& info);
-
-  // PERSISTANT-MEMBERS
-  _dbTechLayerRuleFlags flags_;
-  uint width_;
-  uint spacing_;
-  double resistance_;
-  double capacitance_;
-  double edge_capacitance_;
-  uint wire_extension_;
-  dbId<_dbTechNonDefaultRule> non_default_rule_;
-  dbId<_dbTechLayer> layer_;
 };
 
 dbOStream& operator<<(dbOStream& stream, const _dbTechLayerRule& rule);

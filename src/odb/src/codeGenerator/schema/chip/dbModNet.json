@@ -10,7 +10,7 @@
 	  "schema":"db_schema_update_hierarchy"	    	    	
            },
           {
-	  "name":"parent_",
+	  "name":"_parent",
           "type":"dbId<_dbModule>",
           "flags":["no-set"],
 	  "schema":"db_schema_update_hierarchy",	    	    	       	
@@ -23,31 +23,31 @@
 	  "schema":"db_schema_update_hierarchy"	    	    	       	      	
           },
           {
-          "name":"prev_entry_",
+          "name":"_prev_entry",
           "type":"dbId<_dbModNet>",
           "flags":["no-set","no-get"],
 	  "schema":"db_schema_hier_port_removal"	    	    	       	      	
           },
 	  {
-          "name": "moditerms_",
+          "name": "_moditerms",
           "type": "dbId<_dbModITerm>",
           "flags":["no-set","no-get"],
 	  "schema":"db_schema_update_hierarchy"	    	    	       	      	      	
 	  },
 	  {
-	      "name": "modbterms_",
+	      "name": "_modbterms",
 	      "type": "dbId<_dbModBTerm>",
 	      "flags":["no-set","no-get"],
 	      "schema":"db_schema_update_hierarchy"	    	    	       	      	      	      	
 	  },
 	  {
-	      "name": "iterms_",
+	      "name": "_iterms",
 	      "type": "dbId<_dbITerm>",
 	      "flags":["no-set","no-get"],
 	      "schema":"db_schema_update_hierarchy"	    	    	       	      	      	      	      	
 	  },
 	  {
-	      "name": "bterms_",
+	      "name": "_bterms",
 	      "type": "dbId<_dbBTerm>",
 	      "flags":["no-set","no-get"],
 	      "schema":"db_schema_update_hierarchy"	    	    	       	      	      	      	      	      	

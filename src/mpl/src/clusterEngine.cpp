@@ -174,9 +174,7 @@ void ClusteringEngine::searchForFixedInstsInsideFloorplanShape()
   odb::Rect floorplan_shape = micronsToDbu(block_, tree_->floorplan_shape);
 
   for (odb::dbInst* inst : block_->getInsts()) {
-    odb::dbMaster* master = inst->getMaster();
-
-    if (master->isBlock() || master->isCover()) {
+    if (inst->isBlock()) {
       continue;
     }
 
@@ -873,7 +871,7 @@ DataFlowHypergraph ClusteringEngine::computeHypergraph(
     for (int i = 1; i < hyperedge.size(); i++) {
       graph.backward_vertices[hyperedge[i]].push_back(graph.hyperedges.size());
     }
-    graph.hyperedges.push_back(std::move(hyperedge));
+    graph.hyperedges.push_back(hyperedge);
   }
 
   return graph;
@@ -1602,7 +1600,7 @@ void ClusteringEngine::breakLargeFlatCluster(Cluster* parent)
         && loads_id.size() < tree_->large_net_threshold) {
       std::vector<int> hyperedge;
       hyperedge.insert(hyperedge.end(), loads_id.begin(), loads_id.end());
-      hyperedges.push_back(std::move(hyperedge));
+      hyperedges.push_back(hyperedge);
     }
   }
 
@@ -2020,60 +2018,49 @@ void ClusteringEngine::clearConnections()
 
 void ClusteringEngine::buildNetListConnections()
 {
-  for (odb::dbNet* db_net : block_->getNets()) {
-    if (!isValidNet(db_net)) {
+  const float connection_weight = 1.0;
+
+  for (odb::dbNet* net : block_->getNets()) {
+    if (!isValidNet(net)) {
       continue;
     }
 
-    Net net = buildNet(db_net);
-    connectClusters(net);
-  }
-}
+    int driver_cluster_id = -1;
+    std::vector<int> load_clusters_ids;
 
-ClusteringEngine::Net ClusteringEngine::buildNet(odb::dbNet* db_net) const
-{
-  Net net;
+    for (odb::dbITerm* iterm : net->getITerms()) {
+      odb::dbInst* inst = iterm->getInst();
+      const int cluster_id = tree_->maps.inst_to_cluster_id.at(inst);
 
-  for (odb::dbITerm* iterm : db_net->getITerms()) {
-    odb::dbInst* inst = iterm->getInst();
-    const int cluster_id = tree_->maps.inst_to_cluster_id.at(inst);
-
-    if (iterm->getIoType() == odb::dbIoType::OUTPUT) {
-      net.driver_id = cluster_id;
-    } else {
-      net.loads_ids.push_back(cluster_id);
-    }
-  }
-
-  if (tree_->io_pads.empty()) {
-    for (odb::dbBTerm* bterm : db_net->getBTerms()) {
-      const int cluster_id = tree_->maps.bterm_to_cluster_id.at(bterm);
-
-      if (bterm->getIoType() == odb::dbIoType::INPUT) {
-        net.driver_id = cluster_id;
+      if (iterm->getIoType() == odb::dbIoType::OUTPUT) {
+        driver_cluster_id = cluster_id;
       } else {
-        net.loads_ids.push_back(cluster_id);
+        load_clusters_ids.push_back(cluster_id);
       }
     }
-  }
 
-  return net;
-}
+    if (tree_->io_pads.empty()) {
+      for (odb::dbBTerm* bterm : net->getBTerms()) {
+        const int cluster_id = tree_->maps.bterm_to_cluster_id.at(bterm);
 
-void ClusteringEngine::connectClusters(const Net& net)
-{
-  if (net.driver_id == -1 || net.loads_ids.empty()
-      || net.loads_ids.size() >= tree_->large_net_threshold) {
-    return;
-  }
+        if (bterm->getIoType() == odb::dbIoType::INPUT) {
+          driver_cluster_id = cluster_id;
+        } else {
+          load_clusters_ids.push_back(cluster_id);
+        }
+      }
+    }
 
-  const float connection_weight = 1.0;
-  Cluster* driver = tree_->maps.id_to_cluster.at(net.driver_id);
+    if (driver_cluster_id != -1 && !load_clusters_ids.empty()
+        && load_clusters_ids.size() < tree_->large_net_threshold) {
+      Cluster* driver_cluster = tree_->maps.id_to_cluster.at(driver_cluster_id);
 
-  for (const int load_cluster_id : net.loads_ids) {
-    if (load_cluster_id != net.driver_id) {
-      Cluster* load = tree_->maps.id_to_cluster.at(load_cluster_id);
-      connect(driver, load, connection_weight);
+      for (const int load_cluster_id : load_clusters_ids) {
+        if (load_cluster_id != driver_cluster_id) {
+          Cluster* load_cluster = tree_->maps.id_to_cluster.at(load_cluster_id);
+          connect(driver_cluster, load_cluster, connection_weight);
+        }
+      }
     }
   }
 }
@@ -2118,7 +2105,7 @@ void ClusteringEngine::fetchMixedLeaves(
   // We push the leaves after finishing searching the children so
   // that each vector of clusters represents the children of one
   // parent.
-  mixed_leaves.push_back(std::move(sister_mixed_leaves));
+  mixed_leaves.push_back(sister_mixed_leaves);
 }
 
 void ClusteringEngine::breakMixedLeaves(

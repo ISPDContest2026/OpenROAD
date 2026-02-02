@@ -4506,6 +4506,8 @@ int Resizer::holdBufferCount() const
   return repair_hold_->holdBufferCount();
 }
 
+
+ 
 ////////////////////////////////////////////////////////////////
 bool Resizer::recoverPower(float recover_power_percent,
                            bool match_cell_footprint,
@@ -5081,7 +5083,7 @@ void Resizer::eliminateDeadLogic(bool clean_nets)
       }
     }
   }
-
+  
   logger_->report("Removed {} unused instances and {} unused nets.",
                   remove_inst_count,
                   remove_net_count);
@@ -5242,6 +5244,237 @@ bool Resizer::checkAndMarkVTSwappable(
   }
 
   return true;
+}
+
+std::string getBaseName(const char* name) {
+    std::string s(name);
+    // 假設格式是 NamexDrive_... 
+    // 只要找到 'x' 後面接數字，就只取前面的部分 (Logic Function)
+    for (size_t i = 0; i < s.size(); ++i) {
+        if (s[i] == 'x' && i + 1 < s.size() && (s[i+1] >= '0' && s[i+1] <= '9')) {
+            return s.substr(0, i);
+        }
+    }
+    return s; 
+}
+bool Resizer::isBuffer(dbMaster* master) {
+  if (!master) return false;
+  if (master->getType() != odb::dbMasterType::CORE) return false;
+  
+  sta::Cell* cell = db_network_->dbToSta(master);
+  LibertyCell* lib_cell = network_->libertyCell(cell);
+  if (lib_cell && lib_cell->isBuffer()) return true;
+  
+  return false;
+}
+
+// 取得某個 Instance 的上一級驅動 Instance
+dbInst* Resizer::getDriverInst(dbInst* inst) {
+  if (!inst) return nullptr;
+  
+  // 1. 找到 Input Pin
+  dbITerm* input_iterm = nullptr;
+  for (dbITerm* iterm : inst->getITerms()) {
+    if (iterm->getIoType() == odb::dbIoType::INPUT) {
+      input_iterm = iterm;
+      break;
+    }
+  }
+  
+  // 2. 追蹤 Net 找到 Driver
+  if (!input_iterm || !input_iterm->getNet()) return nullptr;
+  dbNet* net = input_iterm->getNet();
+  
+  for (dbITerm* iterm : net->getITerms()) {
+    if (iterm->getIoType() == odb::dbIoType::OUTPUT) {
+      return iterm->getInst();
+    }
+  }
+  return nullptr; // 可能是 PI (BTerm) 或無驅動
+}
+
+// 檢查當前設計的狀態 (僅回傳 TNS 以簡化依賴)
+float Resizer::getTNS() {
+  sta_->updateTiming(false); 
+  return sta_->totalNegativeSlack(sta::MinMax::max());
+}
+
+// 主演算法入口
+void Resizer::myContestAlgorithm(int max_iterations) {
+  resizePreamble(); // 初始化與 Preamble 檢查
+  
+  logger_->report("Orz: 開始執行 Buffer Chain 優化 (SizeDown & Unbuffer)...");
+
+  // 取得初始狀態
+  float init_tns = getTNS();
+  logger_->report("Orz: 初始狀態 -> TNS: {:.6f}", init_tns);
+
+  for (int iter = 0; iter < max_iterations; ++iter) {
+    logger_->report("Orz: Iteration {}/{}", iter + 1, max_iterations);
+    int move_count = 0;
+
+    // 1. 收集候選 Buffer (避免 Iterator 失效)
+    std::vector<dbInst*> buffers;
+    for (auto inst : block_->getInsts()) {
+      if (isBuffer(inst->getMaster())) {
+        buffers.push_back(inst);
+      }
+    }
+
+    logger_->report("Orz: buffer size is {}", buffers.size());
+    // 2. 遍歷並嘗試優化
+    for (dbInst* inst : buffers) {
+      // 檢查是否仍然存在 (可能在前面的 unbuffer 中被刪除了)
+      if (!inst->getMaster()) continue;
+
+      
+
+      // 檢查上一級是否為 Buffer
+      dbInst* driver_inst = getDriverInst(inst);
+      
+      // 條件：Driver 必須存在且也是 Buffer (構成 Buffer Chain)
+      if (!driver_inst || !isBuffer(driver_inst->getMaster())) {
+        continue;
+      }
+
+      // --- 進入優化流程 ---
+      dbMaster* old_master = inst->getMaster();
+      sta::Cell* old_sta_cell = db_network_->dbToSta(old_master);
+      LibertyCell* old_lib_cell = network_->libertyCell(old_sta_cell);
+      
+      bool optimized = false;
+
+      // ---------------------------------------------------------
+      // 策略 A: 嘗試 Size Down (變弱)
+      // ---------------------------------------------------------
+      
+      // 尋找比現在面積更小 (通常驅動更弱) 的 Cell
+      LibertyCell* weaker_cell = nullptr;
+      if (old_lib_cell) {
+          double current_area = old_lib_cell->area();
+          const char* current_footprint = old_lib_cell->footprint();
+          std::string current_base_name = getBaseName(old_lib_cell->name());
+
+          
+          sta::LibertyLibraryIterator* lib_iter = network_->libertyLibraryIterator();
+          //logger_->report("Orz: fp -> {}", current_base_name);
+          while (lib_iter->hasNext()) {
+            sta::LibertyLibrary* lib = lib_iter->next();
+            sta::LibertyCellIterator cell_iter(lib);
+            while (cell_iter.hasNext()) {
+              LibertyCell* cell = cell_iter.next();
+              if (cell == old_lib_cell) continue;
+              if (cell->testCell()) continue; 
+              if (!cell->isBuffer()) continue;
+              
+              bool is_equiv = false;
+              if (getBaseName(cell->name()) == current_base_name) {
+                  is_equiv = false;
+              }
+
+              if (is_equiv) {
+                  if (cell->area() < current_area) {
+                      if (!weaker_cell || cell->area() > weaker_cell->area()) {
+                          weaker_cell = cell;
+                      }
+                  }
+              }
+            }
+          }
+          delete lib_iter;
+      }
+
+      if (weaker_cell) {
+        // 執行替換
+        sta::Instance* sta_inst = db_network_->dbToSta(inst);
+        replaceCell(sta_inst, weaker_cell, true); // true = update timing graph
+        
+        // 驗證
+        float new_tns = getTNS();
+        
+        // 寬容度檢查：允許極微小的 TNS 惡化 (浮點數誤差)
+        if (new_tns >= init_tns - 1e-9) {
+          // 成功！更新基準線
+          init_tns = new_tns;
+          optimized = true;
+          move_count++;
+          //logger_->report("Orz: 更換成功");
+        } else {
+          // 失敗，還原
+          replaceCell(sta_inst, old_lib_cell, true);
+        }
+      }
+
+      // ---------------------------------------------------------
+      // 策略 B: 如果 Size Down 失敗或已經最小，嘗試 Unbuffer (移除)
+      // ---------------------------------------------------------
+      /*
+      if (!optimized) {
+        // 準備 Unbuffer 資訊
+        dbITerm* input_term = nullptr;
+        dbITerm* output_term = nullptr;
+        for (auto iterm : inst->getITerms()) {
+            if (iterm->getIoType() == odb::dbIoType::INPUT) input_term = iterm;
+            else if (iterm->getIoType() == odb::dbIoType::OUTPUT) output_term = iterm;
+        }
+
+        if (input_term && output_term && input_term->getNet() && output_term->getNet()) {
+            dbNet* in_net = input_term->getNet();
+            dbNet* out_net = output_term->getNet();
+            
+            // 暫存連接關係以便 Undo
+            std::vector<dbITerm*> sinks;
+            for (auto iterm : out_net->getITerms()) {
+                if (iterm != output_term) sinks.push_back(iterm);
+            }
+
+            // 執行 Unbuffer: 將 output net 的所有 sink 接到 input net
+            // 1. 斷開 sinks 與 out_net 的連接
+            for (auto sink : sinks) {
+                sink->disconnect();
+                sink->connect(in_net);
+            }
+            // 2. 斷開 inst
+            input_term->disconnect();
+            output_term->disconnect();
+            
+            // 3. 暫時移除 inst (這裡先不 destroy，只斷線，為了方便 undo)
+            
+            // 驗證
+            float new_tns = getTNS();
+            
+            if (new_tns >= init_tns - 1e-9) {
+                // 成功！徹底刪除
+                dbInst::destroy(inst);
+                dbNet::destroy(out_net); // 刪除懸空的 net
+                
+                init_tns = new_tns;
+                optimized = true;
+                move_count++;
+            } else {
+                // 失敗，還原連接
+                // 1. 重新連接 inst
+                input_term->connect(in_net);
+                output_term->connect(out_net);
+                // 2. 將 sinks 接回 out_net
+                for (auto sink : sinks) {
+                    sink->disconnect();
+                    sink->connect(out_net);
+                }
+            }
+        }
+      }
+    */    
+    } // end for buffers
+    
+    if (move_count == 0) {
+      logger_->report("Orz: 本輪無可優化對象，提早結束。");
+      break;
+    }
+  }
+  sta_->graphDelayCalc()->delaysInvalid();
+  sta_->updateTiming(true); // true = force full update
+  logger_->report("Orz: 優化完成。最終 TNS: {:.6f}", getTNS());
 }
 
 }  // namespace rsz

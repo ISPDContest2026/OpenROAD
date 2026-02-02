@@ -10,6 +10,7 @@
 #include <utility>
 #include <vector>
 
+#include "odb/array1.h"
 #include "odb/db.h"
 #include "odb/dbSet.h"
 #include "odb/dbShape.h"

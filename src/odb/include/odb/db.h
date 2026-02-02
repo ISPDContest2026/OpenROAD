@@ -787,20 +787,6 @@ class dbBlock : public dbObject
   dbModInst* findModInst(const char* path);
 
   ///
-  /// Find a specific moditerm in this block. path is
-  /// master_module_name/modinst_name/term_name Returns nullptr if the object
-  /// was not found.
-  ///
-  dbModITerm* findModITerm(const char* hierarchical_name);
-
-  ///
-  /// Find a specific modbterm in this block. path is
-  /// master_module_name/modinst_name/term_name Returns nullptr if the object
-  /// was not found.
-  ///
-  dbModBTerm* findModBTerm(const char* hierarchical_name);
-
-  ///
   /// Find a specific PowerDomain in this block.
   /// Returns nullptr if the object was not found.
   ///
@@ -5517,11 +5503,6 @@ class dbMaster : public dbObject
   int getMasterId();
 
   ///
-  /// Clear the access points of all pins.
-  ///
-  void clearPinAccess(int pin_access_idx);
-
-  ///
   /// Create a new master.
   /// Returns nullptr if a master with this name already exists
   ///
@@ -5715,8 +5696,6 @@ class dbMPin : public dbObject
   Rect getBBox();
 
   std::vector<std::vector<odb::dbAccessPoint*>> getPinAccess() const;
-
-  void clearPinAccess(int pin_access_idx);
 
   ///
   /// Create a new physical pin.
@@ -7247,6 +7226,12 @@ class dbChipInst : public dbObject
  public:
   std::string getName() const;
 
+  void setLoc(const Point3D& loc);
+
+  Point3D getLoc() const;
+
+  void setOrient(dbOrientType3D orient);
+
   dbOrientType3D getOrient() const;
 
   dbChip* getMasterChip() const;
@@ -7256,12 +7241,6 @@ class dbChipInst : public dbObject
   // User Code Begin dbChipInst
 
   dbTransform getTransform() const;
-
-  void setOrient(dbOrientType3D orient);
-
-  void setLoc(const Point3D& loc);
-
-  Point3D getLoc() const;
 
   Rect getBBox() const;
 

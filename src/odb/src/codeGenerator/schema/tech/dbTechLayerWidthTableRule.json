@@ -4,11 +4,11 @@
   "fields": [
     {
       "type": "bit",
-      "name": "wrong_direction"
+      "name": "wrong_direction_"
     },
     {
       "type": "bit",
-      "name": "orthogonal"
+      "name": "orthogonal_"
     },
     {
       "type": "dbVector<int>",

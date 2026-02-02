@@ -16,21 +16,21 @@ class dbNetTrackItr : public dbIterator
  public:
   dbNetTrackItr(dbTable<_dbNetTrack>* net_tracks_tbl)
   {
-    net_tracks_tbl_ = net_tracks_tbl;
+    _net_tracks_tbl = net_tracks_tbl;
   }
 
-  bool reversible() const override;
-  bool orderReversed() const override;
+  bool reversible() override;
+  bool orderReversed() override;
   void reverse(dbObject* parent) override;
-  uint sequential() const override;
-  uint size(dbObject* parent) const override;
-  uint begin(dbObject* parent) const override;
-  uint end(dbObject* parent) const override;
-  uint next(uint id, ...) const override;
+  uint sequential() override;
+  uint size(dbObject* parent) override;
+  uint begin(dbObject* parent) override;
+  uint end(dbObject* parent) override;
+  uint next(uint id, ...) override;
   dbObject* getObject(uint id, ...) override;
 
  private:
-  dbTable<_dbNetTrack>* net_tracks_tbl_;
+  dbTable<_dbNetTrack>* _net_tracks_tbl;
 };
 
 }  // namespace odb

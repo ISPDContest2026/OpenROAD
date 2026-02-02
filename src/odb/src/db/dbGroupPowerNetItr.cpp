@@ -11,16 +11,15 @@
 #include "dbNet.h"
 #include "dbTable.h"
 #include "odb/dbObject.h"
-#include "odb/odb.h"
 
 namespace odb {
 
-bool dbGroupPowerNetItr::reversible() const
+bool dbGroupPowerNetItr::reversible()
 {
   return true;
 }
 
-bool dbGroupPowerNetItr::orderReversed() const
+bool dbGroupPowerNetItr::orderReversed()
 {
   return false;
 }
@@ -28,32 +27,32 @@ bool dbGroupPowerNetItr::orderReversed() const
 void dbGroupPowerNetItr::reverse(dbObject* parent)
 {
   _dbGroup* group = (_dbGroup*) parent;
-  std::reverse(group->power_nets_.begin(), group->power_nets_.end());
+  std::reverse(group->_power_nets.begin(), group->_power_nets.end());
 }
 
-uint dbGroupPowerNetItr::sequential() const
+uint dbGroupPowerNetItr::sequential()
 {
   return 0;
 }
 
-uint dbGroupPowerNetItr::size(dbObject* parent) const
+uint dbGroupPowerNetItr::size(dbObject* parent)
 {
   _dbGroup* group = (_dbGroup*) parent;
-  return group->power_nets_.size();
+  return group->_power_nets.size();
 }
 
-uint dbGroupPowerNetItr::begin(dbObject*) const
+uint dbGroupPowerNetItr::begin(dbObject*)
 {
   return 0;
 }
 
-uint dbGroupPowerNetItr::end(dbObject* parent) const
+uint dbGroupPowerNetItr::end(dbObject* parent)
 {
   _dbGroup* group = (_dbGroup*) parent;
-  return group->power_nets_.size();
+  return group->_power_nets.size();
 }
 
-uint dbGroupPowerNetItr::next(uint id, ...) const
+uint dbGroupPowerNetItr::next(uint id, ...)
 {
   return ++id;
 }
@@ -64,8 +63,8 @@ dbObject* dbGroupPowerNetItr::getObject(uint id, ...)
   va_start(ap, id);
   _dbGroup* parent = (_dbGroup*) va_arg(ap, dbObject*);
   va_end(ap);
-  uint nid = parent->power_nets_[id];
-  return net_tbl_->getPtr(nid);
+  uint nid = parent->_power_nets[id];
+  return _net_tbl->getPtr(nid);
 }
 
 }  // namespace odb

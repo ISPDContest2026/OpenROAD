@@ -21,12 +21,12 @@ namespace odb {
 //
 // BPins are ordered by io-type and cannot be reversed.
 //
-bool dbBPinItr::reversible() const
+bool dbBPinItr::reversible()
 {
   return true;
 }
 
-bool dbBPinItr::orderReversed() const
+bool dbBPinItr::orderReversed()
 {
   return true;
 }
@@ -34,26 +34,26 @@ bool dbBPinItr::orderReversed() const
 void dbBPinItr::reverse(dbObject* parent)
 {
   _dbBTerm* bterm = (_dbBTerm*) parent;
-  uint id = bterm->bpins_;
+  uint id = bterm->_bpins;
   uint list = 0;
 
   while (id != 0) {
-    _dbBPin* bpin = bpin_tbl_->getPtr(id);
+    _dbBPin* bpin = _bpin_tbl->getPtr(id);
     uint n = bpin->next_bpin_;
     bpin->next_bpin_ = list;
     list = id;
     id = n;
   }
 
-  bterm->bpins_ = list;
+  bterm->_bpins = list;
 }
 
-uint dbBPinItr::sequential() const
+uint dbBPinItr::sequential()
 {
   return 0;
 }
 
-uint dbBPinItr::size(dbObject* parent) const
+uint dbBPinItr::size(dbObject* parent)
 {
   uint id;
   uint cnt = 0;
@@ -66,26 +66,26 @@ uint dbBPinItr::size(dbObject* parent) const
   return cnt;
 }
 
-uint dbBPinItr::begin(dbObject* parent) const
+uint dbBPinItr::begin(dbObject* parent)
 {
   _dbBTerm* bterm = (_dbBTerm*) parent;
-  return bterm->bpins_;
+  return bterm->_bpins;
 }
 
-uint dbBPinItr::end(dbObject* /* unused: parent */) const
+uint dbBPinItr::end(dbObject* /* unused: parent */)
 {
   return 0;
 }
 
-uint dbBPinItr::next(uint id, ...) const
+uint dbBPinItr::next(uint id, ...)
 {
-  _dbBPin* bpin = bpin_tbl_->getPtr(id);
+  _dbBPin* bpin = _bpin_tbl->getPtr(id);
   return bpin->next_bpin_;
 }
 
 dbObject* dbBPinItr::getObject(uint id, ...)
 {
-  return bpin_tbl_->getPtr(id);
+  return _bpin_tbl->getPtr(id);
 }
 
 }  // namespace odb

@@ -14,117 +14,117 @@
       "flags": ["no-set", "no-get"]
     },
     {
-      "name": "domain_",
+      "name": "_domain",
       "type": "dbId<_dbPowerDomain>",
       "flags": ["no-set"],
       "parent":"dbBlock"
     },
     {
-      "name": "elements_",
+      "name": "_elements",
       "type": "dbVector<std::string>",
       "flags": ["no-set","no-template", "no-get"]
     },
     {
-      "name": "exclude_elements_",
+      "name": "_exclude_elements",
       "type": "dbVector<std::string>",
       "flags": ["no-set","no-template", "no-get"]
     },
     {
-      "name": "source_",
+      "name": "_source",
       "type": "std::string",
       "flags": []
     },
     {
-      "name": "sink_",
+      "name": "_sink",
       "type": "std::string",
       "flags": []
     },
     {
-      "name": "use_functional_equivalence_",
+      "name": "_use_functional_equivalence",
       "type": "bool",
       "default": "false",
       "flags": []
     },
     {
-      "name": "applies_to_",
+      "name": "_applies_to",
       "type": "std::string",
       "flags": []
     },
     {
-      "name": "applies_to_boundary_",
+      "name": "_applies_to_boundary",
       "type": "std::string",
       "flags": []
     },
     {
-      "name": "rule_",
+      "name": "_rule",
       "type": "std::string",
       "flags": []
     },
     {
-      "name": "threshold_",
+      "name": "_threshold",
       "type": "float",
       "default": "0",
       "flags": []
     },
     {
-      "name": "no_shift_",
+      "name": "_no_shift",
       "type": "bool",
       "default": "false",
       "flags": []
     },
     {
-      "name": "force_shift_",
+      "name": "_force_shift",
       "type": "bool",
       "default": "false",
       "flags": []
     },
     {
-      "name": "location_",
+      "name": "_location",
       "type": "std::string",
       "flags": []
     },
     {
-      "name": "input_supply_",
+      "name": "_input_supply",
       "type": "std::string",
       "flags": []
     },
     {
-      "name": "output_supply_",
+      "name": "_output_supply",
       "type": "std::string",
       "flags": []
     },
     {
-      "name": "internal_supply_",
+      "name": "_internal_supply",
       "type": "std::string",
       "flags": []
     },
     {
-      "name": "name_prefix_",
+      "name": "_name_prefix",
       "type": "std::string",
       "flags": []
     },
     {
-      "name": "name_suffix_",
+      "name": "_name_suffix",
       "type": "std::string",
       "flags": []
     },
     {
-      "name": "instances_",
+      "name": "_instances",
       "type": "dbVector<std::pair<std::string, std::string>>",
       "flags": ["no-set", "no-get","no-template"]
     },
     {
-      "name" : "cell_name_",
+      "name" : "_cell_name",
       "type" : "std::string",
       "flags": ["no-serial"]
     },
     {
-      "name" : "cell_input_",
+      "name" : "_cell_input",
       "type" : "std::string",
       "flags": ["no-serial"]
     },
     {
-      "name": "cell_output_",
+      "name": "_cell_output",
       "type": "std::string",
       "flags": ["no-serial"]
     }

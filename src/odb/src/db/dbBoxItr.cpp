@@ -3,8 +3,6 @@
 
 #include "dbBoxItr.h"
 
-#include <cassert>
-
 #include "dbBPin.h"
 #include "dbBTerm.h"
 #include "dbBlock.h"
@@ -18,6 +16,7 @@
 #include "dbTable.hpp"
 #include "dbTechVia.h"
 #include "dbVia.h"
+#include "odb/ZException.h"
 #include "odb/dbId.h"
 #include "odb/dbObject.h"
 #include "odb/dbTypes.h"
@@ -25,13 +24,13 @@
 namespace odb {
 
 template <uint page_size>
-bool dbBoxItr<page_size>::reversible() const
+bool dbBoxItr<page_size>::reversible()
 {
   return true;
 }
 
 template <uint page_size>
-bool dbBoxItr<page_size>::orderReversed() const
+bool dbBoxItr<page_size>::orderReversed()
 {
   return true;
 }
@@ -42,18 +41,18 @@ void dbBoxItr<page_size>::reverse(dbObject* parent)
   switch (parent->getImpl()->getType()) {
     case dbRegionObj: {
       _dbRegion* region = (_dbRegion*) parent;
-      uint id = region->boxes_;
+      uint id = region->_boxes;
       uint list = 0;
 
       while (id != 0) {
-        _dbBox* b = box_tbl_->getPtr(id);
+        _dbBox* b = _box_tbl->getPtr(id);
         uint n = b->next_box_;
         b->next_box_ = list;
         list = id;
         id = n;
       }
 
-      region->boxes_ = list;
+      region->_boxes = list;
       break;
     }
 
@@ -62,52 +61,52 @@ void dbBoxItr<page_size>::reverse(dbObject* parent)
 
     case dbViaObj: {
       _dbVia* via = (_dbVia*) parent;
-      uint id = via->boxes_;
+      uint id = via->_boxes;
       uint list = 0;
 
       while (id != 0) {
-        _dbBox* b = box_tbl_->getPtr(id);
+        _dbBox* b = _box_tbl->getPtr(id);
         uint n = b->next_box_;
         b->next_box_ = list;
         list = id;
         id = n;
       }
 
-      via->boxes_ = list;
+      via->_boxes = list;
       break;
     }
 
     case dbMasterObj: {
       _dbMaster* master = (_dbMaster*) parent;
-      uint id = master->obstructions_;
+      uint id = master->_obstructions;
       uint list = 0;
 
       while (id != 0) {
-        _dbBox* b = box_tbl_->getPtr(id);
+        _dbBox* b = _box_tbl->getPtr(id);
         uint n = b->next_box_;
         b->next_box_ = list;
         list = id;
         id = n;
       }
 
-      master->obstructions_ = list;
+      master->_obstructions = list;
       break;
     }
 
     case dbMPinObj: {
       _dbMPin* pin = (_dbMPin*) parent;
-      uint id = pin->geoms_;
+      uint id = pin->_geoms;
       uint list = 0;
 
       while (id != 0) {
-        _dbBox* b = box_tbl_->getPtr(id);
+        _dbBox* b = _box_tbl->getPtr(id);
         uint n = b->next_box_;
         b->next_box_ = list;
         list = id;
         id = n;
       }
 
-      pin->geoms_ = list;
+      pin->_geoms = list;
       break;
     }
 
@@ -117,7 +116,7 @@ void dbBoxItr<page_size>::reverse(dbObject* parent)
       uint list = 0;
 
       while (id != 0) {
-        _dbBox* b = box_tbl_->getPtr(id);
+        _dbBox* b = _box_tbl->getPtr(id);
         uint n = b->next_box_;
         b->next_box_ = list;
         list = id;
@@ -134,7 +133,7 @@ void dbBoxItr<page_size>::reverse(dbObject* parent)
       uint list = 0;
 
       while (id != 0) {
-        _dbBox* b = box_tbl_->getPtr(id);
+        _dbBox* b = _box_tbl->getPtr(id);
         uint n = b->next_box_;
         b->next_box_ = list;
         list = id;
@@ -151,7 +150,7 @@ void dbBoxItr<page_size>::reverse(dbObject* parent)
       uint list = 0;
 
       while (id != 0) {
-        _dbBox* b = box_tbl_->getPtr(id);
+        _dbBox* b = _box_tbl->getPtr(id);
         uint n = b->next_box_;
         b->next_box_ = list;
         list = id;
@@ -168,13 +167,13 @@ void dbBoxItr<page_size>::reverse(dbObject* parent)
 }
 
 template <uint page_size>
-uint dbBoxItr<page_size>::sequential() const
+uint dbBoxItr<page_size>::sequential()
 {
   return 0;
 }
 
 template <uint page_size>
-uint dbBoxItr<page_size>::size(dbObject* parent) const
+uint dbBoxItr<page_size>::size(dbObject* parent)
 {
   uint id;
   uint cnt = 0;
@@ -188,51 +187,51 @@ uint dbBoxItr<page_size>::size(dbObject* parent) const
 }
 
 template <uint page_size>
-uint dbBoxItr<page_size>::begin(dbObject* parent) const
+uint dbBoxItr<page_size>::begin(dbObject* parent)
 {
   switch (parent->getImpl()->getType()) {
     case dbRegionObj: {
       _dbRegion* region = (_dbRegion*) parent;
-      return region->boxes_;
+      return region->_boxes;
     }
 
     case dbViaObj: {
       _dbVia* via = (_dbVia*) parent;
-      return via->boxes_;
+      return via->_boxes;
     }
 
     case dbMasterObj: {
       _dbMaster* master = (_dbMaster*) parent;
-      if (include_polygons_ && master->poly_obstructions_) {
-        dbId<_dbPolygon> pid = master->poly_obstructions_;
-        _dbPolygon* pbox = pbox_tbl_->getPtr(pid);
+      if (include_polygons_ && master->_poly_obstructions) {
+        dbId<_dbPolygon> pid = master->_poly_obstructions;
+        _dbPolygon* pbox = _pbox_tbl->getPtr(pid);
         while (pbox != nullptr && pbox->boxes_ == 0) {
           // move to next pbox
           pid = pbox->next_pbox_;
-          pbox = pbox_tbl_->getPtr(pid);
+          pbox = _pbox_tbl->getPtr(pid);
         }
         if (pbox != nullptr) {
           return pbox->boxes_;
         }
       }
-      return master->obstructions_;
+      return master->_obstructions;
     }
 
     case dbMPinObj: {
       _dbMPin* pin = (_dbMPin*) parent;
-      if (include_polygons_ && pin->poly_geoms_) {
-        dbId<_dbPolygon> pid = pin->poly_geoms_;
-        _dbPolygon* pbox = pbox_tbl_->getPtr(pid);
+      if (include_polygons_ && pin->_poly_geoms) {
+        dbId<_dbPolygon> pid = pin->_poly_geoms;
+        _dbPolygon* pbox = _pbox_tbl->getPtr(pid);
         while (pbox != nullptr && pbox->boxes_ == 0) {
           // move to next pbox
           pid = pbox->next_pbox_;
-          pbox = pbox_tbl_->getPtr(pid);
+          pbox = _pbox_tbl->getPtr(pid);
         }
         if (pbox != nullptr) {
           return pbox->boxes_;
         }
       }
-      return pin->geoms_;
+      return pin->_geoms;
     }
 
     case dbTechViaObj: {
@@ -258,15 +257,15 @@ uint dbBoxItr<page_size>::begin(dbObject* parent) const
 }
 
 template <uint page_size>
-uint dbBoxItr<page_size>::end(dbObject* /* unused: parent */) const
+uint dbBoxItr<page_size>::end(dbObject* /* unused: parent */)
 {
   return 0;
 }
 
 template <uint page_size>
-uint dbBoxItr<page_size>::next(uint id, ...) const
+uint dbBoxItr<page_size>::next(uint id, ...)
 {
-  _dbBox* box = box_tbl_->getPtr(id);
+  _dbBox* box = _box_tbl->getPtr(id);
 
   if (!include_polygons_ || box->next_box_ != 0) {
     // return next box if available or when not considering polygons
@@ -276,16 +275,16 @@ uint dbBoxItr<page_size>::next(uint id, ...) const
   if (box->flags_.owner_type == dbBoxOwner::PBOX) {
     // if owner is dbPolygon need to check for next dbPolygon
     dbId<_dbPolygon> pid = box->owner_;
-    _dbPolygon* box_pbox = pbox_tbl_->getPtr(pid);
+    _dbPolygon* box_pbox = _pbox_tbl->getPtr(pid);
 
     _dbPolygon* pbox = box_pbox;
     if (pbox->next_pbox_ != 0) {
       // move to next pbox
-      pbox = pbox_tbl_->getPtr(pbox->next_pbox_);
+      pbox = _pbox_tbl->getPtr(pbox->next_pbox_);
       while (pbox != nullptr && pbox->boxes_ == 0) {
         // move to next pbox
         pid = pbox->next_pbox_;
-        pbox = pbox_tbl_->getPtr(pid);
+        pbox = _pbox_tbl->getPtr(pid);
       }
       if (pbox != nullptr) {
         return pbox->boxes_;
@@ -295,18 +294,18 @@ uint dbBoxItr<page_size>::next(uint id, ...) const
     // end of polygons
 
     // return non-polygon list from owner
-    if (box_pbox->flags_.owner_type == dbBoxOwner::MASTER) {
+    if (box_pbox->flags_.owner_type_ == dbBoxOwner::MASTER) {
       _dbMaster* master = (_dbMaster*) box_pbox->getOwner();
-      return master->obstructions_;
+      return master->_obstructions;
     }
-    if (box_pbox->flags_.owner_type == dbBoxOwner::MPIN) {
+    if (box_pbox->flags_.owner_type_ == dbBoxOwner::MPIN) {
       _dbMaster* master = (_dbMaster*) box_pbox->getOwner();
-      _dbMPin* pin = (_dbMPin*) master->mpin_tbl_->getPtr(box_pbox->owner_);
-      return pin->geoms_;
+      _dbMPin* pin = (_dbMPin*) master->_mpin_tbl->getPtr(box_pbox->owner_);
+      return pin->_geoms;
     }
 
     // this should not be possible unless new types with polygons are added
-    assert(0);
+    ZASSERT(0);
   }
 
   return 0;
@@ -315,7 +314,7 @@ uint dbBoxItr<page_size>::next(uint id, ...) const
 template <uint page_size>
 dbObject* dbBoxItr<page_size>::getObject(uint id, ...)
 {
-  return box_tbl_->getPtr(id);
+  return _box_tbl->getPtr(id);
 }
 
 template class dbBoxItr<8>;

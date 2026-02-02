@@ -26,25 +26,25 @@ template class dbTable<_dbObstruction>;
 
 _dbObstruction::_dbObstruction(_dbDatabase*, const _dbObstruction& o)
     : flags_(o.flags_),
-      inst_(o.inst_),
-      bbox_(o.bbox_),
-      min_spacing_(o.min_spacing_),
-      effective_width_(o.effective_width_)
+      _inst(o._inst),
+      _bbox(o._bbox),
+      _min_spacing(o._min_spacing),
+      _effective_width(o._effective_width)
 {
 }
 
 _dbObstruction::_dbObstruction(_dbDatabase*)
 {
-  flags_.slot_obs = 0;
-  flags_.fill_obs = 0;
-  flags_.except_pg_nets = 0;
-  flags_.pushed_down = 0;
-  flags_.has_min_spacing = 0;
-  flags_.has_effective_width = 0;
-  flags_.spare_bits = 0;
+  flags_._slot_obs = 0;
+  flags_._fill_obs = 0;
+  flags_._except_pg_nets = 0;
+  flags_._pushed_down = 0;
+  flags_._has_min_spacing = 0;
+  flags_._has_effective_width = 0;
+  flags_._spare_bits = 0;
   flags_._is_system_reserved = 0;
-  min_spacing_ = 0;
-  effective_width_ = 0;
+  _min_spacing = 0;
+  _effective_width = 0;
 }
 
 _dbObstruction::~_dbObstruction()
@@ -55,10 +55,10 @@ dbOStream& operator<<(dbOStream& stream, const _dbObstruction& obs)
 {
   uint* bit_field = (uint*) &obs.flags_;
   stream << *bit_field;
-  stream << obs.inst_;
-  stream << obs.bbox_;
-  stream << obs.min_spacing_;
-  stream << obs.effective_width_;
+  stream << obs._inst;
+  stream << obs._bbox;
+  stream << obs._min_spacing;
+  stream << obs._effective_width;
   return stream;
 }
 
@@ -66,15 +66,15 @@ dbIStream& operator>>(dbIStream& stream, _dbObstruction& obs)
 {
   uint* bit_field = (uint*) &obs.flags_;
   stream >> *bit_field;
-  stream >> obs.inst_;
-  stream >> obs.bbox_;
-  stream >> obs.min_spacing_;
-  stream >> obs.effective_width_;
+  stream >> obs._inst;
+  stream >> obs._bbox;
+  stream >> obs._min_spacing;
+  stream >> obs._effective_width;
 
   _dbDatabase* db = obs.getImpl()->getDatabase();
   if (!db->isSchema(db_schema_except_pg_nets_obstruction)) {
     // assume false for older databases
-    obs.flags_.except_pg_nets = false;
+    obs.flags_._except_pg_nets = false;
   }
 
   if (!db->isSchema(db_schema_die_area_is_polygon)) {
@@ -87,35 +87,35 @@ dbIStream& operator>>(dbIStream& stream, _dbObstruction& obs)
 
 bool _dbObstruction::operator==(const _dbObstruction& rhs) const
 {
-  if (flags_.slot_obs != rhs.flags_.slot_obs) {
+  if (flags_._slot_obs != rhs.flags_._slot_obs) {
     return false;
   }
 
-  if (flags_.fill_obs != rhs.flags_.fill_obs) {
+  if (flags_._fill_obs != rhs.flags_._fill_obs) {
     return false;
   }
 
-  if (flags_.except_pg_nets != rhs.flags_.except_pg_nets) {
+  if (flags_._except_pg_nets != rhs.flags_._except_pg_nets) {
     return false;
   }
 
-  if (flags_.pushed_down != rhs.flags_.pushed_down) {
+  if (flags_._pushed_down != rhs.flags_._pushed_down) {
     return false;
   }
 
-  if (flags_.has_min_spacing != rhs.flags_.has_min_spacing) {
+  if (flags_._has_min_spacing != rhs.flags_._has_min_spacing) {
     return false;
   }
 
-  if (flags_.has_effective_width != rhs.flags_.has_effective_width) {
+  if (flags_._has_effective_width != rhs.flags_._has_effective_width) {
     return false;
   }
 
-  if (inst_ != rhs.inst_) {
+  if (_inst != rhs._inst) {
     return false;
   }
 
-  if (bbox_ != rhs.bbox_) {
+  if (_bbox != rhs._bbox) {
     return false;
   }
 
@@ -126,19 +126,19 @@ bool _dbObstruction::operator<(const _dbObstruction& rhs) const
 {
   _dbBlock* lhs_block = (_dbBlock*) getOwner();
   _dbBlock* rhs_block = (_dbBlock*) rhs.getOwner();
-  _dbBox* lhs_box = lhs_block->box_tbl_->getPtr(bbox_);
-  _dbBox* rhs_box = rhs_block->box_tbl_->getPtr(rhs.bbox_);
+  _dbBox* lhs_box = lhs_block->_box_tbl->getPtr(_bbox);
+  _dbBox* rhs_box = rhs_block->_box_tbl->getPtr(rhs._bbox);
 
   if (*lhs_box < *rhs_box) {
     return true;
   }
 
   if (lhs_box->equal(*rhs_box)) {
-    if (inst_ && rhs.inst_) {
+    if (_inst && rhs._inst) {
       _dbBlock* lhs_blk = (_dbBlock*) getOwner();
       _dbBlock* rhs_blk = (_dbBlock*) rhs.getOwner();
-      _dbInst* lhs_inst = lhs_blk->inst_tbl_->getPtr(inst_);
-      _dbInst* rhs_inst = rhs_blk->inst_tbl_->getPtr(rhs.inst_);
+      _dbInst* lhs_inst = lhs_blk->_inst_tbl->getPtr(_inst);
+      _dbInst* rhs_inst = rhs_blk->_inst_tbl->getPtr(rhs._inst);
       int r = strcmp(lhs_inst->name_, rhs_inst->name_);
 
       if (r < 0) {
@@ -148,73 +148,73 @@ bool _dbObstruction::operator<(const _dbObstruction& rhs) const
       if (r > 0) {
         return false;
       }
-    } else if (inst_) {
+    } else if (_inst) {
       return false;
-    } else if (rhs.inst_) {
+    } else if (rhs._inst) {
       return true;
     }
 
-    if (flags_.slot_obs < rhs.flags_.slot_obs) {
+    if (flags_._slot_obs < rhs.flags_._slot_obs) {
       return true;
     }
 
-    if (flags_.slot_obs > rhs.flags_.slot_obs) {
-      return false;
-    }
-
-    if (flags_.fill_obs < rhs.flags_.fill_obs) {
-      return true;
-    }
-
-    if (flags_.fill_obs > rhs.flags_.fill_obs) {
+    if (flags_._slot_obs > rhs.flags_._slot_obs) {
       return false;
     }
 
-    if (flags_.except_pg_nets < rhs.flags_.except_pg_nets) {
+    if (flags_._fill_obs < rhs.flags_._fill_obs) {
       return true;
     }
 
-    if (flags_.except_pg_nets > rhs.flags_.except_pg_nets) {
+    if (flags_._fill_obs > rhs.flags_._fill_obs) {
       return false;
     }
 
-    if (flags_.pushed_down < rhs.flags_.pushed_down) {
+    if (flags_._except_pg_nets < rhs.flags_._except_pg_nets) {
       return true;
     }
 
-    if (flags_.pushed_down > rhs.flags_.pushed_down) {
+    if (flags_._except_pg_nets > rhs.flags_._except_pg_nets) {
       return false;
     }
 
-    if (flags_.has_min_spacing < rhs.flags_.has_min_spacing) {
+    if (flags_._pushed_down < rhs.flags_._pushed_down) {
       return true;
     }
 
-    if (flags_.has_min_spacing > rhs.flags_.has_min_spacing) {
+    if (flags_._pushed_down > rhs.flags_._pushed_down) {
       return false;
     }
 
-    if (flags_.has_effective_width < rhs.flags_.has_effective_width) {
+    if (flags_._has_min_spacing < rhs.flags_._has_min_spacing) {
       return true;
     }
 
-    if (flags_.has_effective_width > rhs.flags_.has_effective_width) {
+    if (flags_._has_min_spacing > rhs.flags_._has_min_spacing) {
       return false;
     }
 
-    if (min_spacing_ < rhs.min_spacing_) {
+    if (flags_._has_effective_width < rhs.flags_._has_effective_width) {
       return true;
     }
 
-    if (min_spacing_ > rhs.min_spacing_) {
+    if (flags_._has_effective_width > rhs.flags_._has_effective_width) {
       return false;
     }
 
-    if (effective_width_ < rhs.effective_width_) {
+    if (_min_spacing < rhs._min_spacing) {
       return true;
     }
 
-    if (effective_width_ > rhs.effective_width_) {
+    if (_min_spacing > rhs._min_spacing) {
+      return false;
+    }
+
+    if (_effective_width < rhs._effective_width) {
+      return true;
+    }
+
+    if (_effective_width > rhs._effective_width) {
       return false;
     }
   }
@@ -232,105 +232,105 @@ dbBox* dbObstruction::getBBox()
 {
   _dbObstruction* obs = (_dbObstruction*) this;
   _dbBlock* block = (_dbBlock*) obs->getOwner();
-  return (dbBox*) block->box_tbl_->getPtr(obs->bbox_);
+  return (dbBox*) block->_box_tbl->getPtr(obs->_bbox);
 }
 
 dbInst* dbObstruction::getInstance()
 {
   _dbObstruction* obs = (_dbObstruction*) this;
 
-  if (obs->inst_ == 0) {
+  if (obs->_inst == 0) {
     return nullptr;
   }
 
   _dbBlock* block = (_dbBlock*) obs->getOwner();
-  return (dbInst*) block->inst_tbl_->getPtr(obs->inst_);
+  return (dbInst*) block->_inst_tbl->getPtr(obs->_inst);
 }
 
 void dbObstruction::setSlotObstruction()
 {
   _dbObstruction* obs = (_dbObstruction*) this;
-  obs->flags_.slot_obs = 1;
+  obs->flags_._slot_obs = 1;
 }
 
 bool dbObstruction::isSlotObstruction()
 {
   _dbObstruction* obs = (_dbObstruction*) this;
-  return obs->flags_.slot_obs == 1;
+  return obs->flags_._slot_obs == 1;
 }
 
 void dbObstruction::setFillObstruction()
 {
   _dbObstruction* obs = (_dbObstruction*) this;
-  obs->flags_.fill_obs = 1;
+  obs->flags_._fill_obs = 1;
 }
 
 bool dbObstruction::isFillObstruction()
 {
   _dbObstruction* obs = (_dbObstruction*) this;
-  return obs->flags_.fill_obs == 1;
+  return obs->flags_._fill_obs == 1;
 }
 
 void dbObstruction::setExceptPGNetsObstruction()
 {
   _dbObstruction* obs = (_dbObstruction*) this;
-  obs->flags_.except_pg_nets = 1;
+  obs->flags_._except_pg_nets = 1;
 }
 
 bool dbObstruction::isExceptPGNetsObstruction()
 {
   _dbObstruction* obs = (_dbObstruction*) this;
-  return obs->flags_.except_pg_nets == 1;
+  return obs->flags_._except_pg_nets == 1;
 }
 
 void dbObstruction::setPushedDown()
 {
   _dbObstruction* obs = (_dbObstruction*) this;
-  obs->flags_.pushed_down = 1;
+  obs->flags_._pushed_down = 1;
 }
 
 bool dbObstruction::isPushedDown()
 {
   _dbObstruction* obs = (_dbObstruction*) this;
-  return obs->flags_.pushed_down == 1;
+  return obs->flags_._pushed_down == 1;
 }
 
 bool dbObstruction::hasEffectiveWidth()
 {
   _dbObstruction* obs = (_dbObstruction*) this;
-  return obs->flags_.has_effective_width == 1U;
+  return obs->flags_._has_effective_width == 1U;
 }
 
 void dbObstruction::setEffectiveWidth(int w)
 {
   _dbObstruction* obs = (_dbObstruction*) this;
-  obs->flags_.has_effective_width = 1U;
-  obs->effective_width_ = w;
+  obs->flags_._has_effective_width = 1U;
+  obs->_effective_width = w;
 }
 
 int dbObstruction::getEffectiveWidth()
 {
   _dbObstruction* obs = (_dbObstruction*) this;
-  return obs->effective_width_;
+  return obs->_effective_width;
 }
 
 bool dbObstruction::hasMinSpacing()
 {
   _dbObstruction* obs = (_dbObstruction*) this;
-  return obs->flags_.has_min_spacing == 1U;
+  return obs->flags_._has_min_spacing == 1U;
 }
 
 void dbObstruction::setMinSpacing(int w)
 {
   _dbObstruction* obs = (_dbObstruction*) this;
-  obs->flags_.has_min_spacing = 1U;
-  obs->min_spacing_ = w;
+  obs->flags_._has_min_spacing = 1U;
+  obs->_min_spacing = w;
 }
 
 int dbObstruction::getMinSpacing()
 {
   _dbObstruction* obs = (_dbObstruction*) this;
-  return obs->min_spacing_;
+  return obs->_min_spacing;
 }
 
 dbBlock* dbObstruction::getBlock()
@@ -362,22 +362,22 @@ dbObstruction* dbObstruction::create(dbBlock* block_,
   _dbTechLayer* layer = (_dbTechLayer*) layer_;
   _dbInst* inst = (_dbInst*) inst_;
 
-  _dbObstruction* obs = block->obstruction_tbl_->create();
+  _dbObstruction* obs = block->_obstruction_tbl->create();
 
   if (inst) {
-    obs->inst_ = inst->getOID();
+    obs->_inst = inst->getOID();
   }
 
-  _dbBox* box = block->box_tbl_->create();
+  _dbBox* box = block->_box_tbl->create();
   box->shape_.rect.init(x1, y1, x2, y2);
   box->flags_.owner_type = dbBoxOwner::OBSTRUCTION;
   box->owner_ = obs->getOID();
   box->flags_.layer_id = layer->getOID();
-  obs->bbox_ = box->getOID();
+  obs->_bbox = box->getOID();
 
   // Update bounding box of block
   block->add_rect(box->shape_.rect);
-  for (auto callback : block->callbacks_) {
+  for (auto callback : block->_callbacks) {
     callback->inDbObstructionCreate((dbObstruction*) obs);
   }
   return (dbObstruction*) obs;
@@ -396,11 +396,11 @@ void dbObstruction::destroy(dbObstruction* obstruction)
         "You cannot delete a system created obstruction (isSystemReserved).");
   }
 
-  for (auto callback : block->callbacks_) {
+  for (auto callback : block->_callbacks) {
     callback->inDbObstructionDestroy(obstruction);
   }
   dbProperty::destroyProperties(obs);
-  block->obstruction_tbl_->destroy(obs);
+  block->_obstruction_tbl->destroy(obs);
 }
 
 dbSet<dbObstruction>::iterator dbObstruction::destroy(
@@ -415,7 +415,7 @@ dbSet<dbObstruction>::iterator dbObstruction::destroy(
 dbObstruction* dbObstruction::getObstruction(dbBlock* block_, uint dbid_)
 {
   _dbBlock* block = (_dbBlock*) block_;
-  return (dbObstruction*) block->obstruction_tbl_->getPtr(dbid_);
+  return (dbObstruction*) block->_obstruction_tbl->getPtr(dbid_);
 }
 
 void _dbObstruction::collectMemInfo(MemInfo& info)

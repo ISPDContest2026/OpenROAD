@@ -60,7 +60,6 @@ struct Segment  // A Segment is a 2-pin connection
         y1(y1),
         x2(x2),
         y2(y2),
-        Zpoint(-1),
         cost(cost),
         xFirst(false),
         HVH(false)
@@ -175,8 +174,8 @@ struct TreeNode
   int nbr_count = 0;
   int nbr[3];   // three neighbors
   int edge[3];  // three adjacent edges
-  int hID = -1;
-  int lID = -1;
+  int hID;
+  int lID;
   // If two nodes are at the same x & y then the duplicate will have
   // stackAlias set to the index of the first node.  This does not
   // apply to pins nodes, only Steiner nodes.
@@ -220,7 +219,7 @@ struct TreeEdge
 {
   bool assigned;
 
-  int len = 0;  // the Manhanttan Distance for two end nodes
+  int len;  // the Manhanttan Distance for two end nodes
   int n1, n1a;
   int n2, n2a;
   Route route;

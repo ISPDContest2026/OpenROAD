@@ -817,16 +817,16 @@ void set_title(std::string title)
   gui->setMainWindowTitle(title);
 }
 
-int gif_start(const char* filename)
+void gif_start(const char* filename)
 {
   if (!check_gui("gif_start")) {
-    return 0;
+    return;
   }
   auto gui = gui::Gui::get();
-  return gui->gifStart(filename);
+  gui->gifStart(filename);
 }
 
-void gif_add(int key, double xlo, double ylo, double xhi, double yhi, int width_px = 0, double dbu_per_pixel = 0, int delay = 0)
+void gif_add(double xlo, double ylo, double xhi, double yhi, int width_px = 0, double dbu_per_pixel = 0, int delay = 0)
 {
   if (!check_gui("gif_add")) {
     return;
@@ -836,24 +836,16 @@ void gif_add(int key, double xlo, double ylo, double xhi, double yhi, int width_
   if (delay > 0) {
     delay_pass = delay;
   }
-  std::optional<int> key_pass;
-  if (key >= 0) {
-    key_pass = key;
-  }
-  gui->gifAddFrame(key_pass, make_rect(xlo, ylo, xhi, yhi), width_px, dbu_per_pixel, delay_pass);
+  gui->gifAddFrame(make_rect(xlo, ylo, xhi, yhi), width_px, dbu_per_pixel, delay_pass);
 }
 
-void gif_end(int key)
+void gif_end()
 {
   if (!check_gui("gif_end")) {
     return;
   }
-  std::optional<int> key_pass;
-  if (key >= 0) {
-    key_pass = key;
-  }
   auto gui = gui::Gui::get();
-  gui->gifEnd(key_pass);
+  gui->gifEnd();
 }
 
 %} // inline

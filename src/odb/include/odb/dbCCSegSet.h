@@ -17,6 +17,19 @@ class dbCCSeg;
 template <>
 class dbSetIterator<dbCCSeg>
 {
+  friend class dbSet<dbCCSeg>;
+
+  dbIterator* _itr;
+  uint _cur;
+  uint _pid;
+
+  dbSetIterator(dbIterator* itr, uint id, uint pid)
+  {
+    _itr = itr;
+    _cur = id;
+    _pid = pid;
+  }
+
  public:
   using value_type = dbCCSeg*;
   using difference_type = std::ptrdiff_t;
@@ -26,128 +39,113 @@ class dbSetIterator<dbCCSeg>
 
   dbSetIterator()
   {
-    itr_ = nullptr;
-    cur_ = 0;
-    pid_ = 0;
+    _itr = nullptr;
+    _cur = 0;
+    _pid = 0;
   }
 
   dbSetIterator(const dbSetIterator& it)
   {
-    itr_ = it.itr_;
-    cur_ = it.cur_;
-    pid_ = it.pid_;
+    _itr = it._itr;
+    _cur = it._cur;
+    _pid = it._pid;
   }
 
   bool operator==(const dbSetIterator<dbCCSeg>& it)
   {
-    return (itr_ == it.itr_) && (cur_ == it.cur_) && (pid_ == it.pid_);
+    return (_itr == it._itr) && (_cur == it._cur) && (_pid == it._pid);
   }
 
   bool operator!=(const dbSetIterator<dbCCSeg>& it)
   {
-    return (itr_ != it.itr_) || (cur_ != it.cur_) || (pid_ != it.pid_);
+    return (_itr != it._itr) || (_cur != it._cur) || (_pid != it._pid);
   }
 
-  dbCCSeg* operator*() { return (dbCCSeg*) itr_->getObject(cur_); }
+  dbCCSeg* operator*() { return (dbCCSeg*) _itr->getObject(_cur); }
 
-  dbCCSeg* operator->() { return (dbCCSeg*) itr_->getObject(cur_); }
+  dbCCSeg* operator->() { return (dbCCSeg*) _itr->getObject(_cur); }
 
   dbSetIterator<dbCCSeg>& operator++()
   {
-    cur_ = itr_->next(cur_, pid_);
+    _cur = _itr->next(_cur, _pid);
     return *this;
   }
 
   dbSetIterator<dbCCSeg> operator++(int)
   {
     dbSetIterator it(*this);
-    cur_ = itr_->next(cur_, pid_);
+    _cur = _itr->next(_cur, _pid);
     return it;
   }
-
- private:
-  friend class dbSet<dbCCSeg>;
-
-  dbSetIterator(dbIterator* itr, uint id, uint pid)
-  {
-    itr_ = itr;
-    cur_ = id;
-    pid_ = pid;
-  }
-
-  dbIterator* itr_;
-  uint cur_;
-  uint pid_;
 };
 
 template <>
 class dbSet<dbCCSeg>
 {
+  dbIterator* _itr;
+  dbObject* _parent;
+  uint _pid;
+
  public:
   using iterator = dbSetIterator<dbCCSeg>;
 
   dbSet()
   {
-    itr_ = nullptr;
-    parent_ = nullptr;
-    pid_ = 0;
+    _itr = nullptr;
+    _parent = nullptr;
+    _pid = 0;
   }
 
   dbSet(dbObject* parent, dbIterator* itr)
   {
-    parent_ = parent;
-    itr_ = itr;
-    pid_ = parent->getId();
+    _parent = parent;
+    _itr = itr;
+    _pid = parent->getId();
   }
 
   dbSet(const dbSet<dbCCSeg>& c)
   {
-    itr_ = c.itr_;
-    parent_ = c.parent_;
-    pid_ = c.pid_;
+    _itr = c._itr;
+    _parent = c._parent;
+    _pid = c._pid;
   }
 
   ///
   /// Returns the number of items in this set.
   ///
-  uint size() { return itr_->size(parent_); }
+  uint size() { return _itr->size(_parent); }
 
   ///
   /// Return a begin() iterator.
   ///
-  iterator begin() { return iterator(itr_, itr_->begin(parent_), pid_); }
+  iterator begin() { return iterator(_itr, _itr->begin(_parent), _pid); }
 
   ///
   /// Return an end() iterator.
   ///
-  iterator end() { return iterator(itr_, itr_->end(parent_), pid_); }
+  iterator end() { return iterator(_itr, _itr->end(_parent), _pid); }
 
   ///
   /// Returns the maximum number sequential elements the this set
   /// may iterate.
   ///
-  uint sequential() { return itr_->sequential(); }
+  uint sequential() { return _itr->sequential(); }
 
   ///
   /// Returns true if this set is reversible.
   ///
-  bool reversible() { return itr_->reversible(); }
+  bool reversible() { return _itr->reversible(); }
 
   ///
   /// Returns true if the is iterated in the reverse order that
   /// it was created.
   ///
-  bool orderReversed() { return itr_->orderReversed(); }
+  bool orderReversed() { return _itr->orderReversed(); }
 
   ///
   /// Reverse the order of this set.
   ///
-  void reverse() { itr_->reverse(parent_); }
-
- private:
-  dbIterator* itr_;
-  dbObject* parent_;
-  uint pid_;
+  void reverse() { _itr->reverse(_parent); }
 };
 
 }  // namespace odb

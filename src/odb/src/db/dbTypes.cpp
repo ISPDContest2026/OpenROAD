@@ -63,14 +63,14 @@ std::optional<dbOrientType::Value> dbOrientType::fromString(const char* orient)
 dbOrientType::dbOrientType(const char* orient)
 {
   auto opt = fromString(orient);
-  value_ = opt.value_or(dbOrientType::DEFAULT);
+  _value = opt.value_or(dbOrientType::DEFAULT);
 }
 
 const char* dbOrientType::getString() const
 {
   const char* value = "";
 
-  switch (value_) {
+  switch (_value) {
     case R0:
       value = "R0";
       break;
@@ -109,7 +109,7 @@ const char* dbOrientType::getString() const
 
 dbOrientType dbOrientType::flipX() const
 {
-  switch (value_) {
+  switch (_value) {
     case R0:
       return MX;
     case R90:
@@ -132,7 +132,7 @@ dbOrientType dbOrientType::flipX() const
 
 dbOrientType dbOrientType::flipY() const
 {
-  switch (value_) {
+  switch (_value) {
     case R0:
       return MY;
     case R90:
@@ -155,7 +155,7 @@ dbOrientType dbOrientType::flipY() const
 
 bool dbOrientType::isRightAngleRotation() const
 {
-  switch (value_) {
+  switch (_value) {
     case R90:
     case R270:
     case MYR90:
@@ -234,69 +234,69 @@ bool dbOrientType3D::isMirrorZ() const
 }
 
 dbGDSSTrans::dbGDSSTrans(bool flipX, double mag, double angle)
-    : flipX_(flipX), mag_(mag), angle_(angle)
+    : _flipX(flipX), _mag(mag), _angle(angle)
 {
 }
 
 bool dbGDSSTrans::operator==(const dbGDSSTrans& rhs) const
 {
-  return (flipX_ == rhs.flipX_) && (mag_ == rhs.mag_) && (angle_ == rhs.angle_);
+  return (_flipX == rhs._flipX) && (_mag == rhs._mag) && (_angle == rhs._angle);
 }
 
 std::string dbGDSSTrans::to_string() const
 {
   std::string s;
-  if (flipX_) {
+  if (_flipX) {
     s += std::string("FLIP_X ");
   }
   s += "MAG ";
-  s += std::to_string(mag_);
+  s += std::to_string(_mag);
   s += " ANGLE ";
-  s += std::to_string(angle_);
+  s += std::to_string(_angle);
   s += " ";
   return s;
 }
 
 bool dbGDSSTrans::identity() const
 {
-  return (!flipX_) && (mag_ == 1.0) && (angle_ == 0.0);
+  return (!_flipX) && (_mag == 1.0) && (_angle == 0.0);
 }
 
 dbGDSTextPres::dbGDSTextPres(dbGDSTextPres::VPres vPres,
                              dbGDSTextPres::HPres hPres)
-    : v_pres_(vPres), h_pres_(hPres)
+    : _vPres(vPres), _hPres(hPres)
 {
 }
 
 bool dbGDSTextPres::operator==(const dbGDSTextPres& rhs) const
 {
-  return (v_pres_ == rhs.v_pres_) && (h_pres_ == rhs.h_pres_);
+  return (_vPres == rhs._vPres) && (_hPres == rhs._hPres);
 }
 
 std::string dbGDSTextPres::to_string() const
 {
   std::string s;
   s += "FONT ";
-  s += (v_pres_ == dbGDSTextPres::VPres::TOP) ? std::string("TOP ")
-                                              : std::string("BOTTOM ");
-  s += (h_pres_ == dbGDSTextPres::HPres::LEFT) ? std::string("LEFT ")
-                                               : std::string("RIGHT ");
+  s += (_vPres == dbGDSTextPres::VPres::TOP) ? std::string("TOP ")
+                                             : std::string("BOTTOM ");
+  s += (_hPres == dbGDSTextPres::HPres::LEFT) ? std::string("LEFT ")
+                                              : std::string("RIGHT ");
   return s;
 }
 
 dbIStream& operator>>(dbIStream& stream, dbGDSSTrans& t)
 {
-  stream >> t.flipX_;
-  stream >> t.mag_;
-  stream >> t.angle_;
+  stream >> t._flipX;
+  stream >> t._mag;
+  stream >> t._angle;
   return stream;
 }
 
 dbOStream& operator<<(dbOStream& stream, const dbGDSSTrans& t)
 {
-  stream << t.flipX_;
-  stream << t.mag_;
-  stream << t.angle_;
+  stream << t._flipX;
+  stream << t._mag;
+  stream << t._angle;
   return stream;
 }
 
@@ -321,31 +321,31 @@ dbIStream& operator>>(dbIStream& stream, dbGDSTextPres& t)
   uint8_t vPresTemp, hPresTemp;
   stream >> vPresTemp;
   stream >> hPresTemp;
-  t.v_pres_ = static_cast<dbGDSTextPres::VPres>(vPresTemp);
-  t.h_pres_ = static_cast<dbGDSTextPres::HPres>(hPresTemp);
+  t._vPres = static_cast<dbGDSTextPres::VPres>(vPresTemp);
+  t._hPres = static_cast<dbGDSTextPres::HPres>(hPresTemp);
   return stream;
 }
 
 dbOStream& operator<<(dbOStream& stream, const dbGDSTextPres& t)
 {
-  stream << static_cast<uint8_t>(t.v_pres_);
-  stream << static_cast<uint8_t>(t.h_pres_);
+  stream << static_cast<uint8_t>(t._vPres);
+  stream << static_cast<uint8_t>(t._hPres);
   return stream;
 }
 
 dbGroupType::dbGroupType(const char* type)
 {
   if (strcasecmp(type, "PHYSICAL_CLUSTER") == 0) {
-    value_ = PHYSICAL_CLUSTER;
+    _value = PHYSICAL_CLUSTER;
 
   } else if (strcasecmp(type, "VOLTAGE_DOMAIN") == 0) {
-    value_ = VOLTAGE_DOMAIN;
+    _value = VOLTAGE_DOMAIN;
 
   } else if (strcasecmp(type, "POWER_DOMAIN") == 0) {
-    value_ = POWER_DOMAIN;
+    _value = POWER_DOMAIN;
 
   } else {
-    value_ = PHYSICAL_CLUSTER;
+    _value = PHYSICAL_CLUSTER;
   }
 }
 
@@ -353,7 +353,7 @@ const char* dbGroupType::getString() const
 {
   const char* value = "";
 
-  switch (value_) {
+  switch (_value) {
     case PHYSICAL_CLUSTER:
       value = "PHYSICAL_CLUSTER";
       break;
@@ -377,37 +377,37 @@ const char* dbGroupType::getString() const
 dbSigType::dbSigType(const char* value)
 {
   if (strcasecmp(value, "SIGNAL") == 0) {
-    value_ = SIGNAL;
+    _value = SIGNAL;
 
   } else if (strcasecmp(value, "POWER") == 0) {
-    value_ = POWER;
+    _value = POWER;
 
   } else if (strcasecmp(value, "GROUND") == 0) {
-    value_ = GROUND;
+    _value = GROUND;
 
   } else if (strcasecmp(value, "CLOCK") == 0) {
-    value_ = CLOCK;
+    _value = CLOCK;
 
   } else if (strcasecmp(value, "ANALOG") == 0) {
-    value_ = ANALOG;
+    _value = ANALOG;
 
   } else if (strcasecmp(value, "RESET") == 0) {
-    value_ = RESET;
+    _value = RESET;
 
   } else if (strcasecmp(value, "SCAN") == 0) {
-    value_ = SCAN;
+    _value = SCAN;
 
   } else if (strcasecmp(value, "TIEOFF") == 0) {
-    value_ = TIEOFF;
+    _value = TIEOFF;
 
   } else {
-    value_ = SIGNAL;
+    _value = SIGNAL;
   }
 }
 
 bool dbSigType::isSupply() const
 {
-  switch (value_) {
+  switch (_value) {
     case POWER:
     case GROUND:
       return true;
@@ -427,7 +427,7 @@ const char* dbSigType::getString() const
 {
   const char* value = "";
 
-  switch (value_) {
+  switch (_value) {
     case SIGNAL:
       value = "SIGNAL";
       break;
@@ -467,19 +467,19 @@ const char* dbSigType::getString() const
 dbIoType::dbIoType(const char* value)
 {
   if (strcasecmp(value, "INPUT") == 0) {
-    value_ = INPUT;
+    _value = INPUT;
 
   } else if (strcasecmp(value, "OUTPUT") == 0) {
-    value_ = OUTPUT;
+    _value = OUTPUT;
 
   } else if (strcasecmp(value, "INOUT") == 0) {
-    value_ = INOUT;
+    _value = INOUT;
 
   } else if (strcasecmp(value, "FEEDTHRU") == 0) {
-    value_ = FEEDTHRU;
+    _value = FEEDTHRU;
 
   } else {
-    value_ = INPUT;
+    _value = INPUT;
   }
 }
 
@@ -487,7 +487,7 @@ const char* dbIoType::getString() const
 {
   const char* value = "";
 
-  switch (value_) {
+  switch (_value) {
     case INPUT:
       value = "INPUT";
       break;
@@ -511,28 +511,28 @@ const char* dbIoType::getString() const
 dbPlacementStatus::dbPlacementStatus(const char* value)
 {
   if (strcasecmp(value, "NONE") == 0) {
-    value_ = NONE;
+    _value = NONE;
 
   } else if (strcasecmp(value, "UNPLACED") == 0) {
-    value_ = UNPLACED;
+    _value = UNPLACED;
 
   } else if (strcasecmp(value, "SUGGESTED") == 0) {
-    value_ = SUGGESTED;
+    _value = SUGGESTED;
 
   } else if (strcasecmp(value, "PLACED") == 0) {
-    value_ = PLACED;
+    _value = PLACED;
 
   } else if (strcasecmp(value, "LOCKED") == 0) {
-    value_ = LOCKED;
+    _value = LOCKED;
 
   } else if (strcasecmp(value, "FIRM") == 0) {
-    value_ = FIRM;
+    _value = FIRM;
 
   } else if (strcasecmp(value, "COVER") == 0) {
-    value_ = COVER;
+    _value = COVER;
 
   } else {
-    value_ = NONE;
+    _value = NONE;
   }
 }
 
@@ -540,7 +540,7 @@ const char* dbPlacementStatus::getString() const
 {
   const char* value = "";
 
-  switch (value_) {
+  switch (_value) {
     case NONE:
       value = "NONE";
       break;
@@ -575,7 +575,7 @@ const char* dbPlacementStatus::getString() const
 
 bool dbPlacementStatus::isPlaced() const
 {
-  switch (value_) {
+  switch (_value) {
     case NONE:
     case UNPLACED:
     case SUGGESTED:
@@ -592,7 +592,7 @@ bool dbPlacementStatus::isPlaced() const
 
 bool dbPlacementStatus::isFixed() const
 {
-  switch (value_) {
+  switch (_value) {
     case NONE:
     case UNPLACED:
     case SUGGESTED:
@@ -609,124 +609,124 @@ bool dbPlacementStatus::isFixed() const
 
 dbMasterType::dbMasterType(const char* value)
 {
-  value_ = CORE;
+  _value = CORE;
 
   if (strcasecmp(value, "COVER") == 0) {
-    value_ = COVER;
+    _value = COVER;
 
   } else if (strcasecmp(value, "COVER BUMP") == 0) {
-    value_ = COVER_BUMP;
+    _value = COVER_BUMP;
 
   } else if (strcasecmp(value, "RING") == 0) {
-    value_ = RING;
+    _value = RING;
 
   } else if (strcasecmp(value, "BLOCK") == 0) {
-    value_ = BLOCK;
+    _value = BLOCK;
 
   } else if (strcasecmp(value, "BLOCK BLACKBOX") == 0) {
-    value_ = BLOCK_BLACKBOX;
+    _value = BLOCK_BLACKBOX;
 
   } else if (strcasecmp(value, "BLOCK SOFT") == 0) {
-    value_ = BLOCK_SOFT;
+    _value = BLOCK_SOFT;
 
   } else if (strcasecmp(value, "PAD") == 0) {
-    value_ = PAD;
+    _value = PAD;
 
   } else if (strcasecmp(value, "PAD INPUT") == 0) {
-    value_ = PAD_INPUT;
+    _value = PAD_INPUT;
 
   } else if (strcasecmp(value, "PAD OUTPUT") == 0) {
-    value_ = PAD_OUTPUT;
+    _value = PAD_OUTPUT;
 
   } else if (strcasecmp(value, "PAD INOUT") == 0) {
-    value_ = PAD_INOUT;
+    _value = PAD_INOUT;
 
   } else if (strcasecmp(value, "PAD POWER") == 0) {
-    value_ = PAD_POWER;
+    _value = PAD_POWER;
 
   } else if (strcasecmp(value, "PAD SPACER") == 0) {
-    value_ = PAD_SPACER;
+    _value = PAD_SPACER;
 
   } else if (strcasecmp(value, "PAD AREAIO") == 0) {
-    value_ = PAD_AREAIO;
+    _value = PAD_AREAIO;
 
   } else if (strcasecmp(value, "CORE") == 0) {
-    value_ = CORE;
+    _value = CORE;
 
   } else if (strcasecmp(value, "CORE FEEDTHRU") == 0) {
-    value_ = CORE_FEEDTHRU;
+    _value = CORE_FEEDTHRU;
 
   } else if (strcasecmp(value, "CORE TIEHIGH") == 0) {
-    value_ = CORE_TIEHIGH;
+    _value = CORE_TIEHIGH;
 
   } else if (strcasecmp(value, "CORE TIELOW") == 0) {
-    value_ = CORE_TIELOW;
+    _value = CORE_TIELOW;
 
   } else if (strcasecmp(value, "CORE SPACER") == 0) {
-    value_ = CORE_SPACER;
+    _value = CORE_SPACER;
 
   } else if (strcasecmp(value, "CORE ANTENNACELL") == 0) {
-    value_ = CORE_ANTENNACELL;
+    _value = CORE_ANTENNACELL;
 
   } else if (strcasecmp(value, "CORE WELLTAP") == 0) {
-    value_ = CORE_WELLTAP;
+    _value = CORE_WELLTAP;
 
   } else if (strcasecmp(value, "ENDCAP") == 0) {
-    value_ = ENDCAP;
+    _value = ENDCAP;
 
   } else if (strcasecmp(value, "ENDCAP PRE") == 0) {
-    value_ = ENDCAP_PRE;
+    _value = ENDCAP_PRE;
 
   } else if (strcasecmp(value, "ENDCAP POST") == 0) {
-    value_ = ENDCAP_POST;
+    _value = ENDCAP_POST;
 
   } else if (strcasecmp(value, "ENDCAP TOPLEFT") == 0) {
-    value_ = ENDCAP_TOPLEFT;
+    _value = ENDCAP_TOPLEFT;
 
   } else if (strcasecmp(value, "ENDCAP TOPRIGHT") == 0) {
-    value_ = ENDCAP_TOPRIGHT;
+    _value = ENDCAP_TOPRIGHT;
 
   } else if (strcasecmp(value, "ENDCAP BOTTOMLEFT") == 0) {
-    value_ = ENDCAP_BOTTOMLEFT;
+    _value = ENDCAP_BOTTOMLEFT;
 
   } else if (strcasecmp(value, "ENDCAP BOTTOMRIGHT") == 0) {
-    value_ = ENDCAP_BOTTOMRIGHT;
+    _value = ENDCAP_BOTTOMRIGHT;
 
   } else if (strcasecmp(value, "ENDCAP BOTTOMEDGE") == 0) {
-    value_ = ENDCAP_LEF58_BOTTOMEDGE;
+    _value = ENDCAP_LEF58_BOTTOMEDGE;
 
   } else if (strcasecmp(value, "ENDCAP TOPEDGE") == 0) {
-    value_ = ENDCAP_LEF58_TOPEDGE;
+    _value = ENDCAP_LEF58_TOPEDGE;
 
   } else if (strcasecmp(value, "ENDCAP RIGHTEDGE") == 0) {
-    value_ = ENDCAP_LEF58_RIGHTEDGE;
+    _value = ENDCAP_LEF58_RIGHTEDGE;
 
   } else if (strcasecmp(value, "ENDCAP LEFTEDGE") == 0) {
-    value_ = ENDCAP_LEF58_LEFTEDGE;
+    _value = ENDCAP_LEF58_LEFTEDGE;
 
   } else if (strcasecmp(value, "ENDCAP RIGHTBOTTOMEDGE") == 0) {
-    value_ = ENDCAP_LEF58_RIGHTBOTTOMEDGE;
+    _value = ENDCAP_LEF58_RIGHTBOTTOMEDGE;
 
   } else if (strcasecmp(value, "ENDCAP LEFTBOTTOMEDGE") == 0) {
-    value_ = ENDCAP_LEF58_LEFTBOTTOMEDGE;
+    _value = ENDCAP_LEF58_LEFTBOTTOMEDGE;
 
   } else if (strcasecmp(value, "ENDCAP RIGHTTOPEDGE") == 0) {
-    value_ = ENDCAP_LEF58_RIGHTTOPEDGE;
+    _value = ENDCAP_LEF58_RIGHTTOPEDGE;
 
   } else if (strcasecmp(value, "ENDCAP LEFTTOPEDGE") == 0) {
-    value_ = ENDCAP_LEF58_LEFTTOPEDGE;
+    _value = ENDCAP_LEF58_LEFTTOPEDGE;
 
   } else if (strcasecmp(value, "ENDCAP RIGHTBOTTOMCORNER") == 0) {
-    value_ = ENDCAP_LEF58_RIGHTBOTTOMCORNER;
+    _value = ENDCAP_LEF58_RIGHTBOTTOMCORNER;
 
   } else if (strcasecmp(value, "ENDCAP LEFTBOTTOMCORNER") == 0) {
-    value_ = ENDCAP_LEF58_LEFTBOTTOMCORNER;
+    _value = ENDCAP_LEF58_LEFTBOTTOMCORNER;
 
   } else if (strcasecmp(value, "ENDCAP RIGHTTOPCORNER") == 0) {
-    value_ = ENDCAP_LEF58_RIGHTTOPCORNER;
+    _value = ENDCAP_LEF58_RIGHTTOPCORNER;
 
   } else if (strcasecmp(value, "ENDCAP LEFTTOPCORNER") == 0) {
-    value_ = ENDCAP_LEF58_LEFTTOPCORNER;
+    _value = ENDCAP_LEF58_LEFTTOPCORNER;
   }
 }
 
@@ -734,7 +734,7 @@ const char* dbMasterType::getString() const
 {
   const char* value = "";
 
-  switch (value_) {
+  switch (_value) {
     case COVER:
       value = "COVER";
       break;
@@ -897,7 +897,7 @@ const char* dbMasterType::getString() const
 
 bool dbMasterType::isBlock() const
 {
-  switch (value_) {
+  switch (_value) {
     case BLOCK:
     case BLOCK_BLACKBOX:
     case BLOCK_SOFT:
@@ -946,7 +946,7 @@ bool dbMasterType::isBlock() const
 
 bool dbMasterType::isCore() const
 {
-  switch (value_) {
+  switch (_value) {
     case CORE:
     case CORE_FEEDTHRU:
     case CORE_TIEHIGH:
@@ -995,7 +995,7 @@ bool dbMasterType::isCore() const
 
 bool dbMasterType::isPad() const
 {
-  switch (value_) {
+  switch (_value) {
     case PAD:
     case PAD_INPUT:
     case PAD_OUTPUT:
@@ -1044,7 +1044,7 @@ bool dbMasterType::isPad() const
 
 bool dbMasterType::isEndCap() const
 {
-  switch (value_) {
+  switch (_value) {
     case ENDCAP:
     case ENDCAP_PRE:
     case ENDCAP_POST:
@@ -1093,7 +1093,7 @@ bool dbMasterType::isEndCap() const
 
 bool dbMasterType::isCover() const
 {
-  switch (value_) {
+  switch (_value) {
     case COVER:
     case COVER_BUMP:
       return true;
@@ -1169,14 +1169,14 @@ std::optional<dbTechLayerType::Value> dbTechLayerType::fromString(
 dbTechLayerType::dbTechLayerType(const char* value)
 {
   auto opt = fromString(value);
-  value_ = opt.value_or(dbTechLayerType::DEFAULT);
+  _value = opt.value_or(dbTechLayerType::DEFAULT);
 }
 
 const char* dbTechLayerType::getString() const
 {
   const char* value = "";
 
-  switch (value_) {
+  switch (_value) {
     case NONE:
       value = "NONE";
       break;
@@ -1208,16 +1208,16 @@ const char* dbTechLayerType::getString() const
 dbTechLayerDir::dbTechLayerDir(const char* value)
 {
   if (strcasecmp(value, "NONE") == 0) {
-    value_ = NONE;
+    _value = NONE;
 
   } else if (strcasecmp(value, "HORIZONTAL") == 0) {
-    value_ = HORIZONTAL;
+    _value = HORIZONTAL;
 
   } else if (strcasecmp(value, "VERTICAL") == 0) {
-    value_ = VERTICAL;
+    _value = VERTICAL;
 
   } else {
-    value_ = NONE;
+    _value = NONE;
   }
 }
 
@@ -1225,7 +1225,7 @@ const char* dbTechLayerDir::getString() const
 {
   const char* value = "";
 
-  switch (value_) {
+  switch (_value) {
     case NONE:
       value = "NONE";
       break;
@@ -1245,16 +1245,16 @@ const char* dbTechLayerDir::getString() const
 dbTechLayerMinStepType::dbTechLayerMinStepType(const char* value)
 {
   if (strcasecmp(value, "INSIDECORNER") == 0) {
-    value_ = INSIDE_CORNER;
+    _value = INSIDE_CORNER;
 
   } else if (strcasecmp(value, "OUTSIDECORNER") == 0) {
-    value_ = OUTSIDE_CORNER;
+    _value = OUTSIDE_CORNER;
 
   } else if (strcasecmp(value, "STEP") == 0) {
-    value_ = STEP;
+    _value = STEP;
 
   } else {
-    value_ = OUTSIDE_CORNER;
+    _value = OUTSIDE_CORNER;
   }
 }
 
@@ -1262,7 +1262,7 @@ const char* dbTechLayerMinStepType::getString() const
 {
   const char* value = "";
 
-  switch (value_) {
+  switch (_value) {
     case INSIDE_CORNER:
       value = "INSIDECORNER";
       break;

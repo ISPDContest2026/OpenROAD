@@ -11,12 +11,12 @@
 
 namespace odb {
 
-bool dbSBoxItr::reversible() const
+bool dbSBoxItr::reversible()
 {
   return true;
 }
 
-bool dbSBoxItr::orderReversed() const
+bool dbSBoxItr::orderReversed()
 {
   return true;
 }
@@ -26,18 +26,18 @@ void dbSBoxItr::reverse(dbObject* parent)
   switch (parent->getImpl()->getType()) {
     case dbSWireObj: {
       _dbSWire* wire = (_dbSWire*) parent;
-      uint id = wire->wires_;
+      uint id = wire->_wires;
       uint list = 0;
 
       while (id != 0) {
-        _dbSBox* b = box_tbl_->getPtr(id);
+        _dbSBox* b = _box_tbl->getPtr(id);
         uint n = b->next_box_;
         b->next_box_ = list;
         list = id;
         id = n;
       }
 
-      wire->wires_ = list;
+      wire->_wires = list;
       break;
     }
 
@@ -46,12 +46,12 @@ void dbSBoxItr::reverse(dbObject* parent)
   }
 }
 
-uint dbSBoxItr::sequential() const
+uint dbSBoxItr::sequential()
 {
   return 0;
 }
 
-uint dbSBoxItr::size(dbObject* parent) const
+uint dbSBoxItr::size(dbObject* parent)
 {
   uint id;
   uint cnt = 0;
@@ -64,12 +64,12 @@ uint dbSBoxItr::size(dbObject* parent) const
   return cnt;
 }
 
-uint dbSBoxItr::begin(dbObject* parent) const
+uint dbSBoxItr::begin(dbObject* parent)
 {
   switch (parent->getImpl()->getType()) {
     case dbSWireObj: {
       _dbSWire* wire = (_dbSWire*) parent;
-      return wire->wires_;
+      return wire->_wires;
     }
 
     default:
@@ -79,20 +79,20 @@ uint dbSBoxItr::begin(dbObject* parent) const
   return 0;
 }
 
-uint dbSBoxItr::end(dbObject* /* unused: parent */) const
+uint dbSBoxItr::end(dbObject* /* unused: parent */)
 {
   return 0;
 }
 
-uint dbSBoxItr::next(uint id, ...) const
+uint dbSBoxItr::next(uint id, ...)
 {
-  _dbSBox* box = box_tbl_->getPtr(id);
+  _dbSBox* box = _box_tbl->getPtr(id);
   return box->next_box_;
 }
 
 dbObject* dbSBoxItr::getObject(uint id, ...)
 {
-  return box_tbl_->getPtr(id);
+  return _box_tbl->getPtr(id);
 }
 
 }  // namespace odb

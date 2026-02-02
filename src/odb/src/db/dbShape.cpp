@@ -16,18 +16,18 @@ namespace odb {
 
 bool dbShape::operator<(const dbShape& rhs)
 {
-  if (type_ < rhs.type_) {
+  if (_type < rhs._type) {
     return true;
   }
 
-  if (type_ > rhs.type_) {
+  if (_type > rhs._type) {
     return false;
   }
 
-  switch (type_) {
+  switch (_type) {
     case VIA: {
-      _dbVia* lhs_via = (_dbVia*) via_;
-      _dbVia* rhs_via = (_dbVia*) rhs.via_;
+      _dbVia* lhs_via = (_dbVia*) _via;
+      _dbVia* rhs_via = (_dbVia*) rhs._via;
 
       int r = strcmp(lhs_via->name_, rhs_via->name_);
 
@@ -43,8 +43,8 @@ bool dbShape::operator<(const dbShape& rhs)
     }
 
     case TECH_VIA: {
-      _dbTechVia* lhs_via = (_dbTechVia*) via_;
-      _dbTechVia* rhs_via = (_dbTechVia*) rhs.via_;
+      _dbTechVia* lhs_via = (_dbTechVia*) _via;
+      _dbTechVia* rhs_via = (_dbTechVia*) rhs._via;
 
       int r = strcmp(lhs_via->name_, rhs_via->name_);
 
@@ -59,8 +59,8 @@ bool dbShape::operator<(const dbShape& rhs)
     }
 
     case SEGMENT: {
-      _dbTechLayer* lhs_lay = (_dbTechLayer*) layer_;
-      _dbTechLayer* rhs_lay = (_dbTechLayer*) rhs.layer_;
+      _dbTechLayer* lhs_lay = (_dbTechLayer*) _layer;
+      _dbTechLayer* rhs_lay = (_dbTechLayer*) rhs._layer;
 
       int r = strcmp(lhs_lay->name_, rhs_lay->name_);
 
@@ -75,8 +75,8 @@ bool dbShape::operator<(const dbShape& rhs)
     }
 
     case TECH_VIA_BOX: {
-      _dbTechVia* lhs_via = (_dbTechVia*) via_;
-      _dbTechVia* rhs_via = (_dbTechVia*) rhs.via_;
+      _dbTechVia* lhs_via = (_dbTechVia*) _via;
+      _dbTechVia* rhs_via = (_dbTechVia*) rhs._via;
 
       int r = strcmp(lhs_via->name_, rhs_via->name_);
 
@@ -88,8 +88,8 @@ bool dbShape::operator<(const dbShape& rhs)
         return false;
       }
 
-      _dbTechLayer* lhs_lay = (_dbTechLayer*) layer_;
-      _dbTechLayer* rhs_lay = (_dbTechLayer*) rhs.layer_;
+      _dbTechLayer* lhs_lay = (_dbTechLayer*) _layer;
+      _dbTechLayer* rhs_lay = (_dbTechLayer*) rhs._layer;
 
       r = strcmp(lhs_lay->name_, rhs_lay->name_);
 
@@ -104,8 +104,8 @@ bool dbShape::operator<(const dbShape& rhs)
     }
 
     case VIA_BOX: {
-      _dbVia* lhs_via = (_dbVia*) via_;
-      _dbVia* rhs_via = (_dbVia*) rhs.via_;
+      _dbVia* lhs_via = (_dbVia*) _via;
+      _dbVia* rhs_via = (_dbVia*) rhs._via;
 
       int r = strcmp(lhs_via->name_, rhs_via->name_);
 
@@ -117,8 +117,8 @@ bool dbShape::operator<(const dbShape& rhs)
         return false;
       }
 
-      _dbTechLayer* lhs_lay = (_dbTechLayer*) layer_;
-      _dbTechLayer* rhs_lay = (_dbTechLayer*) rhs.layer_;
+      _dbTechLayer* lhs_lay = (_dbTechLayer*) _layer;
+      _dbTechLayer* rhs_lay = (_dbTechLayer*) rhs._layer;
 
       r = strcmp(lhs_lay->name_, rhs_lay->name_);
 
@@ -133,19 +133,19 @@ bool dbShape::operator<(const dbShape& rhs)
     }
   }
 
-  return rect_ < rhs.rect_;
+  return _rect < rhs._rect;
 }
 
 void dbShape::getViaXY(int& x, int& y) const
 {
-  switch (type_) {
+  switch (_type) {
     case VIA: {
       dbVia* v = getVia();
       dbBox* b = v->getBBox();
       int xmin = b->xMin();
       int ymin = b->yMin();
-      x = rect_.xMin() - xmin;
-      y = rect_.yMin() - ymin;
+      x = _rect.xMin() - xmin;
+      y = _rect.yMin() - ymin;
       break;
     }
 
@@ -154,8 +154,8 @@ void dbShape::getViaXY(int& x, int& y) const
       dbBox* b = v->getBBox();
       int xmin = b->xMin();
       int ymin = b->yMin();
-      x = rect_.xMin() - xmin;
-      y = rect_.yMin() - ymin;
+      x = _rect.xMin() - xmin;
+      y = _rect.yMin() - ymin;
       break;
     }
     default:

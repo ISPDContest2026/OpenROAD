@@ -31,14 +31,14 @@ _dbTechNonDefaultRule::_dbTechNonDefaultRule(_dbDatabase*,
                                              const _dbTechNonDefaultRule& r)
     : flags_(r.flags_),
       name_(nullptr),
-      layer_rules_(r.layer_rules_),
-      vias_(r.vias_),
-      samenet_rules_(r.samenet_rules_),
-      samenet_matrix_(r.samenet_matrix_),
-      use_vias_(r.use_vias_),
-      use_rules_(r.use_rules_),
-      cut_layers_(r.cut_layers_),
-      min_cuts_(r.min_cuts_)
+      _layer_rules(r._layer_rules),
+      _vias(r._vias),
+      _samenet_rules(r._samenet_rules),
+      _samenet_matrix(r._samenet_matrix),
+      _use_vias(r._use_vias),
+      _use_rules(r._use_rules),
+      _cut_layers(r._cut_layers),
+      _min_cuts(r._min_cuts)
 {
   if (r.name_) {
     name_ = safe_strdup(r.name_);
@@ -47,9 +47,9 @@ _dbTechNonDefaultRule::_dbTechNonDefaultRule(_dbDatabase*,
 
 _dbTechNonDefaultRule::_dbTechNonDefaultRule(_dbDatabase*)
 {
-  flags_.spare_bits = 0;
-  flags_.hard_spacing = 0;
-  flags_.block_rule = 0;
+  flags_._spare_bits = 0;
+  flags_._hard_spacing = 0;
+  flags_._block_rule = 0;
   name_ = nullptr;
 }
 
@@ -65,14 +65,14 @@ dbOStream& operator<<(dbOStream& stream, const _dbTechNonDefaultRule& rule)
   uint* bit_field = (uint*) &rule.flags_;
   stream << *bit_field;
   stream << rule.name_;
-  stream << rule.layer_rules_;
-  stream << rule.vias_;
-  stream << rule.samenet_rules_;
-  stream << rule.samenet_matrix_;
-  stream << rule.use_vias_;
-  stream << rule.use_rules_;
-  stream << rule.cut_layers_;
-  stream << rule.min_cuts_;
+  stream << rule._layer_rules;
+  stream << rule._vias;
+  stream << rule._samenet_rules;
+  stream << rule._samenet_matrix;
+  stream << rule._use_vias;
+  stream << rule._use_rules;
+  stream << rule._cut_layers;
+  stream << rule._min_cuts;
   return stream;
 }
 
@@ -81,25 +81,25 @@ dbIStream& operator>>(dbIStream& stream, _dbTechNonDefaultRule& rule)
   uint* bit_field = (uint*) &rule.flags_;
   stream >> *bit_field;
   stream >> rule.name_;
-  stream >> rule.layer_rules_;
-  stream >> rule.vias_;
-  stream >> rule.samenet_rules_;
-  stream >> rule.samenet_matrix_;
-  stream >> rule.use_vias_;
-  stream >> rule.use_rules_;
-  stream >> rule.cut_layers_;
-  stream >> rule.min_cuts_;
+  stream >> rule._layer_rules;
+  stream >> rule._vias;
+  stream >> rule._samenet_rules;
+  stream >> rule._samenet_matrix;
+  stream >> rule._use_vias;
+  stream >> rule._use_rules;
+  stream >> rule._cut_layers;
+  stream >> rule._min_cuts;
 
   return stream;
 }
 
 bool _dbTechNonDefaultRule::operator==(const _dbTechNonDefaultRule& rhs) const
 {
-  if (flags_.hard_spacing != rhs.flags_.hard_spacing) {
+  if (flags_._hard_spacing != rhs.flags_._hard_spacing) {
     return false;
   }
 
-  if (flags_.block_rule != rhs.flags_.block_rule) {
+  if (flags_._block_rule != rhs.flags_._block_rule) {
     return false;
   }
 
@@ -111,35 +111,35 @@ bool _dbTechNonDefaultRule::operator==(const _dbTechNonDefaultRule& rhs) const
     return false;
   }
 
-  if (layer_rules_ != rhs.layer_rules_) {
+  if (_layer_rules != rhs._layer_rules) {
     return false;
   }
 
-  if (vias_ != rhs.vias_) {
+  if (_vias != rhs._vias) {
     return false;
   }
 
-  if (samenet_rules_ != rhs.samenet_rules_) {
+  if (_samenet_rules != rhs._samenet_rules) {
     return false;
   }
 
-  if (samenet_matrix_ != rhs.samenet_matrix_) {
+  if (_samenet_matrix != rhs._samenet_matrix) {
     return false;
   }
 
-  if (use_vias_ != rhs.use_vias_) {
+  if (_use_vias != rhs._use_vias) {
     return false;
   }
 
-  if (use_rules_ != rhs.use_rules_) {
+  if (_use_rules != rhs._use_rules) {
     return false;
   }
 
-  if (cut_layers_ != rhs.cut_layers_) {
+  if (_cut_layers != rhs._cut_layers) {
     return false;
   }
 
-  if (min_cuts_ != rhs.min_cuts_) {
+  if (_min_cuts != rhs._min_cuts) {
     return false;
   }
 
@@ -148,7 +148,7 @@ bool _dbTechNonDefaultRule::operator==(const _dbTechNonDefaultRule& rhs) const
 
 _dbTech* _dbTechNonDefaultRule::getTech()
 {
-  if (flags_.block_rule == 0) {
+  if (flags_._block_rule == 0) {
     return (_dbTech*) getOwner();
   }
 
@@ -157,7 +157,7 @@ _dbTech* _dbTechNonDefaultRule::getTech()
 
 _dbBlock* _dbTechNonDefaultRule::getBlock()
 {
-  assert(flags_.block_rule == 1);
+  assert(flags_._block_rule == 1);
   return (_dbBlock*) getOwner();
 }
 
@@ -167,14 +167,14 @@ void _dbTechNonDefaultRule::collectMemInfo(MemInfo& info)
   info.size += sizeof(*this);
 
   info.children_["name"].add(name_);
-  info.children_["_layer_rules"].add(layer_rules_);
-  info.children_["_vias"].add(vias_);
-  info.children_["_samenet_rules"].add(samenet_rules_);
-  info.children_["_samenet_matrix"].add(samenet_matrix_);
-  info.children_["_use_vias"].add(use_vias_);
-  info.children_["_use_rules"].add(use_rules_);
-  info.children_["_cut_layers"].add(cut_layers_);
-  info.children_["_min_cuts"].add(min_cuts_);
+  info.children_["_layer_rules"].add(_layer_rules);
+  info.children_["_vias"].add(_vias);
+  info.children_["_samenet_rules"].add(_samenet_rules);
+  info.children_["_samenet_matrix"].add(_samenet_matrix);
+  info.children_["_use_vias"].add(_use_vias);
+  info.children_["_use_rules"].add(_use_rules);
+  info.children_["_cut_layers"].add(_cut_layers);
+  info.children_["_min_cuts"].add(_min_cuts);
 }
 
 bool _dbTechNonDefaultRule::operator<(const _dbTechNonDefaultRule& rhs) const
@@ -203,23 +203,23 @@ const char* dbTechNonDefaultRule::getConstName()
 bool dbTechNonDefaultRule::isBlockRule()
 {
   _dbTechNonDefaultRule* rule = (_dbTechNonDefaultRule*) this;
-  return rule->flags_.block_rule == 1;
+  return rule->flags_._block_rule == 1;
 }
 
 dbTechLayerRule* dbTechNonDefaultRule::getLayerRule(dbTechLayer* layer_)
 {
   _dbTechNonDefaultRule* rule = (_dbTechNonDefaultRule*) this;
   _dbTechLayer* layer = (_dbTechLayer*) layer_;
-  dbId<_dbTechLayerRule> id = rule->layer_rules_[layer->number_];
+  dbId<_dbTechLayerRule> id = rule->_layer_rules[layer->_number];
 
   if (id == 0) {
     return nullptr;
   }
 
-  if (rule->flags_.block_rule == 0) {
-    return (dbTechLayerRule*) rule->getTech()->layer_rule_tbl_->getPtr(id);
+  if (rule->flags_._block_rule == 0) {
+    return (dbTechLayerRule*) rule->getTech()->_layer_rule_tbl->getPtr(id);
   }
-  return (dbTechLayerRule*) rule->getBlock()->layer_rule_tbl_->getPtr(id);
+  return (dbTechLayerRule*) rule->getBlock()->_layer_rule_tbl->getPtr(id);
 }
 
 void dbTechNonDefaultRule::getLayerRules(
@@ -230,17 +230,17 @@ void dbTechNonDefaultRule::getLayerRules(
   layer_rules.clear();
 
   auto add_rules = [rule, &layer_rules](auto& tbl) {
-    for (const auto& id : rule->layer_rules_) {
+    for (const auto& id : rule->_layer_rules) {
       if (id.isValid()) {
         layer_rules.push_back((dbTechLayerRule*) tbl->getPtr(id));
       }
     }
   };
 
-  if (rule->flags_.block_rule == 0) {
-    add_rules(rule->getTech()->layer_rule_tbl_);
+  if (rule->flags_._block_rule == 0) {
+    add_rules(rule->getTech()->_layer_rule_tbl);
   } else {
-    add_rules(rule->getBlock()->layer_rule_tbl_);
+    add_rules(rule->getBlock()->_layer_rule_tbl);
   }
 }
 
@@ -250,14 +250,14 @@ void dbTechNonDefaultRule::getVias(std::vector<dbTechVia*>& vias)
 
   vias.clear();
 
-  if (rule->flags_.block_rule == 1) {  // not supported on block rules
+  if (rule->flags_._block_rule == 1) {  // not supported on block rules
     return;
   }
 
   _dbTech* tech = rule->getTech();
 
-  for (const auto& id : rule->vias_) {
-    vias.push_back((dbTechVia*) tech->via_tbl_->getPtr(id));
+  for (const auto& id : rule->_vias) {
+    vias.push_back((dbTechVia*) tech->_via_tbl->getPtr(id));
   }
 }
 
@@ -266,7 +266,7 @@ dbTechSameNetRule* dbTechNonDefaultRule::findSameNetRule(dbTechLayer* l1_,
 {
   _dbTechNonDefaultRule* ndrule = (_dbTechNonDefaultRule*) this;
 
-  if (ndrule->flags_.block_rule == 1) {  // not supported on block rules
+  if (ndrule->flags_._block_rule == 1) {  // not supported on block rules
     return nullptr;
   }
 
@@ -274,13 +274,13 @@ dbTechSameNetRule* dbTechNonDefaultRule::findSameNetRule(dbTechLayer* l1_,
   _dbTechLayer* l1 = (_dbTechLayer*) l1_;
   _dbTechLayer* l2 = (_dbTechLayer*) l2_;
   dbId<_dbTechSameNetRule> rule
-      = ndrule->samenet_matrix_(l1->number_, l2->number_);
+      = ndrule->_samenet_matrix(l1->_number, l2->_number);
 
   if (rule == 0) {
     return nullptr;
   }
 
-  return (dbTechSameNetRule*) tech->samenet_rule_tbl_->getPtr(rule);
+  return (dbTechSameNetRule*) tech->_samenet_rule_tbl->getPtr(rule);
 }
 
 void dbTechNonDefaultRule::getSameNetRules(
@@ -290,33 +290,33 @@ void dbTechNonDefaultRule::getSameNetRules(
 
   rules.clear();
 
-  if (ndrule->flags_.block_rule == 1) {  // not supported on block rules
+  if (ndrule->flags_._block_rule == 1) {  // not supported on block rules
     return;
   }
 
   _dbTech* tech = ndrule->getTech();
 
-  for (const auto& id : ndrule->samenet_rules_) {
-    rules.push_back((dbTechSameNetRule*) tech->samenet_rule_tbl_->getPtr(id));
+  for (const auto& id : ndrule->_samenet_rules) {
+    rules.push_back((dbTechSameNetRule*) tech->_samenet_rule_tbl->getPtr(id));
   }
 }
 
 bool dbTechNonDefaultRule::getHardSpacing()
 {
   _dbTechNonDefaultRule* rule = (_dbTechNonDefaultRule*) this;
-  return rule->flags_.hard_spacing == 1;
+  return rule->flags_._hard_spacing == 1;
 }
 
 void dbTechNonDefaultRule::setHardSpacing(bool value)
 {
   _dbTechNonDefaultRule* rule = (_dbTechNonDefaultRule*) this;
-  rule->flags_.hard_spacing = value;
+  rule->flags_._hard_spacing = value;
 }
 
 void dbTechNonDefaultRule::addUseVia(dbTechVia* via)
 {
   _dbTechNonDefaultRule* rule = (_dbTechNonDefaultRule*) this;
-  rule->use_vias_.push_back(via->getId());
+  rule->_use_vias.push_back(via->getId());
 }
 
 void dbTechNonDefaultRule::getUseVias(std::vector<dbTechVia*>& vias)
@@ -324,7 +324,7 @@ void dbTechNonDefaultRule::getUseVias(std::vector<dbTechVia*>& vias)
   _dbTechNonDefaultRule* rule = (_dbTechNonDefaultRule*) this;
   _dbTech* tech = rule->getTech();
 
-  for (const auto& vid : rule->use_vias_) {
+  for (const auto& vid : rule->_use_vias) {
     dbTechVia* via = dbTechVia::getTechVia((dbTech*) tech, vid);
     vias.push_back(via);
   }
@@ -333,7 +333,7 @@ void dbTechNonDefaultRule::getUseVias(std::vector<dbTechVia*>& vias)
 void dbTechNonDefaultRule::addUseViaRule(dbTechViaGenerateRule* gen_rule)
 {
   _dbTechNonDefaultRule* rule = (_dbTechNonDefaultRule*) this;
-  rule->use_rules_.push_back(gen_rule->getId());
+  rule->_use_rules.push_back(gen_rule->getId());
 }
 
 void dbTechNonDefaultRule::getUseViaRules(
@@ -342,7 +342,7 @@ void dbTechNonDefaultRule::getUseViaRules(
   _dbTechNonDefaultRule* rule = (_dbTechNonDefaultRule*) this;
   _dbTech* tech = rule->getTech();
 
-  for (const auto& rid : rule->use_rules_) {
+  for (const auto& rid : rule->_use_rules) {
     dbTechViaGenerateRule* rule
         = dbTechViaGenerateRule::getTechViaGenerateRule((dbTech*) tech, rid);
     rules.push_back(rule);
@@ -356,16 +356,16 @@ void dbTechNonDefaultRule::setMinCuts(dbTechLayer* cut_layer, const int count)
   const uint id = cut_layer->getId();
   uint idx = 0;
 
-  for (const auto& lid : rule->cut_layers_) {
+  for (const auto& lid : rule->_cut_layers) {
     if (lid == id) {
-      rule->min_cuts_[idx] = count;
+      rule->_min_cuts[idx] = count;
       return;
     }
     ++idx;
   }
 
-  rule->cut_layers_.push_back(id);
-  rule->min_cuts_.push_back(count);
+  rule->_cut_layers.push_back(id);
+  rule->_min_cuts.push_back(count);
 }
 
 bool dbTechNonDefaultRule::getMinCuts(dbTechLayer* cut_layer, int& count)
@@ -375,9 +375,9 @@ bool dbTechNonDefaultRule::getMinCuts(dbTechLayer* cut_layer, int& count)
   const uint id = cut_layer->getId();
   uint idx = 0;
 
-  for (const auto& lid : rule->cut_layers_) {
+  for (const auto& lid : rule->_cut_layers) {
     if (lid == id) {
-      count = rule->min_cuts_[idx];
+      count = rule->_min_cuts[idx];
       return true;
     }
     ++idx;
@@ -394,13 +394,13 @@ dbTechNonDefaultRule* dbTechNonDefaultRule::create(dbTech* tech_,
   }
 
   _dbTech* tech = (_dbTech*) tech_;
-  _dbTechNonDefaultRule* rule = tech->non_default_rule_tbl_->create();
+  _dbTechNonDefaultRule* rule = tech->_non_default_rule_tbl->create();
   rule->name_ = safe_strdup(name_);
-  rule->layer_rules_.resize(tech->layer_cnt_);
+  rule->_layer_rules.resize(tech->_layer_cnt);
 
   int i;
-  for (i = 0; i < tech->layer_cnt_; ++i) {
-    rule->layer_rules_.push_back(0);
+  for (i = 0; i < tech->_layer_cnt; ++i) {
+    rule->_layer_rules.push_back(0);
   }
 
   return (dbTechNonDefaultRule*) rule;
@@ -415,15 +415,15 @@ dbTechNonDefaultRule* dbTechNonDefaultRule::create(dbBlock* block_,
 
   _dbBlock* block = (_dbBlock*) block_;
   _dbTech* tech = (_dbTech*) block->getDb()->getTech();
-  _dbTechNonDefaultRule* rule = block->non_default_rule_tbl_->create();
+  _dbTechNonDefaultRule* rule = block->_non_default_rule_tbl->create();
 
   rule->name_ = safe_strdup(name_);
-  rule->flags_.block_rule = 1;
-  rule->layer_rules_.resize(tech->layer_cnt_);
+  rule->flags_._block_rule = 1;
+  rule->_layer_rules.resize(tech->_layer_cnt);
 
   int i;
-  for (i = 0; i < tech->layer_cnt_; ++i) {
-    rule->layer_rules_.push_back(0);
+  for (i = 0; i < tech->_layer_cnt; ++i) {
+    rule->_layer_rules.push_back(0);
   }
 
   return (dbTechNonDefaultRule*) rule;
@@ -433,7 +433,7 @@ dbTechNonDefaultRule* dbTechNonDefaultRule::getTechNonDefaultRule(dbTech* tech_,
                                                                   uint dbid_)
 {
   _dbTech* tech = (_dbTech*) tech_;
-  return (dbTechNonDefaultRule*) tech->non_default_rule_tbl_->getPtr(dbid_);
+  return (dbTechNonDefaultRule*) tech->_non_default_rule_tbl->getPtr(dbid_);
 }
 
 dbTechNonDefaultRule* dbTechNonDefaultRule::getTechNonDefaultRule(
@@ -441,7 +441,7 @@ dbTechNonDefaultRule* dbTechNonDefaultRule::getTechNonDefaultRule(
     uint dbid_)
 {
   _dbBlock* block = (_dbBlock*) block_;
-  return (dbTechNonDefaultRule*) block->non_default_rule_tbl_->getPtr(dbid_);
+  return (dbTechNonDefaultRule*) block->_non_default_rule_tbl->getPtr(dbid_);
 }
 
 }  // namespace odb

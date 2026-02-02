@@ -3,7 +3,7 @@
   "type": "dbObject",
   "fields": [
     {
-      "name": "num_masks",
+      "name": "num_masks_",
       "type": "uint",
       "flags": [
         "no-set",
@@ -12,7 +12,7 @@
       "bits": 2
     },
     {
-      "name": "type",
+      "name": "type_",
       "type": "dbTechLayerType::Value",
       "flags": [
         "no-set",
@@ -21,7 +21,7 @@
       "bits": 4
     },
     {
-      "name": "direction",
+      "name": "direction_",
       "type": "dbTechLayerDir::Value",
       "flags": [
         "no-set",
@@ -30,7 +30,7 @@
       "bits": 4
     },
     {
-      "name": "minstep_type",
+      "name": "minstep_type_",
       "type": "dbTechLayerMinStepType::Value",
       "flags": [
         "no-set",
@@ -39,7 +39,7 @@
       "bits": 2
     },
     {
-      "name": "has_max_width",
+      "name": "has_max_width_",
       "type": "bit",
       "flags": [
         "no-set",
@@ -47,7 +47,7 @@
       ]
     },
     {
-      "name": "has_thickness",
+      "name": "has_thickness_",
       "type": "bit",
       "flags": [
         "no-set",
@@ -55,7 +55,7 @@
       ]
     },
     {
-      "name": "has_area",
+      "name": "has_area_",
       "type": "bit",
       "flags": [
         "no-set",
@@ -63,7 +63,7 @@
       ]
     },
     {
-      "name": "has_protrusion",
+      "name": "has_protrusion_",
       "type": "bit",
       "flags": [
         "no-set",
@@ -71,7 +71,7 @@
       ]
     },
     {
-      "name": "has_alias",
+      "name": "has_alias_",
       "type": "bit",
       "flags": [
         "no-set",
@@ -79,7 +79,7 @@
       ]
     },
     {
-      "name": "has_xy_pitch",
+      "name": "has_xy_pitch_",
       "type": "bit",
       "flags": [
         "no-set",
@@ -87,7 +87,7 @@
       ]
     },
     {
-      "name": "has_xy_offset",
+      "name": "has_xy_offset_",
       "type": "bit",
       "flags": [
         "no-set",
@@ -95,28 +95,28 @@
       ]
     },
     {
-      "name": "rect_only",
+      "name": "rect_only_",
       "type": "bit",
       "flags": []
     },
     {
-      "name": "right_way_on_grid_only",
+      "name": "right_way_on_grid_only_",
       "type": "bit",
       "flags": []
     },
     {
-      "name": "right_way_on_grid_only_check_mask",
+      "name": "right_way_on_grid_only_check_mask_",
       "type": "bit",
       "flags": []
     },
     {
       "type": "bit",
-      "name": "rect_only_except_non_core_pins",
+      "name": "rect_only_except_non_core_pins_",
       "flags": []
     },
     {
       "type": "uint",
-      "name": "lef58_type",
+      "name": "lef58_type_",
       "bits": 5,
       "flags": [
         "no-set",

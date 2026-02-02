@@ -19,16 +19,16 @@ template class dbTable<_dbGDSText>;
 
 bool _dbGDSText::operator==(const _dbGDSText& rhs) const
 {
-  if (layer_ != rhs.layer_) {
+  if (_layer != rhs._layer) {
     return false;
   }
-  if (datatype_ != rhs.datatype_) {
+  if (_datatype != rhs._datatype) {
     return false;
   }
-  if (origin_ != rhs.origin_) {
+  if (_origin != rhs._origin) {
     return false;
   }
-  if (text_ != rhs.text_) {
+  if (_text != rhs._text) {
     return false;
   }
 
@@ -42,31 +42,31 @@ bool _dbGDSText::operator<(const _dbGDSText& rhs) const
 
 _dbGDSText::_dbGDSText(_dbDatabase* db)
 {
-  layer_ = 0;
-  datatype_ = 0;
+  _layer = 0;
+  _datatype = 0;
 }
 
 dbIStream& operator>>(dbIStream& stream, _dbGDSText& obj)
 {
-  stream >> obj.layer_;
-  stream >> obj.datatype_;
-  stream >> obj.origin_;
-  stream >> obj.propattr_;
-  stream >> obj.presentation_;
-  stream >> obj.transform_;
-  stream >> obj.text_;
+  stream >> obj._layer;
+  stream >> obj._datatype;
+  stream >> obj._origin;
+  stream >> obj._propattr;
+  stream >> obj._presentation;
+  stream >> obj._transform;
+  stream >> obj._text;
   return stream;
 }
 
 dbOStream& operator<<(dbOStream& stream, const _dbGDSText& obj)
 {
-  stream << obj.layer_;
-  stream << obj.datatype_;
-  stream << obj.origin_;
-  stream << obj.propattr_;
-  stream << obj.presentation_;
-  stream << obj.transform_;
-  stream << obj.text_;
+  stream << obj._layer;
+  stream << obj._datatype;
+  stream << obj._origin;
+  stream << obj._propattr;
+  stream << obj._presentation;
+  stream << obj._transform;
+  stream << obj._text;
   return stream;
 }
 
@@ -76,11 +76,11 @@ void _dbGDSText::collectMemInfo(MemInfo& info)
   info.size += sizeof(*this);
 
   // User Code Begin collectMemInfo
-  info.children_["propattr"].add(propattr_);
-  for (auto& [i, s] : propattr_) {
+  info.children_["propattr"].add(_propattr);
+  for (auto& [i, s] : _propattr) {
     info.children_["propattr"].add(s);
   }
-  info.children_["text"].add(text_);
+  info.children_["text"].add(_text);
   // User Code End collectMemInfo
 }
 
@@ -94,85 +94,85 @@ void dbGDSText::setLayer(int16_t layer)
 {
   _dbGDSText* obj = (_dbGDSText*) this;
 
-  obj->layer_ = layer;
+  obj->_layer = layer;
 }
 
 int16_t dbGDSText::getLayer() const
 {
   _dbGDSText* obj = (_dbGDSText*) this;
-  return obj->layer_;
+  return obj->_layer;
 }
 
 void dbGDSText::setDatatype(int16_t datatype)
 {
   _dbGDSText* obj = (_dbGDSText*) this;
 
-  obj->datatype_ = datatype;
+  obj->_datatype = datatype;
 }
 
 int16_t dbGDSText::getDatatype() const
 {
   _dbGDSText* obj = (_dbGDSText*) this;
-  return obj->datatype_;
+  return obj->_datatype;
 }
 
 void dbGDSText::setOrigin(Point origin)
 {
   _dbGDSText* obj = (_dbGDSText*) this;
 
-  obj->origin_ = origin;
+  obj->_origin = origin;
 }
 
 Point dbGDSText::getOrigin() const
 {
   _dbGDSText* obj = (_dbGDSText*) this;
-  return obj->origin_;
+  return obj->_origin;
 }
 
 void dbGDSText::setPresentation(dbGDSTextPres presentation)
 {
   _dbGDSText* obj = (_dbGDSText*) this;
 
-  obj->presentation_ = presentation;
+  obj->_presentation = presentation;
 }
 
 dbGDSTextPres dbGDSText::getPresentation() const
 {
   _dbGDSText* obj = (_dbGDSText*) this;
-  return obj->presentation_;
+  return obj->_presentation;
 }
 
 void dbGDSText::setTransform(dbGDSSTrans transform)
 {
   _dbGDSText* obj = (_dbGDSText*) this;
 
-  obj->transform_ = transform;
+  obj->_transform = transform;
 }
 
 dbGDSSTrans dbGDSText::getTransform() const
 {
   _dbGDSText* obj = (_dbGDSText*) this;
-  return obj->transform_;
+  return obj->_transform;
 }
 
 void dbGDSText::setText(const std::string& text)
 {
   _dbGDSText* obj = (_dbGDSText*) this;
 
-  obj->text_ = text;
+  obj->_text = text;
 }
 
 std::string dbGDSText::getText() const
 {
   _dbGDSText* obj = (_dbGDSText*) this;
-  return obj->text_;
+  return obj->_text;
 }
 
 // User Code Begin dbGDSTextPublicMethods
 std::vector<std::pair<std::int16_t, std::string>>& dbGDSText::getPropattr()
 {
   auto* obj = (_dbGDSText*) this;
-  return obj->propattr_;
+  return obj->_propattr;
 }
 
 dbGDSText* dbGDSText::create(dbGDSStructure* structure)

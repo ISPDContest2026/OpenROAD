@@ -45,23 +45,23 @@ class tmg_conn_graph
   bool isBadShort(tcg_edge* pe, const tmg_conn* conn);
   bool dfsStart(int& j);
   bool dfsNext(int* from, int* to, int* k, bool* is_short, bool* is_loop);
-  tcg_pt& pt(const int index) { return ptV_[index]; }
-  const tcg_pt& pt(const int index) const { return ptV_[index]; }
+  tcg_pt& pt(const int index) { return _ptV[index]; }
+  const tcg_pt& pt(const int index) const { return _ptV[index]; }
 
  public:
-  tcg_pt* ptV_;
-  int ptN_;
-  int* path_vis_;
-  tcg_edge** stackV_;
-  int stackN_;
+  tcg_pt* _ptV;
+  int _ptN;
+  int* _path_vis;
+  tcg_edge** _stackV;
+  int _stackN;
 
  private:
-  tcg_edge* e_;
-  int ptNmax_;
-  int shortNmax_;
+  tcg_edge* _e;
+  int _ptNmax;
+  int _shortNmax;
   int _eNmax;
-  tcg_edge* eV_;
-  int eN_;
+  tcg_edge* _eV;
+  int _eN;
 };
 
 }  // namespace odb

@@ -18,12 +18,12 @@ namespace odb {
 //
 ////////////////////////////////////////////////////////////////////
 
-bool dbCapNodeItr::reversible() const
+bool dbCapNodeItr::reversible()
 {
   return true;
 }
 
-bool dbCapNodeItr::orderReversed() const
+bool dbCapNodeItr::orderReversed()
 {
   return true;
 }
@@ -31,26 +31,26 @@ bool dbCapNodeItr::orderReversed() const
 void dbCapNodeItr::reverse(dbObject* parent)
 {
   _dbNet* net = (_dbNet*) parent;
-  uint id = net->cap_nodes_;
+  uint id = net->_cap_nodes;
   uint list = 0;
 
   while (id != 0) {
-    _dbCapNode* seg = seg_tbl_->getPtr(id);
-    uint n = seg->next_;
-    seg->next_ = list;
+    _dbCapNode* seg = _seg_tbl->getPtr(id);
+    uint n = seg->_next;
+    seg->_next = list;
     list = id;
     id = n;
   }
 
-  net->cap_nodes_ = list;
+  net->_cap_nodes = list;
 }
 
-uint dbCapNodeItr::sequential() const
+uint dbCapNodeItr::sequential()
 {
   return 0;
 }
 
-uint dbCapNodeItr::size(dbObject* parent) const
+uint dbCapNodeItr::size(dbObject* parent)
 {
   uint id;
   uint cnt = 0;
@@ -63,26 +63,26 @@ uint dbCapNodeItr::size(dbObject* parent) const
   return cnt;
 }
 
-uint dbCapNodeItr::begin(dbObject* parent) const
+uint dbCapNodeItr::begin(dbObject* parent)
 {
   _dbNet* net = (_dbNet*) parent;
-  return net->cap_nodes_;
+  return net->_cap_nodes;
 }
 
-uint dbCapNodeItr::end(dbObject* /* unused: parent */) const
+uint dbCapNodeItr::end(dbObject* /* unused: parent */)
 {
   return 0;
 }
 
-uint dbCapNodeItr::next(uint id, ...) const
+uint dbCapNodeItr::next(uint id, ...)
 {
-  _dbCapNode* seg = seg_tbl_->getPtr(id);
-  return seg->next_;
+  _dbCapNode* seg = _seg_tbl->getPtr(id);
+  return seg->_next;
 }
 
 dbObject* dbCapNodeItr::getObject(uint id, ...)
 {
-  return seg_tbl_->getPtr(id);
+  return _seg_tbl->getPtr(id);
 }
 
 }  // namespace odb

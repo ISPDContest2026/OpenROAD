@@ -11,12 +11,12 @@
 
 namespace odb {
 
-bool dbPolygonItr::reversible() const
+bool dbPolygonItr::reversible()
 {
   return true;
 }
 
-bool dbPolygonItr::orderReversed() const
+bool dbPolygonItr::orderReversed()
 {
   return true;
 }
@@ -26,7 +26,7 @@ void dbPolygonItr::reverse(dbObject* parent)
   switch (parent->getImpl()->getType()) {
     case dbMasterObj: {
       _dbMaster* master = (_dbMaster*) parent;
-      uint id = master->poly_obstructions_;
+      uint id = master->_poly_obstructions;
       uint list = 0;
 
       while (id != 0) {
@@ -37,13 +37,13 @@ void dbPolygonItr::reverse(dbObject* parent)
         id = n;
       }
 
-      master->poly_obstructions_ = list;
+      master->_poly_obstructions = list;
       break;
     }
 
     case dbMPinObj: {
       _dbMPin* pin = (_dbMPin*) parent;
-      uint id = pin->poly_geoms_;
+      uint id = pin->_poly_geoms;
       uint list = 0;
 
       while (id != 0) {
@@ -54,7 +54,7 @@ void dbPolygonItr::reverse(dbObject* parent)
         id = n;
       }
 
-      pin->poly_geoms_ = list;
+      pin->_poly_geoms = list;
       break;
     }
 
@@ -63,12 +63,12 @@ void dbPolygonItr::reverse(dbObject* parent)
   }
 }
 
-uint dbPolygonItr::sequential() const
+uint dbPolygonItr::sequential()
 {
   return 0;
 }
 
-uint dbPolygonItr::size(dbObject* parent) const
+uint dbPolygonItr::size(dbObject* parent)
 {
   uint id;
   uint cnt = 0;
@@ -81,17 +81,17 @@ uint dbPolygonItr::size(dbObject* parent) const
   return cnt;
 }
 
-uint dbPolygonItr::begin(dbObject* parent) const
+uint dbPolygonItr::begin(dbObject* parent)
 {
   switch (parent->getImpl()->getType()) {
     case dbMasterObj: {
       _dbMaster* master = (_dbMaster*) parent;
-      return master->poly_obstructions_;
+      return master->_poly_obstructions;
     }
 
     case dbMPinObj: {
       _dbMPin* pin = (_dbMPin*) parent;
-      return pin->poly_geoms_;
+      return pin->_poly_geoms;
     }
 
     default:
@@ -101,12 +101,12 @@ uint dbPolygonItr::begin(dbObject* parent) const
   return 0;
 }
 
-uint dbPolygonItr::end(dbObject* /* unused: parent */) const
+uint dbPolygonItr::end(dbObject* /* unused: parent */)
 {
   return 0;
 }
 
-uint dbPolygonItr::next(uint id, ...) const
+uint dbPolygonItr::next(uint id, ...)
 {
   _dbPolygon* box = pbox_tbl_->getPtr(id);
   return box->next_pbox_;

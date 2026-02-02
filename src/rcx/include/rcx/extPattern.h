@@ -15,8 +15,10 @@
 
 namespace rcx {
 
-class extWirePattern;
+template <class T>
+class AthArray;
 
+class extWirePattern;
 class extPattern
 {
  public:

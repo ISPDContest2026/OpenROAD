@@ -17,19 +17,25 @@ class dbOStream;
 
 struct _dbObstructionFlags
 {
-  uint slot_obs : 1;
-  uint fill_obs : 1;
-  uint pushed_down : 1;
-  uint has_min_spacing : 1;
-  uint has_effective_width : 1;
-  uint except_pg_nets : 1;
+  uint _slot_obs : 1;
+  uint _fill_obs : 1;
+  uint _pushed_down : 1;
+  uint _has_min_spacing : 1;
+  uint _has_effective_width : 1;
+  uint _except_pg_nets : 1;
   uint _is_system_reserved : 1;
-  uint spare_bits : 25;
+  uint _spare_bits : 25;
 };
 
 class _dbObstruction : public _dbObject
 {
  public:
+  _dbObstructionFlags flags_;
+  dbId<_dbInst> _inst;
+  dbId<_dbBox> _bbox;
+  int _min_spacing;
+  int _effective_width;
+
   _dbObstruction(_dbDatabase*, const _dbObstruction& o);
   _dbObstruction(_dbDatabase*);
   ~_dbObstruction();
@@ -38,12 +44,6 @@ class _dbObstruction : public _dbObject
   bool operator!=(const _dbObstruction& rhs) const { return !operator==(rhs); }
   bool operator<(const _dbObstruction& rhs) const;
   void collectMemInfo(MemInfo& info);
-
-  _dbObstructionFlags flags_;
-  dbId<_dbInst> inst_;
-  dbId<_dbBox> bbox_;
-  int min_spacing_;
-  int effective_width_;
 };
 
 dbOStream& operator<<(dbOStream& stream, const _dbObstruction& obs);

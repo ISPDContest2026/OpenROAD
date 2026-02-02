@@ -21,12 +21,12 @@ namespace odb {
 //
 ////////////////////////////////////////////////
 
-bool dbNetITermItr::reversible() const
+bool dbNetITermItr::reversible()
 {
   return true;
 }
 
-bool dbNetITermItr::orderReversed() const
+bool dbNetITermItr::orderReversed()
 {
   return true;
 }
@@ -34,13 +34,13 @@ bool dbNetITermItr::orderReversed() const
 void dbNetITermItr::reverse(dbObject* parent)
 {
   _dbNet* net = (_dbNet*) parent;
-  uint id = net->iterms_;
+  uint id = net->_iterms;
   uint list = 0;
 
   while (id != 0) {
-    _dbITerm* iterm = iterm_tbl_->getPtr(id);
-    uint n = iterm->next_net_iterm_;
-    iterm->next_net_iterm_ = list;
+    _dbITerm* iterm = _iterm_tbl->getPtr(id);
+    uint n = iterm->_next_net_iterm;
+    iterm->_next_net_iterm = list;
     list = id;
     id = n;
   }
@@ -49,21 +49,21 @@ void dbNetITermItr::reverse(dbObject* parent)
   id = list;
 
   while (id != 0) {
-    _dbITerm* iterm = iterm_tbl_->getPtr(id);
-    iterm->prev_net_iterm_ = prev;
+    _dbITerm* iterm = _iterm_tbl->getPtr(id);
+    iterm->_prev_net_iterm = prev;
     prev = id;
-    id = iterm->next_net_iterm_;
+    id = iterm->_next_net_iterm;
   }
 
-  net->iterms_ = list;
+  net->_iterms = list;
 }
 
-uint dbNetITermItr::sequential() const
+uint dbNetITermItr::sequential()
 {
   return 0;
 }
 
-uint dbNetITermItr::size(dbObject* parent) const
+uint dbNetITermItr::size(dbObject* parent)
 {
   uint id;
   uint cnt = 0;
@@ -76,26 +76,26 @@ uint dbNetITermItr::size(dbObject* parent) const
   return cnt;
 }
 
-uint dbNetITermItr::begin(dbObject* parent) const
+uint dbNetITermItr::begin(dbObject* parent)
 {
   _dbNet* net = (_dbNet*) parent;
-  return (uint) net->iterms_;
+  return (uint) net->_iterms;
 }
 
-uint dbNetITermItr::end(dbObject* /* unused: parent */) const
+uint dbNetITermItr::end(dbObject* /* unused: parent */)
 {
   return 0;
 }
 
-uint dbNetITermItr::next(uint id, ...) const
+uint dbNetITermItr::next(uint id, ...)
 {
-  _dbITerm* iterm = iterm_tbl_->getPtr(id);
-  return iterm->next_net_iterm_;
+  _dbITerm* iterm = _iterm_tbl->getPtr(id);
+  return iterm->_next_net_iterm;
 }
 
 dbObject* dbNetITermItr::getObject(uint id, ...)
 {
-  return iterm_tbl_->getPtr(id);
+  return _iterm_tbl->getPtr(id);
 }
 
 ////////////////////////////////////////////////
@@ -104,12 +104,12 @@ dbObject* dbNetITermItr::getObject(uint id, ...)
 //
 ////////////////////////////////////////////////
 
-bool dbInstITermItr::reversible() const
+bool dbInstITermItr::reversible()
 {
   return false;
 }
 
-bool dbInstITermItr::orderReversed() const
+bool dbInstITermItr::orderReversed()
 {
   return false;
 }
@@ -118,12 +118,12 @@ void dbInstITermItr::reverse(dbObject* /* unused: parent */)
 {
 }
 
-uint dbInstITermItr::sequential() const
+uint dbInstITermItr::sequential()
 {
   return 0;
 }
 
-uint dbInstITermItr::size(dbObject* parent) const
+uint dbInstITermItr::size(dbObject* parent)
 {
   uint id;
   uint cnt = 0;
@@ -136,35 +136,35 @@ uint dbInstITermItr::size(dbObject* parent) const
   return cnt;
 }
 
-uint dbInstITermItr::begin(dbObject* parent) const
+uint dbInstITermItr::begin(dbObject* parent)
 {
   _dbInst* inst = (_dbInst*) parent;
 
-  if (inst->iterms_.empty()) {
+  if (inst->_iterms.empty()) {
     return 0;
   }
 
-  return inst->iterms_[0];
+  return inst->_iterms[0];
 }
 
-uint dbInstITermItr::end(dbObject* /* unused: parent */) const
+uint dbInstITermItr::end(dbObject* /* unused: parent */)
 {
   return 0;
 }
 
-uint dbInstITermItr::next(uint id, ...) const
+uint dbInstITermItr::next(uint id, ...)
 {
   _dbITerm* iterm = _iterm_tbl->getPtr(id);
   _dbBlock* block = (_dbBlock*) iterm->getOwner();
-  _dbInst* inst = block->inst_tbl_->getPtr(iterm->inst_);
-  uint cnt = inst->iterms_.size();
-  uint idx = iterm->flags_.mterm_idx + 1;
+  _dbInst* inst = block->_inst_tbl->getPtr(iterm->_inst);
+  uint cnt = inst->_iterms.size();
+  uint idx = iterm->flags_._mterm_idx + 1;
 
   if (idx == cnt) {
     return 0;
   }
 
-  dbId<_dbITerm> next = inst->iterms_[idx];
+  dbId<_dbITerm> next = inst->_iterms[idx];
   return next;
 }
 

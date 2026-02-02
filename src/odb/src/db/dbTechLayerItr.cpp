@@ -7,16 +7,15 @@
 #include "dbTech.h"
 #include "dbTechLayer.h"
 #include "odb/dbObject.h"
-#include "odb/odb.h"
 
 namespace odb {
 
-bool dbTechLayerItr::reversible() const
+bool dbTechLayerItr::reversible()
 {
   return false;
 }
 
-bool dbTechLayerItr::orderReversed() const
+bool dbTechLayerItr::orderReversed()
 {
   return false;
 }
@@ -25,12 +24,12 @@ void dbTechLayerItr::reverse(dbObject* /* unused: parent */)
 {
 }
 
-uint dbTechLayerItr::sequential() const
+uint dbTechLayerItr::sequential()
 {
   return 0;
 }
 
-uint dbTechLayerItr::size(dbObject* parent) const
+uint dbTechLayerItr::size(dbObject* parent)
 {
   uint id;
   uint cnt = 0;
@@ -43,21 +42,21 @@ uint dbTechLayerItr::size(dbObject* parent) const
   return cnt;
 }
 
-uint dbTechLayerItr::begin(dbObject* parent) const
+uint dbTechLayerItr::begin(dbObject* parent)
 {
   _dbTech* tech = (_dbTech*) parent;
-  return (uint) tech->bottom_;
+  return (uint) tech->_bottom;
 }
 
-uint dbTechLayerItr::end(dbObject* /* unused: parent */) const
+uint dbTechLayerItr::end(dbObject* /* unused: parent */)
 {
   return 0;
 }
 
-uint dbTechLayerItr::next(uint id, ...) const
+uint dbTechLayerItr::next(uint id, ...)
 {
   _dbTechLayer* layer = _layer_tbl->getPtr(id);
-  return layer->upper_;
+  return layer->_upper;
 }
 
 dbObject* dbTechLayerItr::getObject(uint id, ...)

@@ -20,16 +20,16 @@ template class dbTable<_dbTechLayerArraySpacingRule>;
 bool _dbTechLayerArraySpacingRule::operator==(
     const _dbTechLayerArraySpacingRule& rhs) const
 {
-  if (flags_.parallel_overlap != rhs.flags_.parallel_overlap) {
+  if (flags_.parallel_overlap_ != rhs.flags_.parallel_overlap_) {
     return false;
   }
-  if (flags_.long_array != rhs.flags_.long_array) {
+  if (flags_.long_array_ != rhs.flags_.long_array_) {
     return false;
   }
-  if (flags_.via_width_valid != rhs.flags_.via_width_valid) {
+  if (flags_.via_width_valid_ != rhs.flags_.via_width_valid_) {
     return false;
   }
-  if (flags_.within_valid != rhs.flags_.within_valid) {
+  if (flags_.within_valid_ != rhs.flags_.within_valid_) {
     return false;
   }
   if (via_width_ != rhs.via_width_) {
@@ -177,56 +177,56 @@ void dbTechLayerArraySpacingRule::setParallelOverlap(bool parallel_overlap)
 {
   _dbTechLayerArraySpacingRule* obj = (_dbTechLayerArraySpacingRule*) this;
 
-  obj->flags_.parallel_overlap = parallel_overlap;
+  obj->flags_.parallel_overlap_ = parallel_overlap;
 }
 
 bool dbTechLayerArraySpacingRule::isParallelOverlap() const
 {
   _dbTechLayerArraySpacingRule* obj = (_dbTechLayerArraySpacingRule*) this;
 
-  return obj->flags_.parallel_overlap;
+  return obj->flags_.parallel_overlap_;
 }
 
 void dbTechLayerArraySpacingRule::setLongArray(bool long_array)
 {
   _dbTechLayerArraySpacingRule* obj = (_dbTechLayerArraySpacingRule*) this;
 
-  obj->flags_.long_array = long_array;
+  obj->flags_.long_array_ = long_array;
 }
 
 bool dbTechLayerArraySpacingRule::isLongArray() const
 {
   _dbTechLayerArraySpacingRule* obj = (_dbTechLayerArraySpacingRule*) this;
 
-  return obj->flags_.long_array;
+  return obj->flags_.long_array_;
 }
 
 void dbTechLayerArraySpacingRule::setViaWidthValid(bool via_width_valid)
 {
   _dbTechLayerArraySpacingRule* obj = (_dbTechLayerArraySpacingRule*) this;
 
-  obj->flags_.via_width_valid = via_width_valid;
+  obj->flags_.via_width_valid_ = via_width_valid;
 }
 
 bool dbTechLayerArraySpacingRule::isViaWidthValid() const
 {
   _dbTechLayerArraySpacingRule* obj = (_dbTechLayerArraySpacingRule*) this;
 
-  return obj->flags_.via_width_valid;
+  return obj->flags_.via_width_valid_;
 }
 
 void dbTechLayerArraySpacingRule::setWithinValid(bool within_valid)
 {
   _dbTechLayerArraySpacingRule* obj = (_dbTechLayerArraySpacingRule*) this;
 
-  obj->flags_.within_valid = within_valid;
+  obj->flags_.within_valid_ = within_valid;
 }
 
 bool dbTechLayerArraySpacingRule::isWithinValid() const
 {
   _dbTechLayerArraySpacingRule* obj = (_dbTechLayerArraySpacingRule*) this;
 
-  return obj->flags_.within_valid;
+  return obj->flags_.within_valid_;
 }
 
 // User Code Begin dbTechLayerArraySpacingRulePublicMethods

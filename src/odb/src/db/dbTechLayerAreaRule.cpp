@@ -18,10 +18,10 @@ template class dbTable<_dbTechLayerAreaRule>;
 
 bool _dbTechLayerAreaRule::operator==(const _dbTechLayerAreaRule& rhs) const
 {
-  if (flags_.except_rectangle != rhs.flags_.except_rectangle) {
+  if (flags_.except_rectangle_ != rhs.flags_.except_rectangle_) {
     return false;
   }
-  if (flags_.overlap != rhs.flags_.overlap) {
+  if (flags_.overlap_ != rhs.flags_.overlap_) {
     return false;
   }
   if (area_ != rhs.area_) {
@@ -219,28 +219,28 @@ void dbTechLayerAreaRule::setExceptRectangle(bool except_rectangle)
 {
   _dbTechLayerAreaRule* obj = (_dbTechLayerAreaRule*) this;
 
-  obj->flags_.except_rectangle = except_rectangle;
+  obj->flags_.except_rectangle_ = except_rectangle;
 }
 
 bool dbTechLayerAreaRule::isExceptRectangle() const
 {
   _dbTechLayerAreaRule* obj = (_dbTechLayerAreaRule*) this;
 
-  return obj->flags_.except_rectangle;
+  return obj->flags_.except_rectangle_;
 }
 
 void dbTechLayerAreaRule::setOverlap(uint overlap)
 {
   _dbTechLayerAreaRule* obj = (_dbTechLayerAreaRule*) this;
 
-  obj->flags_.overlap = overlap;
+  obj->flags_.overlap_ = overlap;
 }
 
 uint dbTechLayerAreaRule::getOverlap() const
 {
   _dbTechLayerAreaRule* obj = (_dbTechLayerAreaRule*) this;
 
-  return obj->flags_.overlap;
+  return obj->flags_.overlap_;
 }
 
 // User Code Begin dbTechLayerAreaRulePublicMethods
@@ -257,8 +257,8 @@ dbTechLayerAreaRule* dbTechLayerAreaRule::create(dbTechLayer* _layer)
   newrule->except_step_ = std::pair<int, int>(0, 0);
   newrule->mask_ = 0;
   newrule->rect_width_ = 0;
-  newrule->flags_.except_rectangle = false;
-  newrule->flags_.overlap = 0;
+  newrule->flags_.except_rectangle_ = false;
+  newrule->flags_.overlap_ = 0;
   return ((dbTechLayerAreaRule*) newrule);
 }
 

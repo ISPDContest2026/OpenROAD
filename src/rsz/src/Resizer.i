@@ -656,6 +656,15 @@ fully_rebuffer(Pin *pin)
   ensureLinked();
   Resizer *resizer = getResizer();
   resizer->fullyRebuffer(pin);
+
+}
+
+// 這就是你在 Python 會呼叫的函式名稱
+void
+run_my_contest_algo(int max_iterations)
+{
+  rsz::Resizer *resizer = ord::getResizer();
+  resizer->myContestAlgorithm(max_iterations);
 }
 
 } // namespace

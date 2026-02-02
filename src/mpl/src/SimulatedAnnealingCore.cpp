@@ -263,68 +263,62 @@ void SimulatedAnnealingCore<T>::calOutlinePenalty()
 template <class T>
 void SimulatedAnnealingCore<T>::calWirelength()
 {
+  // Initialization
+  wirelength_ = 0.0;
   if (core_weights_.wirelength <= 0.0) {
     return;
   }
 
-  wirelength_ = computeNetsWireLength(nets_);
-
-  if (graphics_) {
-    graphics_->setWirelengthPenalty({.name = "Wire Length",
-                                     .weight = core_weights_.wirelength,
-                                     .value = wirelength_,
-                                     .normalization_factor = norm_wirelength_});
+  // calculate the total net weight
+  float tot_net_weight = 0.0;
+  for (const auto& net : nets_) {
+    tot_net_weight += net.weight;
   }
-}
 
-template <class T>
-float SimulatedAnnealingCore<T>::computeNetsWireLength(
-    const std::vector<BundledNet>& nets) const
-{
-  float nets_wire_length = 0.0;
-  float nets_weight_sum = 0.0;
+  if (tot_net_weight <= 0.0) {
+    return;
+  }
 
   for (const auto& net : nets_) {
-    nets_weight_sum += net.weight;
-  }
+    T& source = macros_[net.terminals.first];
+    T& target = macros_[net.terminals.second];
 
-  if (nets_weight_sum != 0.0) {
-    for (const auto& net : nets) {
-      const T& source = macros_[net.terminals.first];
-      const T& target = macros_[net.terminals.second];
-
-      if (target.isClusterOfUnplacedIOPins()) {
-        nets_wire_length
-            += computeWLForClusterOfUnplacedIOPins(source, target, net.weight);
-      } else {
-        const float x1 = source.getPinX();
-        const float y1 = source.getPinY();
-        const float x2 = target.getPinX();
-        const float y2 = target.getPinY();
-
-        nets_wire_length
-            += net.weight * (std::abs(x2 - x1) + std::abs(y2 - y1));
-      }
+    if (target.isClusterOfUnplacedIOPins()) {
+      computeWLForClusterOfUnplacedIOPins(source, target, net.weight);
+      continue;
     }
 
-    nets_wire_length = nets_wire_length / nets_weight_sum
-                       / (outline_.getHeight() + outline_.getWidth());
+    const float x1 = source.getPinX();
+    const float y1 = source.getPinY();
+    const float x2 = target.getPinX();
+    const float y2 = target.getPinY();
+    wirelength_ += net.weight * (std::abs(x2 - x1) + std::abs(y2 - y1));
   }
 
-  return nets_wire_length;
+  // normalization
+  wirelength_ = wirelength_ / tot_net_weight
+                / (outline_.getHeight() + outline_.getWidth());
+
+  if (graphics_) {
+    graphics_->setWirelengthPenalty({"Wire Length",
+                                     core_weights_.wirelength,
+                                     wirelength_,
+                                     norm_wirelength_});
+  }
 }
 
 template <class T>
-double SimulatedAnnealingCore<T>::computeWLForClusterOfUnplacedIOPins(
+void SimulatedAnnealingCore<T>::computeWLForClusterOfUnplacedIOPins(
     const T& macro,
     const T& unplaced_ios,
-    const float net_weight) const
+    const float net_weight)
 {
   // To generate maximum cost.
   const float max_dist = die_area_.getPerimeter() / 2;
 
   if (isOutsideTheOutline(macro)) {
-    return net_weight * max_dist;
+    wirelength_ += net_weight * max_dist;
+    return;
   }
 
   const odb::Point macro_location(block_->micronsToDbu(macro.getPinX()),
@@ -347,7 +341,7 @@ double SimulatedAnnealingCore<T>::computeWLForClusterOfUnplacedIOPins(
         = computeDistToNearestRegion(macro_location, {constraint}, nullptr);
   }
 
-  return net_weight * block_->dbuToMicrons(smallest_distance);
+  wirelength_ += net_weight * block_->dbuToMicrons(smallest_distance);
 }
 
 // We consider the macro outside the outline based on the location of

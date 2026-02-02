@@ -34,19 +34,19 @@ template class dbTable<_dbMTerm>;
 
 bool _dbMTerm::operator==(const _dbMTerm& rhs) const
 {
-  if (flags_.io_type != rhs.flags_.io_type) {
+  if (flags_._io_type != rhs.flags_._io_type) {
     return false;
   }
 
-  if (flags_.sig_type != rhs.flags_.sig_type) {
+  if (flags_._sig_type != rhs.flags_._sig_type) {
     return false;
   }
 
-  if (flags_.shape_type != rhs.flags_.shape_type) {
+  if (flags_._shape_type != rhs.flags_._shape_type) {
     return false;
   }
 
-  if (order_id_ != rhs.order_id_) {
+  if (_order_id != rhs._order_id) {
     return false;
   }
 
@@ -62,39 +62,39 @@ bool _dbMTerm::operator==(const _dbMTerm& rhs) const
     return false;
   }
 
-  if (next_mterm_ != rhs.next_mterm_) {
+  if (_next_mterm != rhs._next_mterm) {
     return false;
   }
 
-  if (pins_ != rhs.pins_) {
+  if (_pins != rhs._pins) {
     return false;
   }
 
-  if (targets_ != rhs.targets_) {
+  if (_targets != rhs._targets) {
     return false;
   }
 
-  if (oxide1_ != rhs.oxide1_) {
+  if (_oxide1 != rhs._oxide1) {
     return false;
   }
 
-  if (oxide2_ != rhs.oxide2_) {
+  if (_oxide2 != rhs._oxide2) {
     return false;
   }
 
-  if (par_met_area_ != rhs.par_met_area_) {
+  if (_par_met_area != rhs._par_met_area) {
     return false;
   }
 
-  if (par_met_sidearea_ != rhs.par_met_sidearea_) {
+  if (_par_met_sidearea != rhs._par_met_sidearea) {
     return false;
   }
 
-  if (par_cut_area_ != rhs.par_cut_area_) {
+  if (_par_cut_area != rhs._par_cut_area) {
     return false;
   }
 
-  if (diffarea_ != rhs.diffarea_) {
+  if (_diffarea != rhs._diffarea) {
     return false;
   }
 
@@ -113,43 +113,43 @@ _dbMTerm::~_dbMTerm()
     free((void*) name_);
   }
 
-  for (auto elem : par_met_area_) {
+  for (auto elem : _par_met_area) {
     delete elem;
   }
-  par_met_area_.clear();
+  _par_met_area.clear();
 
-  for (auto elem : par_met_sidearea_) {
+  for (auto elem : _par_met_sidearea) {
     delete elem;
   }
-  par_met_sidearea_.clear();
+  _par_met_sidearea.clear();
 
-  for (auto elem : par_cut_area_) {
+  for (auto elem : _par_cut_area) {
     delete elem;
   }
-  par_cut_area_.clear();
+  _par_cut_area.clear();
 
-  for (auto elem : diffarea_) {
+  for (auto elem : _diffarea) {
     delete elem;
   }
-  diffarea_.clear();
+  _diffarea.clear();
 }
 
 dbOStream& operator<<(dbOStream& stream, const _dbMTerm& mterm)
 {
   uint* bit_field = (uint*) &mterm.flags_;
   stream << *bit_field;
-  stream << mterm.order_id_;
+  stream << mterm._order_id;
   stream << mterm.name_;
   stream << mterm.next_entry_;
-  stream << mterm.next_mterm_;
-  stream << mterm.pins_;
-  stream << mterm.targets_;
-  stream << mterm.oxide1_;
-  stream << mterm.oxide2_;
-  stream << mterm.par_met_area_;
-  stream << mterm.par_met_sidearea_;
-  stream << mterm.par_cut_area_;
-  stream << mterm.diffarea_;
+  stream << mterm._next_mterm;
+  stream << mterm._pins;
+  stream << mterm._targets;
+  stream << mterm._oxide1;
+  stream << mterm._oxide2;
+  stream << mterm._par_met_area;
+  stream << mterm._par_met_sidearea;
+  stream << mterm._par_cut_area;
+  stream << mterm._diffarea;
   return stream;
 }
 
@@ -157,18 +157,18 @@ dbIStream& operator>>(dbIStream& stream, _dbMTerm& mterm)
 {
   uint* bit_field = (uint*) &mterm.flags_;
   stream >> *bit_field;
-  stream >> mterm.order_id_;
+  stream >> mterm._order_id;
   stream >> mterm.name_;
   stream >> mterm.next_entry_;
-  stream >> mterm.next_mterm_;
-  stream >> mterm.pins_;
-  stream >> mterm.targets_;
-  stream >> mterm.oxide1_;
-  stream >> mterm.oxide2_;
-  stream >> mterm.par_met_area_;
-  stream >> mterm.par_met_sidearea_;
-  stream >> mterm.par_cut_area_;
-  stream >> mterm.diffarea_;
+  stream >> mterm._next_mterm;
+  stream >> mterm._pins;
+  stream >> mterm._targets;
+  stream >> mterm._oxide1;
+  stream >> mterm._oxide2;
+  stream >> mterm._par_met_area;
+  stream >> mterm._par_met_sidearea;
+  stream >> mterm._par_cut_area;
+  stream >> mterm._diffarea;
   return stream;
 }
 
@@ -229,30 +229,30 @@ const char* dbMTerm::getConstName()
 dbSigType dbMTerm::getSigType()
 {
   _dbMTerm* mterm = (_dbMTerm*) this;
-  return dbSigType(mterm->flags_.sig_type);
+  return dbSigType(mterm->flags_._sig_type);
 }
 
 dbIoType dbMTerm::getIoType()
 {
   _dbMTerm* mterm = (_dbMTerm*) this;
-  return dbIoType(mterm->flags_.io_type);
+  return dbIoType(mterm->flags_._io_type);
 }
 
 dbMTermShapeType dbMTerm::getShape()
 {
   _dbMTerm* mterm = (_dbMTerm*) this;
-  return dbMTermShapeType(mterm->flags_.shape_type);
+  return dbMTermShapeType(mterm->flags_._shape_type);
 }
 
 void dbMTerm::setMark(uint v)
 {
   _dbMTerm* mterm = (_dbMTerm*) this;
-  mterm->flags_.mark = v;
+  mterm->flags_._mark = v;
 }
 bool dbMTerm::isSetMark()
 {
   _dbMTerm* mterm = (_dbMTerm*) this;
-  return mterm->flags_.mark > 0 ? true : false;
+  return mterm->flags_._mark > 0 ? true : false;
 }
 
 dbMaster* dbMTerm::getMaster()
@@ -264,7 +264,7 @@ dbSet<dbMPin> dbMTerm::getMPins()
 {
   _dbMTerm* mterm = (_dbMTerm*) this;
   _dbMaster* master = (_dbMaster*) mterm->getOwner();
-  return dbSet<dbMPin>(mterm, master->mpin_itr_);
+  return dbSet<dbMPin>(mterm, master->_mpin_itr);
 }
 
 Rect dbMTerm::getBBox()
@@ -280,19 +280,19 @@ Rect dbMTerm::getBBox()
 void* dbMTerm::staPort()
 {
   _dbMTerm* mterm = (_dbMTerm*) this;
-  return mterm->sta_port_;
+  return mterm->_sta_port;
 }
 
 void dbMTerm::staSetPort(void* port)
 {
   _dbMTerm* mterm = (_dbMTerm*) this;
-  mterm->sta_port_ = port;
+  mterm->_sta_port = port;
 }
 
 int dbMTerm::getIndex()
 {
   _dbMTerm* mterm = (_dbMTerm*) this;
-  return mterm->order_id_;
+  return mterm->_order_id;
 }
 
 //
@@ -301,25 +301,25 @@ int dbMTerm::getIndex()
 void dbMTerm::addPartialMetalAreaEntry(double inval, dbTechLayer* refly)
 {
   _dbMTerm* mterm = (_dbMTerm*) this;
-  _dbTechAntennaAreaElement::create(mterm->par_met_area_, inval, refly);
+  _dbTechAntennaAreaElement::create(mterm->_par_met_area, inval, refly);
 }
 
 void dbMTerm::addPartialMetalSideAreaEntry(double inval, dbTechLayer* refly)
 {
   _dbMTerm* mterm = (_dbMTerm*) this;
-  _dbTechAntennaAreaElement::create(mterm->par_met_sidearea_, inval, refly);
+  _dbTechAntennaAreaElement::create(mterm->_par_met_sidearea, inval, refly);
 }
 
 void dbMTerm::addPartialCutAreaEntry(double inval, dbTechLayer* refly)
 {
   _dbMTerm* mterm = (_dbMTerm*) this;
-  _dbTechAntennaAreaElement::create(mterm->par_cut_area_, inval, refly);
+  _dbTechAntennaAreaElement::create(mterm->_par_cut_area, inval, refly);
 }
 
 void dbMTerm::addDiffAreaEntry(double inval, dbTechLayer* refly)
 {
   _dbMTerm* mterm = (_dbMTerm*) this;
-  _dbTechAntennaAreaElement::create(mterm->diffarea_, inval, refly);
+  _dbTechAntennaAreaElement::create(mterm->_diffarea, inval, refly);
 }
 
 dbTechAntennaPinModel* dbMTerm::createDefaultAntennaModel()
@@ -332,12 +332,12 @@ dbTechAntennaPinModel* dbMTerm::createDefaultAntennaModel()
   if (m != nullptr) {
     m->~_dbTechAntennaPinModel();
     new (m) _dbTechAntennaPinModel(mterm->getDatabase());
-    m->mterm_ = getImpl()->getOID();
+    m->_mterm = getImpl()->getOID();
   } else {
     _dbMaster* master = (_dbMaster*) mterm->getOwner();
-    m = master->antenna_pin_model_tbl_->create();
-    mterm->oxide1_ = m->getOID();
-    m->mterm_ = getImpl()->getOID();
+    m = master->_antenna_pin_model_tbl->create();
+    mterm->_oxide1 = m->getOID();
+    m->_mterm = getImpl()->getOID();
   }
 
   return (dbTechAntennaPinModel*) m;
@@ -352,12 +352,12 @@ dbTechAntennaPinModel* dbMTerm::createOxide2AntennaModel()
   if (m != nullptr) {
     m->~_dbTechAntennaPinModel();
     new (m) _dbTechAntennaPinModel(mterm->getDatabase());
-    m->mterm_ = getImpl()->getOID();
+    m->_mterm = getImpl()->getOID();
   } else {
     _dbMaster* master = (_dbMaster*) mterm->getOwner();
-    m = master->antenna_pin_model_tbl_->create();
-    mterm->oxide2_ = m->getOID();
-    m->mterm_ = getImpl()->getOID();
+    m = master->_antenna_pin_model_tbl->create();
+    mterm->_oxide2 = m->getOID();
+    m->_mterm = getImpl()->getOID();
   }
 
   return (dbTechAntennaPinModel*) m;
@@ -366,46 +366,46 @@ dbTechAntennaPinModel* dbMTerm::createOxide2AntennaModel()
 bool dbMTerm::hasDefaultAntennaModel() const
 {
   _dbMTerm* mterm = (_dbMTerm*) this;
-  return (mterm->oxide1_ != 0);
+  return (mterm->_oxide1 != 0);
 }
 
 bool dbMTerm::hasOxide2AntennaModel() const
 {
   _dbMTerm* mterm = (_dbMTerm*) this;
-  return (mterm->oxide2_ != 0);
+  return (mterm->_oxide2 != 0);
 }
 
 dbTechAntennaPinModel* dbMTerm::getDefaultAntennaModel() const
 {
   _dbMTerm* mterm = (_dbMTerm*) this;
 
-  if (mterm->oxide1_ == 0) {
+  if (mterm->_oxide1 == 0) {
     return nullptr;
   }
 
   _dbMaster* master = (_dbMaster*) mterm->getOwner();
-  return (dbTechAntennaPinModel*) master->antenna_pin_model_tbl_->getPtr(
-      mterm->oxide1_);
+  return (dbTechAntennaPinModel*) master->_antenna_pin_model_tbl->getPtr(
+      mterm->_oxide1);
 }
 
 dbTechAntennaPinModel* dbMTerm::getOxide2AntennaModel() const
 {
   _dbMTerm* mterm = (_dbMTerm*) this;
 
-  if (mterm->oxide2_ == 0) {
+  if (mterm->_oxide2 == 0) {
     return nullptr;
   }
 
   _dbMaster* master = (_dbMaster*) mterm->getOwner();
-  return (dbTechAntennaPinModel*) master->antenna_pin_model_tbl_->getPtr(
-      mterm->oxide2_);
+  return (dbTechAntennaPinModel*) master->_antenna_pin_model_tbl->getPtr(
+      mterm->_oxide2);
 }
 
 void dbMTerm::getDiffArea(std::vector<std::pair<double, dbTechLayer*>>& data)
 {
   _dbMTerm* mterm = (_dbMTerm*) this;
   _dbTechAntennaPinModel::getAntennaValues(
-      mterm->getDatabase(), mterm->diffarea_, data);
+      mterm->getDatabase(), mterm->_diffarea, data);
 }
 
 void dbMTerm::writeAntennaLef(lefout& writer) const
@@ -416,19 +416,19 @@ void dbMTerm::writeAntennaLef(lefout& writer) const
   dbLib* tplib = (dbLib*) tpmtr->getImpl()->getOwner();
   dbTech* tech = tplib->getTech();
 
-  for (auto ant : mterm->par_met_area_) {
+  for (auto ant : mterm->_par_met_area) {
     ant->writeLef("ANTENNAPARTIALMETALAREA", tech, writer);
   }
 
-  for (auto ant : mterm->par_met_sidearea_) {
+  for (auto ant : mterm->_par_met_sidearea) {
     ant->writeLef("ANTENNAPARTIALMETALSIDEAREA", tech, writer);
   }
 
-  for (auto ant : mterm->par_cut_area_) {
+  for (auto ant : mterm->_par_cut_area) {
     ant->writeLef("ANTENNAPARTIALCUTAREA", tech, writer);
   }
 
-  for (auto ant : mterm->diffarea_) {
+  for (auto ant : mterm->_diffarea) {
     ant->writeLef("ANTENNADIFFAREA", tech, writer);
   }
 
@@ -450,16 +450,16 @@ dbMTerm* dbMTerm::create(dbMaster* master,
 {
   _dbMaster* master_impl = (_dbMaster*) master;
 
-  if (master_impl->flags_.frozen || master_impl->mterm_hash_.hasMember(name)) {
+  if (master_impl->flags_._frozen || master_impl->_mterm_hash.hasMember(name)) {
     return nullptr;
   }
 
-  _dbMTerm* impl = master_impl->mterm_tbl_->create();
+  _dbMTerm* impl = master_impl->_mterm_tbl->create();
   impl->name_ = strdup(name);
-  impl->flags_.io_type = io_type.getValue();
-  impl->flags_.shape_type = shape_type;
-  master_impl->mterm_hash_.insert(impl);
-  master_impl->mterm_cnt_++;
+  impl->flags_._io_type = io_type.getValue();
+  impl->flags_._shape_type = shape_type;
+  master_impl->_mterm_hash.insert(impl);
+  master_impl->_mterm_cnt++;
 
   dbMTerm* mterm = (dbMTerm*) impl;
   mterm->setSigType(sig_type);
@@ -469,7 +469,7 @@ dbMTerm* dbMTerm::create(dbMaster* master,
 void dbMTerm::setSigType(dbSigType type)
 {
   _dbMTerm* mterm = (_dbMTerm*) this;
-  mterm->flags_.sig_type = type.getValue();
+  mterm->flags_._sig_type = type.getValue();
   if (type == dbSigType::CLOCK) {
     getMaster()->setSequential(true);
   }
@@ -478,7 +478,7 @@ void dbMTerm::setSigType(dbSigType type)
 dbMTerm* dbMTerm::getMTerm(dbMaster* master_, uint dbid_)
 {
   _dbMaster* master = (_dbMaster*) master_;
-  return (dbMTerm*) master->mterm_tbl_->getPtr(dbid_);
+  return (dbMTerm*) master->_mterm_tbl->getPtr(dbid_);
 }
 
 void _dbMTerm::collectMemInfo(MemInfo& info)
@@ -491,18 +491,18 @@ void _dbMTerm::collectMemInfo(MemInfo& info)
   // These fields have unusal pointer ownship semantics relative to
   // the rest of odb (not a table but a vector of owning pointers).
   // Should be just by value.
-  info.children_["_par_met_area"].add(par_met_area_);
+  info.children_["_par_met_area"].add(_par_met_area);
   info.children_["_par_met_area"].size
-      += par_met_area_.size() * sizeof(_dbTechAntennaAreaElement);
-  info.children_["_par_met_sidearea"].add(par_met_sidearea_);
+      += _par_met_area.size() * sizeof(_dbTechAntennaAreaElement);
+  info.children_["_par_met_sidearea"].add(_par_met_sidearea);
   info.children_["_par_met_sidearea"].size
-      += par_met_sidearea_.size() * sizeof(_dbTechAntennaAreaElement);
-  info.children_["_par_cut_area"].add(par_cut_area_);
+      += _par_met_sidearea.size() * sizeof(_dbTechAntennaAreaElement);
+  info.children_["_par_cut_area"].add(_par_cut_area);
   info.children_["_par_cut_area"].size
-      += par_cut_area_.size() * sizeof(_dbTechAntennaAreaElement);
-  info.children_["_diffarea"].add(diffarea_);
+      += _par_cut_area.size() * sizeof(_dbTechAntennaAreaElement);
+  info.children_["_diffarea"].add(_diffarea);
   info.children_["_diffarea"].size
-      += diffarea_.size() * sizeof(_dbTechAntennaAreaElement);
+      += _diffarea.size() * sizeof(_dbTechAntennaAreaElement);
 }
 
 }  // namespace odb

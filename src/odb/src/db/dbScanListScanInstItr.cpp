@@ -8,7 +8,6 @@
 #include "dbScanList.h"
 #include "dbTable.h"
 #include "dbTable.hpp"
-#include "odb/odb.h"
 
 namespace odb {
 
@@ -18,12 +17,12 @@ namespace odb {
 //
 ////////////////////////////////////////////////////////////////////
 
-bool dbScanListScanInstItr::reversible() const
+bool dbScanListScanInstItr::reversible()
 {
   return true;
 }
 
-bool dbScanListScanInstItr::orderReversed() const
+bool dbScanListScanInstItr::orderReversed()
 {
   return true;
 }
@@ -32,28 +31,28 @@ void dbScanListScanInstItr::reverse(dbObject* parent)
 {
   // User Code Begin reverse
   _dbScanList* scan_list = (_dbScanList*) parent;
-  uint current_id = scan_list->first_scan_inst_;
+  uint current_id = scan_list->_first_scan_inst;
   uint new_head = 0;
 
   while (current_id != 0) {
-    _dbScanInst* scan_inst = scan_inst_tbl_->getPtr(current_id);
-    uint new_next = scan_inst->prev_list_scan_inst_;
-    scan_inst->prev_list_scan_inst_ = scan_inst->next_list_scan_inst_;
-    scan_inst->next_list_scan_inst_ = new_next;
+    _dbScanInst* scan_inst = _scan_inst_tbl->getPtr(current_id);
+    uint new_next = scan_inst->_prev_list_scan_inst;
+    scan_inst->_prev_list_scan_inst = scan_inst->_next_list_scan_inst;
+    scan_inst->_next_list_scan_inst = new_next;
     new_head = current_id;
-    current_id = scan_inst->prev_list_scan_inst_;
+    current_id = scan_inst->_prev_list_scan_inst;
   }
 
-  scan_list->first_scan_inst_ = new_head;
+  scan_list->_first_scan_inst = new_head;
   // User Code End reverse
 }
 
-uint dbScanListScanInstItr::sequential() const
+uint dbScanListScanInstItr::sequential()
 {
   return 0;
 }
 
-uint dbScanListScanInstItr::size(dbObject* parent) const
+uint dbScanListScanInstItr::size(dbObject* parent)
 {
   uint id;
   uint cnt = 0;
@@ -67,30 +66,30 @@ uint dbScanListScanInstItr::size(dbObject* parent) const
   return cnt;
 }
 
-uint dbScanListScanInstItr::begin(dbObject* parent) const
+uint dbScanListScanInstItr::begin(dbObject* parent)
 {
   // User Code Begin begin
   _dbScanList* scan_list = (_dbScanList*) parent;
-  return (uint) scan_list->first_scan_inst_;
+  return (uint) scan_list->_first_scan_inst;
   // User Code End begin
 }
 
-uint dbScanListScanInstItr::end(dbObject* /* unused: parent */) const
+uint dbScanListScanInstItr::end(dbObject* /* unused: parent */)
 {
   return 0;
 }
 
-uint dbScanListScanInstItr::next(uint id, ...) const
+uint dbScanListScanInstItr::next(uint id, ...)
 {
   // User Code Begin next
-  _dbScanInst* scan_inst = scan_inst_tbl_->getPtr(id);
-  return (uint) scan_inst->next_list_scan_inst_;
+  _dbScanInst* scan_inst = _scan_inst_tbl->getPtr(id);
+  return (uint) scan_inst->_next_list_scan_inst;
   // User Code End next
 }
 
 dbObject* dbScanListScanInstItr::getObject(uint id, ...)
 {
-  return scan_inst_tbl_->getPtr(id);
+  return _scan_inst_tbl->getPtr(id);
 }
 }  // namespace odb
 // Generator Code End Cpp

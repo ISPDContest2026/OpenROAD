@@ -20,16 +20,16 @@ template class dbTable<_dbGDSPath>;
 
 bool _dbGDSPath::operator==(const _dbGDSPath& rhs) const
 {
-  if (layer_ != rhs.layer_) {
+  if (_layer != rhs._layer) {
     return false;
   }
-  if (datatype_ != rhs.datatype_) {
+  if (_datatype != rhs._datatype) {
     return false;
   }
-  if (width_ != rhs.width_) {
+  if (_width != rhs._width) {
     return false;
   }
-  if (path_type_ != rhs.path_type_) {
+  if (_path_type != rhs._path_type) {
     return false;
   }
 
@@ -43,31 +43,31 @@ bool _dbGDSPath::operator<(const _dbGDSPath& rhs) const
 
 _dbGDSPath::_dbGDSPath(_dbDatabase* db)
 {
-  layer_ = 0;
-  datatype_ = 0;
-  width_ = 0;
-  path_type_ = 0;
+  _layer = 0;
+  _datatype = 0;
+  _width = 0;
+  _path_type = 0;
 }
 
 dbIStream& operator>>(dbIStream& stream, _dbGDSPath& obj)
 {
-  stream >> obj.layer_;
-  stream >> obj.datatype_;
-  stream >> obj.xy_;
-  stream >> obj.propattr_;
-  stream >> obj.width_;
-  stream >> obj.path_type_;
+  stream >> obj._layer;
+  stream >> obj._datatype;
+  stream >> obj._xy;
+  stream >> obj._propattr;
+  stream >> obj._width;
+  stream >> obj._path_type;
   return stream;
 }
 
 dbOStream& operator<<(dbOStream& stream, const _dbGDSPath& obj)
 {
-  stream << obj.layer_;
-  stream << obj.datatype_;
-  stream << obj.xy_;
-  stream << obj.propattr_;
-  stream << obj.width_;
-  stream << obj.path_type_;
+  stream << obj._layer;
+  stream << obj._datatype;
+  stream << obj._xy;
+  stream << obj._propattr;
+  stream << obj._width;
+  stream << obj._path_type;
   return stream;
 }
 
@@ -77,9 +77,9 @@ void _dbGDSPath::collectMemInfo(MemInfo& info)
   info.size += sizeof(*this);
 
   // User Code Begin collectMemInfo
-  info.children_["xy"].add(xy_);
-  info.children_["propattr"].add(propattr_);
-  for (auto& [i, s] : propattr_) {
+  info.children_["xy"].add(_xy);
+  info.children_["propattr"].add(_propattr);
+  for (auto& [i, s] : _propattr) {
     info.children_["propattr"].add(s);
   }
   // User Code End collectMemInfo
@@ -95,78 +95,78 @@ void dbGDSPath::setLayer(int16_t layer)
 {
   _dbGDSPath* obj = (_dbGDSPath*) this;
 
-  obj->layer_ = layer;
+  obj->_layer = layer;
 }
 
 int16_t dbGDSPath::getLayer() const
 {
   _dbGDSPath* obj = (_dbGDSPath*) this;
-  return obj->layer_;
+  return obj->_layer;
 }
 
 void dbGDSPath::setDatatype(int16_t datatype)
 {
   _dbGDSPath* obj = (_dbGDSPath*) this;
 
-  obj->datatype_ = datatype;
+  obj->_datatype = datatype;
 }
 
 int16_t dbGDSPath::getDatatype() const
 {
   _dbGDSPath* obj = (_dbGDSPath*) this;
-  return obj->datatype_;
+  return obj->_datatype;
 }
 
 void dbGDSPath::setXy(const std::vector<Point>& xy)
 {
   _dbGDSPath* obj = (_dbGDSPath*) this;
 
-  obj->xy_ = xy;
+  obj->_xy = xy;
 }
 
 void dbGDSPath::getXy(std::vector<Point>& tbl) const
 {
   _dbGDSPath* obj = (_dbGDSPath*) this;
-  tbl = obj->xy_;
+  tbl = obj->_xy;
 }
 
 void dbGDSPath::setWidth(int width)
 {
   _dbGDSPath* obj = (_dbGDSPath*) this;
 
-  obj->width_ = width;
+  obj->_width = width;
 }
 
 int dbGDSPath::getWidth() const
 {
   _dbGDSPath* obj = (_dbGDSPath*) this;
-  return obj->width_;
+  return obj->_width;
 }
 
 void dbGDSPath::setPathType(int16_t path_type)
 {
   _dbGDSPath* obj = (_dbGDSPath*) this;
 
-  obj->path_type_ = path_type;
+  obj->_path_type = path_type;
 }
 
 int16_t dbGDSPath::getPathType() const
 {
   _dbGDSPath* obj = (_dbGDSPath*) this;
-  return obj->path_type_;
+  return obj->_path_type;
 }
 
 // User Code Begin dbGDSPathPublicMethods
 std::vector<std::pair<std::int16_t, std::string>>& dbGDSPath::getPropattr()
 {
   auto* obj = (_dbGDSPath*) this;
-  return obj->propattr_;
+  return obj->_propattr;
 }
 
 const std::vector<Point>& dbGDSPath::getXY()
 {
   auto obj = (_dbGDSPath*) this;
-  return obj->xy_;
+  return obj->_xy;
 }
 
 dbGDSPath* dbGDSPath::create(dbGDSStructure* structure)

@@ -42,7 +42,7 @@ class DefOut
 
  private:
   class Impl;
-  std::unique_ptr<Impl> writer_;
+  std::unique_ptr<Impl> _writer;
 };
 
 }  // namespace odb

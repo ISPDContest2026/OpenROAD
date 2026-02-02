@@ -3,8 +3,7 @@
 
 #pragma once
 
-#include <cassert>
-
+#include "odb/ZException.h"
 #include "odb/db.h"
 #include "odb/odb.h"
 
@@ -78,9 +77,9 @@ namespace odb {
 
 struct WirePoint
 {
-  int x = 0;
-  int y = 0;
-  dbTechLayer* layer = nullptr;
+  int _x = 0;
+  int _y = 0;
+  dbTechLayer* _layer = nullptr;
 };
 
 template <class O, class D>
@@ -96,19 +95,19 @@ inline void getPrevPoint(dbTech* tech,
   bool look_for_x = true;
   bool look_for_y = true;
   // quiets compiler warnings
-  pnt.x = 0;
-  pnt.y = 0;
-  pnt.layer = nullptr;
+  pnt._x = 0;
+  pnt._y = 0;
+  pnt._layer = nullptr;
 
 prevOpCode:
-  assert(idx >= 0);
+  ZASSERT(idx >= 0);
   opcode = opcodes[idx];
 
   switch (opcode & WOP_OPCODE_MASK) {
     case WOP_PATH:
     case WOP_SHORT: {
       if (get_layer) {
-        pnt.layer = dbTechLayer::getTechLayer(tech, data[idx]);
+        pnt._layer = dbTechLayer::getTechLayer(tech, data[idx]);
 
         if ((look_for_x == false) && (look_for_y == false)) {
           return;
@@ -129,7 +128,7 @@ prevOpCode:
     case WOP_X: {
       if (look_for_x) {
         look_for_x = false;
-        pnt.x = data[idx];
+        pnt._x = data[idx];
 
         if ((look_for_y == false) && (get_layer == false)) {
           return;
@@ -143,7 +142,7 @@ prevOpCode:
     case WOP_Y: {
       if (look_for_y) {
         look_for_y = false;
-        pnt.y = data[idx];
+        pnt._y = data[idx];
 
         if ((look_for_x == false) && (get_layer == false)) {
           return;
@@ -159,9 +158,9 @@ prevOpCode:
         dbVia* via = dbVia::getVia(block, data[idx]);
 
         if (opcode & WOP_VIA_EXIT_TOP) {
-          pnt.layer = via->getTopLayer();
+          pnt._layer = via->getTopLayer();
         } else {
-          pnt.layer = via->getBottomLayer();
+          pnt._layer = via->getBottomLayer();
         }
 
         if ((look_for_x == false) && (look_for_y == false)) {
@@ -180,9 +179,9 @@ prevOpCode:
         dbTechVia* via = dbTechVia::getTechVia(tech, data[idx]);
 
         if (opcode & WOP_VIA_EXIT_TOP) {
-          pnt.layer = via->getTopLayer();
+          pnt._layer = via->getTopLayer();
         } else {
-          pnt.layer = via->getBottomLayer();
+          pnt._layer = via->getBottomLayer();
         }
 
         if ((look_for_x == false) && (look_for_y == false)) {

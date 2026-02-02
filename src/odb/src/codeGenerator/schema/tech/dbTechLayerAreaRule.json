@@ -33,7 +33,7 @@
     },
     {
       "type": "bit",
-      "name": "except_rectangle"
+      "name": "except_rectangle_"
     },
     {
       "type": "std::pair<int,int>",
@@ -51,7 +51,7 @@
     },
     {
       "type": "uint",
-      "name": "overlap",
+      "name": "overlap_",
       "bits": 2
     },
     {

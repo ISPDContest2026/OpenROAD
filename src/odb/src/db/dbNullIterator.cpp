@@ -3,18 +3,16 @@
 
 #include "dbNullIterator.h"
 
-#include "odb/odb.h"
-
 namespace odb {
 
 dbNullIterator dbNullIterator::null_iterator;
 
-bool dbNullIterator::reversible() const
+bool dbNullIterator::reversible()
 {
   return false;
 }
 
-bool dbNullIterator::orderReversed() const
+bool dbNullIterator::orderReversed()
 {
   return false;
 }
@@ -23,27 +21,27 @@ void dbNullIterator::reverse(dbObject*)
 {
 }
 
-uint dbNullIterator::sequential() const
+uint dbNullIterator::sequential()
 {
   return 0;
 }
 
-uint dbNullIterator::size(dbObject*) const
+uint dbNullIterator::size(dbObject*)
 {
   return 0;
 }
 
-uint dbNullIterator::begin(dbObject*) const
+uint dbNullIterator::begin(dbObject*)
 {
   return 0;
 }
 
-uint dbNullIterator::end(dbObject*) const
+uint dbNullIterator::end(dbObject*)
 {
   return 0;
 }
 
-uint dbNullIterator::next(uint, ...) const
+uint dbNullIterator::next(uint, ...)
 {
   return 0;
 }

@@ -375,6 +375,11 @@ class Resizer : public dbStaState, public dbNetworkObserver
   {
     clk_buffers_ = clk_buffers;
   }
+  void myContestAlgorithm(int max_iterations);
+  bool isBuffer(odb::dbMaster* master);
+  odb::dbInst* getDriverInst(odb::dbInst* inst);
+  std::tuple<float, int, int> getSnapshot();
+  float getTNS();
   // Clone inverters next to the registers they drive to remove them
   // from the clock network.
   // yosys is too stupid to use the inverted clock registers
@@ -690,7 +695,7 @@ class Resizer : public dbStaState, public dbNetworkObserver
   bool checkAndMarkVTSwappable(Instance* inst,
                                std::unordered_set<Instance*>& notSwappable,
                                LibertyCell*& best_lib_cell);
-
+  
   ////////////////////////////////////////////////////////////////
   // Jounalling support for checkpointing and backing out changes
   // during repair timing.

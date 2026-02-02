@@ -4,7 +4,6 @@
 #include "dbRSeg.h"
 
 #include <algorithm>
-#include <cassert>
 #include <cstdio>
 #include <vector>
 
@@ -17,6 +16,7 @@
 #include "dbNet.h"
 #include "dbTable.h"
 #include "dbTable.hpp"
+#include "odb/ZException.h"
 #include "odb/db.h"
 #include "odb/dbObject.h"
 #include "odb/dbSet.h"
@@ -29,31 +29,31 @@ template class dbTable<_dbRSeg>;
 
 bool _dbRSeg::operator==(const _dbRSeg& rhs) const
 {
-  if (flags_.path_dir != rhs.flags_.path_dir) {
+  if (flags_._path_dir != rhs.flags_._path_dir) {
     return false;
   }
 
-  if (flags_.allocated_cap != rhs.flags_.allocated_cap) {
+  if (flags_._allocated_cap != rhs.flags_._allocated_cap) {
     return false;
   }
 
-  if (source_ != rhs.source_) {
+  if (_source != rhs._source) {
     return false;
   }
 
-  if (target_ != rhs.target_) {
+  if (_target != rhs._target) {
     return false;
   }
 
-  if (xcoord_ != rhs.xcoord_) {
+  if (_xcoord != rhs._xcoord) {
     return false;
   }
 
-  if (ycoord_ != rhs.ycoord_) {
+  if (_ycoord != rhs._ycoord) {
     return false;
   }
 
-  if (next_ != rhs.next_) {
+  if (_next != rhs._next) {
     return false;
   }
 
@@ -70,20 +70,20 @@ double dbRSeg::getResistance(int corner)
 {
   _dbRSeg* seg = (_dbRSeg*) this;
   _dbBlock* block = (_dbBlock*) seg->getOwner();
-  uint cornerCnt = block->corners_per_block_;
+  uint cornerCnt = block->_corners_per_block;
 
-  assert((corner >= 0) && ((uint) corner < cornerCnt));
-  return (*block->r_val_tbl_)[(seg->getOID() - 1) * cornerCnt + 1 + corner];
+  ZASSERT((corner >= 0) && ((uint) corner < cornerCnt));
+  return (*block->_r_val_tbl)[(seg->getOID() - 1) * cornerCnt + 1 + corner];
 }
 
 void dbRSeg::getAllRes(double* res)
 {
   _dbRSeg* seg = (_dbRSeg*) this;
   _dbBlock* block = (_dbBlock*) seg->getOwner();
-  uint cornerCnt = block->corners_per_block_;
+  uint cornerCnt = block->_corners_per_block;
 
   for (uint ii = 0; ii < cornerCnt; ii++) {
-    res[ii] = (*block->r_val_tbl_)[(seg->getOID() - 1) * cornerCnt + 1 + ii];
+    res[ii] = (*block->_r_val_tbl)[(seg->getOID() - 1) * cornerCnt + 1 + ii];
   }
 }
 
@@ -91,34 +91,34 @@ void dbRSeg::addAllRes(double* res)
 {
   _dbRSeg* seg = (_dbRSeg*) this;
   _dbBlock* block = (_dbBlock*) seg->getOwner();
-  uint cornerCnt = block->corners_per_block_;
+  uint cornerCnt = block->_corners_per_block;
 
   for (uint ii = 0; ii < cornerCnt; ii++) {
-    res[ii] += (*block->r_val_tbl_)[(seg->getOID() - 1) * cornerCnt + 1 + ii];
+    res[ii] += (*block->_r_val_tbl)[(seg->getOID() - 1) * cornerCnt + 1 + ii];
   }
 }
 
 bool dbRSeg::updatedCap()
 {
   _dbRSeg* seg = (_dbRSeg*) this;
-  return (seg->flags_.update_cap == 1 ? true : false);
+  return (seg->flags_._update_cap == 1 ? true : false);
 }
 bool dbRSeg::allocatedCap()
 {
   _dbRSeg* seg = (_dbRSeg*) this;
-  return (seg->flags_.allocated_cap == 1 ? true : false);
+  return (seg->flags_._allocated_cap == 1 ? true : false);
 }
 
 bool dbRSeg::pathLowToHigh()
 {
   _dbRSeg* seg = (_dbRSeg*) this;
-  return (seg->flags_.path_dir == 0 ? true : false);
+  return (seg->flags_._path_dir == 0 ? true : false);
 }
 
 void dbRSeg::addRSegCapacitance(dbRSeg* other)
 {
   _dbRSeg* seg = (_dbRSeg*) this;
-  if (!seg->flags_.allocated_cap) {
+  if (!seg->flags_._allocated_cap) {
     getTargetCapNode()->addCapnCapacitance(other->getTargetCapNode());
     return;
   }
@@ -128,27 +128,26 @@ void dbRSeg::addRSegCapacitance(dbRSeg* other)
 
   for (uint corner = 0; corner < cornerCnt; corner++) {
     float& value
-        = (*block->c_val_tbl_)[(seg->getOID() - 1) * cornerCnt + 1 + corner];
+        = (*block->_c_val_tbl)[(seg->getOID() - 1) * cornerCnt + 1 + corner];
     float& ovalue
-        = (*block->c_val_tbl_)[(oseg->getOID() - 1) * cornerCnt + 1 + corner];
+        = (*block->_c_val_tbl)[(oseg->getOID() - 1) * cornerCnt + 1 + corner];
     value += ovalue;
   }
 
-  debugPrint(getImpl()->getLogger(),
-             utl::ODB,
-             "DB_EDIT",
-             2,
-             "EDIT: dbRSeg {}, other dbRSeg {}, addRSegCapacitance",
-             seg->getId(),
-             oseg->getId());
-
-  if (block->journal_) {
-    block->journal_->beginAction(dbJournal::kUpdateField);
-    block->journal_->pushParam(dbRSegObj);
-    block->journal_->pushParam(seg->getId());
-    block->journal_->pushParam(_dbRSeg::kAddRSegCapacitance);
-    block->journal_->pushParam(oseg->getId());
-    block->journal_->endAction();
+  if (block->_journal) {
+    debugPrint(getImpl()->getLogger(),
+               utl::ODB,
+               "DB_ECO",
+               1,
+               "ECO: dbRSeg {}, other dbRSeg {}, addRSegCapacitance",
+               seg->getId(),
+               oseg->getId());
+    block->_journal->beginAction(dbJournal::UPDATE_FIELD);
+    block->_journal->pushParam(dbRSegObj);
+    block->_journal->pushParam(seg->getId());
+    block->_journal->pushParam(_dbRSeg::ADDRSEGCAPACITANCE);
+    block->_journal->pushParam(oseg->getId());
+    block->_journal->endAction();
   }
 }
 
@@ -157,31 +156,30 @@ void dbRSeg::addRSegResistance(dbRSeg* other)
   _dbRSeg* seg = (_dbRSeg*) this;
   _dbRSeg* oseg = (_dbRSeg*) other;
   _dbBlock* block = (_dbBlock*) seg->getOwner();
-  uint cornerCnt = block->corners_per_block_;
+  uint cornerCnt = block->_corners_per_block;
 
   for (uint corner = 0; corner < cornerCnt; corner++) {
     float& value
-        = (*block->r_val_tbl_)[(seg->getOID() - 1) * cornerCnt + 1 + corner];
+        = (*block->_r_val_tbl)[(seg->getOID() - 1) * cornerCnt + 1 + corner];
     float& ovalue
-        = (*block->r_val_tbl_)[(oseg->getOID() - 1) * cornerCnt + 1 + corner];
+        = (*block->_r_val_tbl)[(oseg->getOID() - 1) * cornerCnt + 1 + corner];
     value += ovalue;
   }
 
-  debugPrint(getImpl()->getLogger(),
-             utl::ODB,
-             "DB_EDIT",
-             2,
-             "EDIT: dbRSeg {}, other dbRSeg {}, addRSegResistance",
-             seg->getId(),
-             oseg->getId());
-
-  if (block->journal_) {
-    block->journal_->beginAction(dbJournal::kUpdateField);
-    block->journal_->pushParam(dbRSegObj);
-    block->journal_->pushParam(seg->getId());
-    block->journal_->pushParam(_dbRSeg::kAddRSegResistance);
-    block->journal_->pushParam(oseg->getId());
-    block->journal_->endAction();
+  if (block->_journal) {
+    debugPrint(getImpl()->getLogger(),
+               utl::ODB,
+               "DB_ECO",
+               1,
+               "ECO: dbRSeg {}, other dbRSeg {}, addRSegResistance",
+               seg->getId(),
+               oseg->getId());
+    block->_journal->beginAction(dbJournal::UPDATE_FIELD);
+    block->_journal->pushParam(dbRSegObj);
+    block->_journal->pushParam(seg->getId());
+    block->_journal->pushParam(_dbRSeg::ADDRSEGRESISTANCE);
+    block->_journal->pushParam(oseg->getId());
+    block->_journal->endAction();
   }
 }
 
@@ -189,32 +187,31 @@ void dbRSeg::setResistance(double res, int corner)
 {
   _dbRSeg* seg = (_dbRSeg*) this;
   _dbBlock* block = (_dbBlock*) seg->getOwner();
-  uint cornerCnt = block->corners_per_block_;
-  assert((corner >= 0) && ((uint) corner < cornerCnt));
+  uint cornerCnt = block->_corners_per_block;
+  ZASSERT((corner >= 0) && ((uint) corner < cornerCnt));
 
   float& value
-      = (*block->r_val_tbl_)[(seg->getOID() - 1) * cornerCnt + 1 + corner];
+      = (*block->_r_val_tbl)[(seg->getOID() - 1) * cornerCnt + 1 + corner];
   float prev_value = value;
   value = (float) res;
 
-  debugPrint(getImpl()->getLogger(),
-             utl::ODB,
-             "DB_EDIT",
-             2,
-             "EDIT: dbRSeg {}, setResistance {}, corner {}",
-             seg->getId(),
-             res,
-             corner);
-
-  if (block->journal_) {
-    block->journal_->beginAction(dbJournal::kUpdateField);
-    block->journal_->pushParam(dbRSegObj);
-    block->journal_->pushParam(seg->getId());
-    block->journal_->pushParam(_dbRSeg::kResistance);
-    block->journal_->pushParam(prev_value);
-    block->journal_->pushParam(value);
-    block->journal_->pushParam(corner);
-    block->journal_->endAction();
+  if (block->_journal) {
+    debugPrint(getImpl()->getLogger(),
+               utl::ODB,
+               "DB_ECO",
+               1,
+               "ECO: dbRSeg {}, setResistance {}, corner {}",
+               seg->getId(),
+               res,
+               corner);
+    block->_journal->beginAction(dbJournal::UPDATE_FIELD);
+    block->_journal->pushParam(dbRSegObj);
+    block->_journal->pushParam(seg->getId());
+    block->_journal->pushParam(_dbRSeg::RESISTANCE);
+    block->_journal->pushParam(prev_value);
+    block->_journal->pushParam(value);
+    block->_journal->pushParam(corner);
+    block->_journal->endAction();
   }
 }
 
@@ -222,39 +219,38 @@ void dbRSeg::adjustResistance(float factor, int corner)
 {
   _dbRSeg* seg = (_dbRSeg*) this;
   _dbBlock* block = (_dbBlock*) seg->getOwner();
-  uint cornerCnt = block->corners_per_block_;
-  assert((corner >= 0) && ((uint) corner < cornerCnt));
+  uint cornerCnt = block->_corners_per_block;
+  ZASSERT((corner >= 0) && ((uint) corner < cornerCnt));
 
   float& value
-      = (*block->r_val_tbl_)[(seg->getOID() - 1) * cornerCnt + 1 + corner];
+      = (*block->_r_val_tbl)[(seg->getOID() - 1) * cornerCnt + 1 + corner];
   float prev_value = value;
   value *= factor;
 
-  debugPrint(getImpl()->getLogger(),
-             utl::ODB,
-             "DB_EDIT",
-             2,
-             "EDIT: dbRSeg {}, adjustResistance {}, corner {}",
-             seg->getId(),
-             factor,
-             corner);
-
-  if (block->journal_) {
-    block->journal_->beginAction(dbJournal::kUpdateField);
-    block->journal_->pushParam(dbRSegObj);
-    block->journal_->pushParam(seg->getId());
-    block->journal_->pushParam(_dbRSeg::kResistance);
-    block->journal_->pushParam(prev_value);
-    block->journal_->pushParam(value);
-    block->journal_->pushParam(corner);
-    block->journal_->endAction();
+  if (block->_journal) {
+    debugPrint(getImpl()->getLogger(),
+               utl::ODB,
+               "DB_ECO",
+               1,
+               "ECO: dbRSeg {}, adjustResistance {}, corner {}",
+               seg->getId(),
+               factor,
+               corner);
+    block->_journal->beginAction(dbJournal::UPDATE_FIELD);
+    block->_journal->pushParam(dbRSegObj);
+    block->_journal->pushParam(seg->getId());
+    block->_journal->pushParam(_dbRSeg::RESISTANCE);
+    block->_journal->pushParam(prev_value);
+    block->_journal->pushParam(value);
+    block->_journal->pushParam(corner);
+    block->_journal->endAction();
   }
 }
 
 void dbRSeg::adjustResistance(float factor)
 {
   _dbBlock* block = (_dbBlock*) getImpl()->getOwner();
-  uint cornerCnt = block->corners_per_block_;
+  uint cornerCnt = block->_corners_per_block;
   uint corner;
   for (corner = 0; corner < cornerCnt; corner++) {
     adjustResistance(factor, corner);
@@ -265,41 +261,40 @@ void dbRSeg::setCapacitance(double cap, int corner)
 {
   _dbRSeg* seg = (_dbRSeg*) this;
   _dbBlock* block = (_dbBlock*) seg->getOwner();
-  uint cornerCnt = block->corners_per_block_;
+  uint cornerCnt = block->_corners_per_block;
 
-  if (!seg->flags_.allocated_cap) {
+  if (!seg->flags_._allocated_cap) {
     fprintf(stdout, "WARNING: cap value storage is not allocated\n");
     return;
   }
-  seg->flags_.update_cap = 1;
+  seg->flags_._update_cap = 1;
   if (cap == 0.0) {
-    seg->flags_.update_cap = 0;
+    seg->flags_._update_cap = 0;
   }
 
-  assert((corner >= 0) && ((uint) corner < cornerCnt));
+  ZASSERT((corner >= 0) && ((uint) corner < cornerCnt));
   float& value
-      = (*block->c_val_tbl_)[(seg->getOID() - 1) * cornerCnt + 1 + corner];
+      = (*block->_c_val_tbl)[(seg->getOID() - 1) * cornerCnt + 1 + corner];
   float prev_value = value;
   value = (float) cap;
 
-  debugPrint(getImpl()->getLogger(),
-             utl::ODB,
-             "DB_EDIT",
-             2,
-             "EDIT: dbRSeg {}, setCapacitance {}, corner {}",
-             seg->getId(),
-             cap,
-             corner);
-
-  if (block->journal_) {
-    block->journal_->beginAction(dbJournal::kUpdateField);
-    block->journal_->pushParam(dbRSegObj);
-    block->journal_->pushParam(seg->getId());
-    block->journal_->pushParam(_dbRSeg::kCapacitance);
-    block->journal_->pushParam(prev_value);
-    block->journal_->pushParam(value);
-    block->journal_->pushParam(corner);
-    block->journal_->endAction();
+  if (block->_journal) {
+    debugPrint(getImpl()->getLogger(),
+               utl::ODB,
+               "DB_ECO",
+               1,
+               "ECO: dbRSeg {}, setCapacitance {}, corner {}",
+               seg->getId(),
+               cap,
+               corner);
+    block->_journal->beginAction(dbJournal::UPDATE_FIELD);
+    block->_journal->pushParam(dbRSegObj);
+    block->_journal->pushParam(seg->getId());
+    block->_journal->pushParam(_dbRSeg::CAPACITANCE);
+    block->_journal->pushParam(prev_value);
+    block->_journal->pushParam(value);
+    block->_journal->pushParam(corner);
+    block->_journal->endAction();
   }
 }
 
@@ -308,10 +303,10 @@ void dbRSeg::adjustSourceCapacitance(float factor, uint corner)
   _dbRSeg* seg = (_dbRSeg*) this;
   _dbBlock* block = (_dbBlock*) seg->getOwner();
 
-  if (seg->flags_.allocated_cap != 0) {
+  if (seg->flags_._allocated_cap != 0) {
     return;
   }
-  dbCapNode* node = dbCapNode::getCapNode((dbBlock*) block, seg->source_);
+  dbCapNode* node = dbCapNode::getCapNode((dbBlock*) block, seg->_source);
   node->adjustCapacitance(factor, corner);
 }
 
@@ -319,36 +314,35 @@ void dbRSeg::adjustCapacitance(float factor, uint corner)
 {
   _dbRSeg* seg = (_dbRSeg*) this;
   _dbBlock* block = (_dbBlock*) seg->getOwner();
-  uint cornerCnt = block->corners_per_block_;
+  uint cornerCnt = block->_corners_per_block;
 
-  if (seg->flags_.allocated_cap == 0) {
+  if (seg->flags_._allocated_cap == 0) {
     _dbBlock* block = (_dbBlock*) seg->getOwner();
-    dbCapNode* node = dbCapNode::getCapNode((dbBlock*) block, seg->target_);
+    dbCapNode* node = dbCapNode::getCapNode((dbBlock*) block, seg->_target);
     node->adjustCapacitance(factor, corner);
   } else {
     float& value
-        = (*block->c_val_tbl_)[(seg->getOID() - 1) * cornerCnt + 1 + corner];
+        = (*block->_c_val_tbl)[(seg->getOID() - 1) * cornerCnt + 1 + corner];
     float prev_value = value;
     value *= factor;
 
-    debugPrint(getImpl()->getLogger(),
-               utl::ODB,
-               "DB_EDIT",
-               2,
-               "EDIT: dbRSeg {}, adjustCapacitance {}, corner {}",
-               seg->getId(),
-               value,
-               0);
-
-    if (block->journal_) {
-      block->journal_->beginAction(dbJournal::kUpdateField);
-      block->journal_->pushParam(dbRSegObj);
-      block->journal_->pushParam(seg->getId());
-      block->journal_->pushParam(_dbRSeg::kCapacitance);
-      block->journal_->pushParam(prev_value);
-      block->journal_->pushParam(value);
-      block->journal_->pushParam(0);
-      block->journal_->endAction();
+    if (block->_journal) {
+      debugPrint(getImpl()->getLogger(),
+                 utl::ODB,
+                 "DB_ECO",
+                 1,
+                 "ECO: dbRSeg {}, adjustCapacitance {}, corner {}",
+                 seg->getId(),
+                 value,
+                 0);
+      block->_journal->beginAction(dbJournal::UPDATE_FIELD);
+      block->_journal->pushParam(dbRSegObj);
+      block->_journal->pushParam(seg->getId());
+      block->_journal->pushParam(_dbRSeg::CAPACITANCE);
+      block->_journal->pushParam(prev_value);
+      block->_journal->pushParam(value);
+      block->_journal->pushParam(0);
+      block->_journal->endAction();
     }
   }
 }
@@ -356,7 +350,7 @@ void dbRSeg::adjustCapacitance(float factor, uint corner)
 void dbRSeg::adjustCapacitance(float factor)
 {
   _dbBlock* block = (_dbBlock*) getImpl()->getOwner();
-  uint cornerCnt = block->corners_per_block_;
+  uint cornerCnt = block->_corners_per_block;
   uint corner;
   for (corner = 0; corner < cornerCnt; corner++) {
     adjustCapacitance(factor, corner);
@@ -367,29 +361,29 @@ double dbRSeg::getCapacitance(int corner)
 {
   _dbRSeg* seg = (_dbRSeg*) this;
   _dbBlock* block = (_dbBlock*) seg->getOwner();
-  uint cornerCnt = block->corners_per_block_;
+  uint cornerCnt = block->_corners_per_block;
 
-  if (seg->flags_.allocated_cap == 0) {
+  if (seg->flags_._allocated_cap == 0) {
     _dbBlock* block = (_dbBlock*) seg->getOwner();
-    dbCapNode* node = dbCapNode::getCapNode((dbBlock*) block, seg->target_);
+    dbCapNode* node = dbCapNode::getCapNode((dbBlock*) block, seg->_target);
     return node->getCapacitance(corner);
   }
-  assert((corner >= 0) && ((uint) corner < cornerCnt));
-  return (*block->c_val_tbl_)[(seg->getOID() - 1) * cornerCnt + 1 + corner];
+  ZASSERT((corner >= 0) && ((uint) corner < cornerCnt));
+  return (*block->_c_val_tbl)[(seg->getOID() - 1) * cornerCnt + 1 + corner];
 }
 
 void dbRSeg::getGndCap(double* gndcap, double* totalcap)
 {
   _dbRSeg* seg = (_dbRSeg*) this;
   _dbBlock* block = (_dbBlock*) seg->getOwner();
-  uint cornerCnt = block->corners_per_block_;
+  uint cornerCnt = block->_corners_per_block;
   double gcap;
-  if (seg->flags_.allocated_cap == 0) {
-    dbCapNode* node = dbCapNode::getCapNode((dbBlock*) block, seg->target_);
+  if (seg->flags_._allocated_cap == 0) {
+    dbCapNode* node = dbCapNode::getCapNode((dbBlock*) block, seg->_target);
     node->getGndCap(gndcap, totalcap);
   } else {
     for (uint ii = 0; ii < cornerCnt; ii++) {
-      gcap = (*block->c_val_tbl_)[(seg->getOID() - 1) * cornerCnt + 1 + ii];
+      gcap = (*block->_c_val_tbl)[(seg->getOID() - 1) * cornerCnt + 1 + ii];
       if (gndcap) {
         gndcap[ii] = gcap;
       }
@@ -404,14 +398,14 @@ void dbRSeg::addGndCap(double* gndcap, double* totalcap)
 {
   _dbRSeg* seg = (_dbRSeg*) this;
   _dbBlock* block = (_dbBlock*) seg->getOwner();
-  uint cornerCnt = block->corners_per_block_;
+  uint cornerCnt = block->_corners_per_block;
   double gcap;
-  if (seg->flags_.allocated_cap == 0) {
-    dbCapNode* node = dbCapNode::getCapNode((dbBlock*) block, seg->target_);
+  if (seg->flags_._allocated_cap == 0) {
+    dbCapNode* node = dbCapNode::getCapNode((dbBlock*) block, seg->_target);
     node->addGndCap(gndcap, totalcap);
   } else {
     for (uint ii = 0; ii < cornerCnt; ii++) {
-      gcap = (*block->c_val_tbl_)[(seg->getOID() - 1) * cornerCnt + 1 + ii];
+      gcap = (*block->_c_val_tbl)[(seg->getOID() - 1) * cornerCnt + 1 + ii];
       if (gndcap) {
         gndcap[ii] += gcap;
       }
@@ -428,9 +422,9 @@ double dbRSeg::getSourceCapacitance(int corner)
 
   _dbRSeg* seg = (_dbRSeg*) this;
 
-  if (seg->flags_.allocated_cap == 0) {
+  if (seg->flags_._allocated_cap == 0) {
     _dbBlock* block = (_dbBlock*) seg->getOwner();
-    dbCapNode* node = dbCapNode::getCapNode((dbBlock*) block, seg->source_);
+    dbCapNode* node = dbCapNode::getCapNode((dbBlock*) block, seg->_source);
     return node->getCapacitance(corner);
   }
   return 0.0;
@@ -445,7 +439,7 @@ dbCapNode* dbRSeg::getTargetCapNode()
     return nullptr;
   }
 
-  _dbCapNode* n = block->cap_node_tbl_->getPtr(target);
+  _dbCapNode* n = block->_cap_node_tbl->getPtr(target);
   return (dbCapNode*) n;
 }
 
@@ -458,7 +452,7 @@ dbCapNode* dbRSeg::getSourceCapNode()
     return nullptr;
   }
 
-  _dbCapNode* n = block->cap_node_tbl_->getPtr(source);
+  _dbCapNode* n = block->_cap_node_tbl->getPtr(source);
   return (dbCapNode*) n;
 }
 
@@ -532,15 +526,15 @@ void dbRSeg::getCapTable(double* cap)
 {
   _dbRSeg* seg = (_dbRSeg*) this;
   _dbBlock* block = (_dbBlock*) seg->getOwner();
-  uint cornerCnt = block->corners_per_block_;
+  uint cornerCnt = block->_corners_per_block;
 
-  if (seg->flags_.allocated_cap == 0) {
+  if (seg->flags_._allocated_cap == 0) {
     _dbBlock* block = (_dbBlock*) seg->getOwner();
-    dbCapNode* node = dbCapNode::getCapNode((dbBlock*) block, seg->target_);
+    dbCapNode* node = dbCapNode::getCapNode((dbBlock*) block, seg->_target);
     node->getCapTable(cap);
   } else {
     for (uint ii = 0; ii < cornerCnt; ii++) {
-      cap[ii] = (*block->c_val_tbl_)[(seg->getOID() - 1) * cornerCnt + 1 + ii];
+      cap[ii] = (*block->_c_val_tbl)[(seg->getOID() - 1) * cornerCnt + 1 + ii];
     }
   }
 }
@@ -548,13 +542,13 @@ void dbRSeg::getCapTable(double* cap)
 uint dbRSeg::getSourceNode()
 {
   _dbRSeg* seg = (_dbRSeg*) this;
-  return seg->source_;
+  return seg->_source;
 }
 
 void dbRSeg::setNext(uint rid)
 {
   _dbRSeg* seg = (_dbRSeg*) this;
-  seg->next_ = rid;
+  seg->_next = rid;
 }
 
 void dbRSeg::setSourceNode(uint source_node)
@@ -562,20 +556,19 @@ void dbRSeg::setSourceNode(uint source_node)
   _dbRSeg* seg = (_dbRSeg*) this;
   _dbBlock* block = (_dbBlock*) seg->getOwner();
 
-  debugPrint(getImpl()->getLogger(),
-             utl::ODB,
-             "DB_EDIT",
-             2,
-             "EDIT: dbRSeg {}, setSourceNode {}",
-             seg->getId(),
-             source_node);
-
-  if (block->journal_) {
-    block->journal_->updateField(
-        this, _dbRSeg::kSource, seg->source_, source_node);
+  if (block->_journal) {
+    debugPrint(getImpl()->getLogger(),
+               utl::ODB,
+               "DB_ECO",
+               1,
+               "ECO: dbRSeg {}, setSourceNode {}",
+               seg->getId(),
+               source_node);
+    block->_journal->updateField(
+        this, _dbRSeg::SOURCE, seg->_source, source_node);
   }
 
-  seg->source_ = source_node;
+  seg->_source = source_node;
 }
 
 void dbRSeg::setTargetNode(uint target_node)
@@ -583,63 +576,61 @@ void dbRSeg::setTargetNode(uint target_node)
   _dbRSeg* seg = (_dbRSeg*) this;
   _dbBlock* block = (_dbBlock*) seg->getOwner();
 
-  debugPrint(getImpl()->getLogger(),
-             utl::ODB,
-             "DB_EDIT",
-             2,
-             "EDIT: dbRSeg {}, setTargetNode {}",
-             seg->getId(),
-             target_node);
-
-  if (block->journal_) {
-    block->journal_->updateField(
-        this, _dbRSeg::kTarget, seg->target_, target_node);
+  if (block->_journal) {
+    debugPrint(getImpl()->getLogger(),
+               utl::ODB,
+               "DB_ECO",
+               1,
+               "ECO: dbRSeg {}, setTargetNode {}",
+               seg->getId(),
+               target_node);
+    block->_journal->updateField(
+        this, _dbRSeg::TARGET, seg->_target, target_node);
   }
 
-  seg->target_ = target_node;
+  seg->_target = target_node;
 }
 
 uint dbRSeg::getTargetNode()
 {
   _dbRSeg* seg = (_dbRSeg*) this;
-  return seg->target_;
+  return seg->_target;
 }
 
 uint dbRSeg::getShapeId()
 {
   _dbRSeg* seg = (_dbRSeg*) this;
   dbBlock* block = (dbBlock*) seg->getOwner();
-  dbCapNode* node = dbCapNode::getCapNode(block, seg->target_);
+  dbCapNode* node = dbCapNode::getCapNode(block, seg->_target);
   return node->getShapeId();
 }
 
 void dbRSeg::setCoords(int x, int y)
 {
   _dbRSeg* seg = (_dbRSeg*) this;
-  const int prev_x = seg->xcoord_;
-  const int prev_y = seg->ycoord_;
-  seg->xcoord_ = x;
-  seg->ycoord_ = y;
+  const int prev_x = seg->_xcoord;
+  const int prev_y = seg->_ycoord;
+  seg->_xcoord = x;
+  seg->_ycoord = y;
   _dbBlock* block = (_dbBlock*) seg->getOwner();
-  debugPrint(getImpl()->getLogger(),
-             utl::ODB,
-             "DB_EDIT",
-             2,
-             "EDIT: dbRSeg {}, setCoords {} {}",
-             seg->getId(),
-             x,
-             y);
-
-  if (block->journal_) {
-    block->journal_->beginAction(dbJournal::kUpdateField);
-    block->journal_->pushParam(dbRSegObj);
-    block->journal_->pushParam(seg->getId());
-    block->journal_->pushParam(_dbRSeg::kCoordinates);
-    block->journal_->pushParam(prev_x);
-    block->journal_->pushParam(x);
-    block->journal_->pushParam(prev_y);
-    block->journal_->pushParam(y);
-    block->journal_->endAction();
+  if (block->_journal) {
+    debugPrint(getImpl()->getLogger(),
+               utl::ODB,
+               "DB_ECO",
+               1,
+               "ECO: dbRSeg {}, setCoords {} {}",
+               seg->getId(),
+               x,
+               y);
+    block->_journal->beginAction(dbJournal::UPDATE_FIELD);
+    block->_journal->pushParam(dbRSegObj);
+    block->_journal->pushParam(seg->getId());
+    block->_journal->pushParam(_dbRSeg::COORDINATES);
+    block->_journal->pushParam(prev_x);
+    block->_journal->pushParam(x);
+    block->_journal->pushParam(prev_y);
+    block->_journal->pushParam(y);
+    block->_journal->endAction();
   }
 }
 
@@ -650,8 +641,8 @@ void dbRSeg::getCoords(int& x, int& y)
   //    dbCapNode *node= dbCapNode::getCapNode(block, seg->_target);
   //    if (node->getTermCoords(x, y))
   //        return;
-  x = seg->xcoord_;
-  y = seg->ycoord_;
+  x = seg->_xcoord;
+  y = seg->_ycoord;
   // node->getCoordY(y);
 }
 
@@ -670,7 +661,7 @@ dbNet* dbRSeg::getNet()
 {
   _dbRSeg* seg = (_dbRSeg*) this;
   _dbBlock* block = (_dbBlock*) seg->getOwner();
-  dbCapNode* node = dbCapNode::getCapNode((dbBlock*) block, seg->target_);
+  dbCapNode* node = dbCapNode::getCapNode((dbBlock*) block, seg->_target);
   return node->getNet();
 }
 
@@ -678,7 +669,7 @@ void dbRSeg::updateShapeId(uint nsid)
 {
   _dbRSeg* seg = (_dbRSeg*) this;
   _dbBlock* block = (_dbBlock*) seg->getOwner();
-  dbCapNode* node = dbCapNode::getCapNode((dbBlock*) block, seg->target_);
+  dbCapNode* node = dbCapNode::getCapNode((dbBlock*) block, seg->_target);
   if (node->isITerm() || node->isBTerm()) {
     return;
   }
@@ -693,54 +684,52 @@ dbRSeg* dbRSeg::create(dbNet* net_,
 {
   _dbNet* net = (_dbNet*) net_;
   _dbBlock* block = (_dbBlock*) net->getOwner();
-  uint cornerCnt = block->corners_per_block_;
+  uint cornerCnt = block->_corners_per_block;
 
-  debugPrint(net_->getImpl()->getLogger(),
-             utl::ODB,
-             "DB_EDIT",
-             2,
-             "EDIT: dbRSeg create 2, net id {}, x: {}, y: {}, path_dir: {}, "
-             "allocate_cap: {}",
-             net->getId(),
-             x,
-             y,
-             path_dir,
-             allocate_cap);
-
-  if (block->journal_) {
-    block->journal_->beginAction(dbJournal::kCreateObject);
-    block->journal_->pushParam(dbRSegObj);
-    block->journal_->pushParam(net->getId());
-    block->journal_->pushParam(x);
-    block->journal_->pushParam(y);
-    block->journal_->pushParam(path_dir);
-    block->journal_->pushParam(allocate_cap);
-    block->journal_->endAction();
+  if (block->_journal) {
+    debugPrint(net_->getImpl()->getLogger(),
+               utl::ODB,
+               "DB_ECO",
+               1,
+               "ECO: dbRSeg create 2, net id {}, x: {}, y: {}, path_dir: {}, "
+               "allocate_cap: {}",
+               net->getId(),
+               x,
+               y,
+               path_dir,
+               allocate_cap);
+    block->_journal->beginAction(dbJournal::CREATE_OBJECT);
+    block->_journal->pushParam(dbRSegObj);
+    block->_journal->pushParam(net->getId());
+    block->_journal->pushParam(x);
+    block->_journal->pushParam(y);
+    block->_journal->pushParam(path_dir);
+    block->_journal->pushParam(allocate_cap);
+    block->_journal->endAction();
   }
 
-  _dbRSeg* seg = block->r_seg_tbl_->create();
+  _dbRSeg* seg = block->_r_seg_tbl->create();
   uint valueMem = 0;
 
-  if (block->max_rseg_id_ >= seg->getOID()) {
+  if (block->_maxRSegId >= seg->getOID()) {
     valueMem = 1;
   } else {
-    block->max_rseg_id_ = seg->getOID();
+    block->_maxRSegId = seg->getOID();
   }
 
-  seg->xcoord_ = x;
-  seg->ycoord_ = y;
+  seg->_xcoord = x;
+  seg->_ycoord = y;
 
-  seg->flags_.path_dir = path_dir;
+  seg->flags_._path_dir = path_dir;
   // seg->flags_._cnt = block->_num_corners;
 
   if (valueMem) {
     for (uint ii = 0; ii < cornerCnt; ii++) {
-      (*block->r_val_tbl_)[(seg->getOID() - 1) * cornerCnt + 1 + ii] = 0.0;
+      (*block->_r_val_tbl)[(seg->getOID() - 1) * cornerCnt + 1 + ii] = 0.0;
     }
   } else {
-    [[maybe_unused]] uint resIdx
-        = block->r_val_tbl_->getIdx(cornerCnt, (float) 0.0);
-    assert((seg->getOID() - 1) * cornerCnt + 1 == resIdx);
+    uint resIdx = block->_r_val_tbl->getIdx(cornerCnt, (float) 0.0);
+    ZASSERT((seg->getOID() - 1) * cornerCnt + 1 == resIdx);
   }
 
   // seg->_resIdx= block->_r_val_tbl->size();
@@ -751,16 +740,15 @@ dbRSeg* dbRSeg::create(dbNet* net_,
   //}
 
   if (allocate_cap) {
-    seg->flags_.allocated_cap = 1;
+    seg->flags_._allocated_cap = 1;
 
     if (valueMem) {
       for (uint ii = 0; ii < cornerCnt; ii++) {
-        (*block->c_val_tbl_)[(seg->getOID() - 1) * cornerCnt + 1 + ii] = 0.0;
+        (*block->_c_val_tbl)[(seg->getOID() - 1) * cornerCnt + 1 + ii] = 0.0;
       }
     } else {
-      [[maybe_unused]] const uint capIdx
-          = block->c_val_tbl_->getIdx(cornerCnt, (float) 0.0);
-      assert((seg->getOID() - 1) * cornerCnt + 1 == capIdx);
+      const uint capIdx = block->_c_val_tbl->getIdx(cornerCnt, (float) 0.0);
+      ZASSERT((seg->getOID() - 1) * cornerCnt + 1 == capIdx);
     }
 
     // seg->_capIdx= block->_c_val_tbl->size();
@@ -795,8 +783,8 @@ dbRSeg* dbRSeg::create(dbNet* net_,
   //    }
   */
   // seg->_net = net->getOID();
-  seg->next_ = net->r_segs_;
-  net->r_segs_ = seg->getOID();
+  seg->_next = net->_r_segs;
+  net->_r_segs = seg->getOID();
   return (dbRSeg*) seg;
 }
 bool dbRSeg::addToNet()
@@ -813,11 +801,11 @@ bool dbRSeg::addToNet()
 
   _dbCapNode* seg = (_dbCapNode*) cap_node;
   _dbBlock* block = (_dbBlock*) seg->getOwner();
-  _dbNet* net = (_dbNet*) dbNet::getNet((dbBlock*) block, seg->net_);
+  _dbNet* net = (_dbNet*) dbNet::getNet((dbBlock*) block, seg->_net);
 
   _dbRSeg* rseg = (_dbRSeg*) this;
-  rseg->next_ = net->r_segs_;
-  net->r_segs_ = rseg->getOID();
+  rseg->_next = net->_r_segs;
+  net->_r_segs = rseg->getOID();
 
   return true;
 }
@@ -828,53 +816,52 @@ void dbRSeg::destroy(dbRSeg* seg_, dbNet* net_)
   _dbNet* net = (_dbNet*) net_;
   _dbBlock* block = (_dbBlock*) seg->getOwner();
 
-  debugPrint(net_->getImpl()->getLogger(),
-             utl::ODB,
-             "DB_EDIT",
-             2,
-             "EDIT: dbRSeg destroy seg {}, net {} ({})",
-             seg->getId(),
-             net->getId(),
-             (block->journal_ ? block->journal_->size() : 0));
-
-  if (block->journal_) {
-    block->journal_->beginAction(dbJournal::kDeleteObject);
-    block->journal_->pushParam(dbRSegObj);
-    block->journal_->pushParam(seg->getId());
-    block->journal_->pushParam(net->getId());
-    block->journal_->endAction();
+  if (block->_journal) {
+    debugPrint(net_->getImpl()->getLogger(),
+               utl::ODB,
+               "DB_ECO",
+               1,
+               "ECO: dbRSeg destroy seg {}, net {} ({})",
+               seg->getId(),
+               net->getId(),
+               block->_journal->size());
+    block->_journal->beginAction(dbJournal::DELETE_OBJECT);
+    block->_journal->pushParam(dbRSegObj);
+    block->_journal->pushParam(seg->getId());
+    block->_journal->pushParam(net->getId());
+    block->_journal->endAction();
+    debugPrint(net_->getImpl()->getLogger(),
+               utl::ODB,
+               "DB_ECO",
+               1,
+               "ECO: dbRSeg destroyed seg {}, net {} ({}) ({} {})",
+               seg->getId(),
+               net->getId(),
+               block->_journal->size(),
+               (void*) block,
+               (void*) block->_journal);
   }
-  debugPrint(net_->getImpl()->getLogger(),
-             utl::ODB,
-             "DB_EDIT",
-             2,
-             "EDIT: dbRSeg destroyed seg {}, net {} ({}) ({} {})",
-             seg->getId(),
-             net->getId(),
-             (block->journal_ ? block->journal_->size() : 0),
-             (void*) block,
-             (void*) (block->journal_));
 
-  dbId<_dbRSeg> c = net->r_segs_;
+  dbId<_dbRSeg> c = net->_r_segs;
   _dbRSeg* p = nullptr;
 
   while (c != 0) {
-    _dbRSeg* s = block->r_seg_tbl_->getPtr(c);
+    _dbRSeg* s = block->_r_seg_tbl->getPtr(c);
 
     if (s == seg) {
       if (p == nullptr) {
-        net->r_segs_ = s->next_;
+        net->_r_segs = s->_next;
       } else {
-        p->next_ = s->next_;
+        p->_next = s->_next;
       }
       break;
     }
     p = s;
-    c = s->next_;
+    c = s->_next;
   }
 
   dbProperty::destroyProperties(seg);
-  block->r_seg_tbl_->destroy(seg);
+  block->_r_seg_tbl->destroy(seg);
 }
 
 void dbRSeg::destroyS(dbRSeg* seg_)
@@ -882,22 +869,21 @@ void dbRSeg::destroyS(dbRSeg* seg_)
   _dbRSeg* seg = (_dbRSeg*) seg_;
   _dbBlock* block = (_dbBlock*) seg->getOwner();
 
-  debugPrint(seg_->getImpl()->getLogger(),
-             utl::ODB,
-             "DB_EDIT",
-             2,
-             "EDIT: dbRSeg simple destroy seg {}",
-             seg->getId());
-
-  if (block->journal_) {
-    block->journal_->beginAction(dbJournal::kDeleteObject);
-    block->journal_->pushParam(dbRSegObj);
-    block->journal_->pushParam(seg->getId());
-    block->journal_->pushParam((uint) 0);
-    block->journal_->endAction();
+  if (block->_journal) {
+    debugPrint(seg_->getImpl()->getLogger(),
+               utl::ODB,
+               "DB_ECO",
+               1,
+               "ECO: dbRSeg simple destroy seg {}",
+               seg->getId());
+    block->_journal->beginAction(dbJournal::DELETE_OBJECT);
+    block->_journal->pushParam(dbRSegObj);
+    block->_journal->pushParam(seg->getId());
+    block->_journal->pushParam((uint) 0);
+    block->_journal->endAction();
   }
   dbProperty::destroyProperties(seg);
-  block->r_seg_tbl_->destroy(seg);
+  block->_r_seg_tbl->destroy(seg);
 }
 
 void dbRSeg::destroy(dbRSeg* seg_)
@@ -916,7 +902,7 @@ dbSet<dbRSeg>::iterator dbRSeg::destroy(dbSet<dbRSeg>::iterator& itr)
 dbRSeg* dbRSeg::getRSeg(dbBlock* block_, uint dbid_)
 {
   _dbBlock* block = (_dbBlock*) block_;
-  return (dbRSeg*) block->r_seg_tbl_->getPtr(dbid_);
+  return (dbRSeg*) block->_r_seg_tbl->getPtr(dbid_);
 }
 
 void dbRSeg::mergeRCs(std::vector<dbRSeg*>& mrsegs)

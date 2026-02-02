@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "boost/container/flat_map.hpp"
+#include "odb/ZException.h"
 #include "odb/dbObject.h"
 #include "odb/odb.h"
 
@@ -31,12 +32,32 @@ inline constexpr size_t kTemplateRecursionLimit = 16;
 
 class dbOStream
 {
- public:
   using Position = std::ostream::pos_type;
+  struct Scope
+  {
+    std::string name;
+    Position start_pos;
+  };
 
+  _dbDatabase* _db;
+  std::ostream& _f;
+  double _lef_area_factor;
+  double _lef_dist_factor;
+  std::vector<Scope> _scopes;
+
+  // By default values are written as their string ("255" vs 0xFF)
+  // representations when using the << stream method. In dbOstream we are
+  // primarly writing the byte representation which the below accomplishes.
+  template <typename T>
+  void writeValueAsBytes(T type)
+  {
+    _f.write(reinterpret_cast<char*>(&type), sizeof(T));
+  }
+
+ public:
   dbOStream(_dbDatabase* db, std::ostream& f);
 
-  _dbDatabase* getDatabase() { return db_; }
+  _dbDatabase* getDatabase() { return _db; }
 
   dbOStream& operator<<(bool c)
   {
@@ -117,7 +138,7 @@ class dbOStream
     } else {
       int l = strlen(c) + 1;
       *this << l;
-      f_.write(c, l);
+      _f.write(c, l);
     }
 
     return *this;
@@ -226,35 +247,13 @@ class dbOStream
     }
   }
 
-  double lefarea(int value) { return ((double) value * lef_area_factor_); }
-  double lefdist(int value) { return ((double) value * lef_dist_factor_); }
+  double lefarea(int value) { return ((double) value * _lef_area_factor); }
+  double lefdist(int value) { return ((double) value * _lef_dist_factor); }
 
-  Position pos() const { return f_.tellp(); }
+  Position pos() const { return _f.tellp(); }
 
   void pushScope(const std::string& name);
   void popScope();
-
- private:
-  struct Scope
-  {
-    std::string name;
-    Position start_pos;
-  };
-
-  // By default values are written as their string ("255" vs 0xFF)
-  // representations when using the << stream method. In dbOstream we are
-  // primarly writing the byte representation which the below accomplishes.
-  template <typename T>
-  void writeValueAsBytes(T type)
-  {
-    f_.write(reinterpret_cast<char*>(&type), sizeof(T));
-  }
-
-  _dbDatabase* db_;
-  std::ostream& f_;
-  double lef_area_factor_;
-  double lef_dist_factor_;
-  std::vector<Scope> scopes_;
 };
 
 // RAII class for scoping ostream operations
@@ -274,10 +273,15 @@ class dbOStreamScope
 
 class dbIStream
 {
+  std::istream& _f;
+  _dbDatabase* _db;
+  double _lef_area_factor;
+  double _lef_dist_factor;
+
  public:
   dbIStream(_dbDatabase* db, std::istream& f);
 
-  _dbDatabase* getDatabase() { return db_; }
+  _dbDatabase* getDatabase() { return _db; }
 
   dbIStream& operator>>(bool& c)
   {
@@ -289,67 +293,67 @@ class dbIStream
 
   dbIStream& operator>>(char& c)
   {
-    f_.read(&c, sizeof(c));
+    _f.read(&c, sizeof(c));
     return *this;
   }
 
   dbIStream& operator>>(unsigned char& c)
   {
-    f_.read(reinterpret_cast<char*>(&c), sizeof(c));
+    _f.read(reinterpret_cast<char*>(&c), sizeof(c));
     return *this;
   }
 
   dbIStream& operator>>(int16_t& c)
   {
-    f_.read(reinterpret_cast<char*>(&c), sizeof(c));
+    _f.read(reinterpret_cast<char*>(&c), sizeof(c));
     return *this;
   }
 
   dbIStream& operator>>(uint16_t& c)
   {
-    f_.read(reinterpret_cast<char*>(&c), sizeof(c));
+    _f.read(reinterpret_cast<char*>(&c), sizeof(c));
     return *this;
   }
 
   dbIStream& operator>>(int& c)
   {
-    f_.read(reinterpret_cast<char*>(&c), sizeof(c));
+    _f.read(reinterpret_cast<char*>(&c), sizeof(c));
     return *this;
   }
 
   dbIStream& operator>>(uint64_t& c)
   {
-    f_.read(reinterpret_cast<char*>(&c), sizeof(c));
+    _f.read(reinterpret_cast<char*>(&c), sizeof(c));
     return *this;
   }
 
   dbIStream& operator>>(unsigned int& c)
   {
-    f_.read(reinterpret_cast<char*>(&c), sizeof(c));
+    _f.read(reinterpret_cast<char*>(&c), sizeof(c));
     return *this;
   }
 
   dbIStream& operator>>(int8_t& c)
   {
-    f_.read(reinterpret_cast<char*>(&c), sizeof(c));
+    _f.read(reinterpret_cast<char*>(&c), sizeof(c));
     return *this;
   }
 
   dbIStream& operator>>(float& c)
   {
-    f_.read(reinterpret_cast<char*>(&c), sizeof(c));
+    _f.read(reinterpret_cast<char*>(&c), sizeof(c));
     return *this;
   }
 
   dbIStream& operator>>(double& c)
   {
-    f_.read(reinterpret_cast<char*>(&c), sizeof(c));
+    _f.read(reinterpret_cast<char*>(&c), sizeof(c));
     return *this;
   }
 
   dbIStream& operator>>(long double& c)
   {
-    f_.read(reinterpret_cast<char*>(&c), sizeof(c));
+    _f.read(reinterpret_cast<char*>(&c), sizeof(c));
     return *this;
   }
 
@@ -362,7 +366,7 @@ class dbIStream
       c = nullptr;
     } else {
       c = (char*) malloc(l);
-      f_.read(c, l);
+      _f.read(c, l);
     }
 
     return *this;
@@ -480,9 +484,9 @@ class dbIStream
     return variantHelper(index, v);
   }
 
-  double lefarea(int value) { return ((double) value * lef_area_factor_); }
+  double lefarea(int value) { return ((double) value * _lef_area_factor); }
 
-  double lefdist(int value) { return ((double) value * lef_dist_factor_); }
+  double lefdist(int value) { return ((double) value * _lef_dist_factor); }
 
  private:
   template <uint32_t I = 0, typename... Ts>
@@ -502,11 +506,6 @@ class dbIStream
       return (*this).variantHelper<I + 1>(index, v);
     }
   }
-
-  std::istream& f_;
-  _dbDatabase* db_;
-  double lef_area_factor_;
-  double lef_dist_factor_;
 };
 
 }  // namespace odb

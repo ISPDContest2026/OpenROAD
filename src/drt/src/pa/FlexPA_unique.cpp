@@ -25,14 +25,13 @@ namespace drt {
 UniqueClass::UniqueClass(const UniqueClassKey& key) : key_(key)
 {
   for (const auto& term : key_.master->getTerms()) {
-    skip_term_[term.get()] = true;
+    skip_term_[term.get()] = false;
   }
 }
 
 void UniqueClass::addInst(frInst* inst)
 {
   insts_.insert(inst);
-  inst->setPinAccessIdx(pin_access_idx_);
 }
 
 void UniqueClass::removeInst(frInst* inst)
@@ -57,12 +56,7 @@ bool UniqueClass::isSkipTerm(frMTerm* term) const
 
 void UniqueClass::setSkipTerm(frMTerm* term, bool skip)
 {
-  auto it = skip_term_.find(term);
-  if (it == skip_term_.end()) {
-    skip_term_[term] = skip;
-  } else {
-    it->second &= skip;
-  }
+  skip_term_[term] = skip;
 }
 
 UniqueInsts::UniqueInsts(frDesign* design,
@@ -287,9 +281,6 @@ void UniqueInsts::initUniqueInstPinAccess(UniqueClass* unique_class)
       pin->addPinAccess(std::make_unique<frPinAccess>());
     }
   }
-#pragma omp critical
-  unique_class->getMaster()->setHasPinAccessUpdate(
-      unique_class->getPinAccessIdx());
   for (frInst* inst : unique_class->getInsts()) {
     inst->setPinAccessIdx(unique_class->getPinAccessIdx());
   }

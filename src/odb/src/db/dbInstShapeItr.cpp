@@ -3,6 +3,7 @@
 
 #include <cassert>
 
+#include "odb/ZException.h"
 #include "odb/db.h"
 #include "odb/dbShape.h"
 #include "odb/geom.h"
@@ -11,48 +12,48 @@ namespace odb {
 
 dbInstShapeItr::dbInstShapeItr(bool expand_vias)
 {
-  state_ = 0;
-  inst_ = nullptr;
-  master_ = nullptr;
-  _mpin_ = nullptr;
-  type_ = ALL;
-  via_ = nullptr;
-  expand_vias_ = expand_vias;
+  _state = 0;
+  _inst = nullptr;
+  _master = nullptr;
+  _mpin = nullptr;
+  _type = ALL;
+  _via = nullptr;
+  _expand_vias = expand_vias;
 }
 
 void dbInstShapeItr::begin(dbInst* inst, IteratorType type)
 {
-  inst_ = inst;
-  master_ = inst_->getMaster();
-  transform_ = inst_->getTransform();
-  type_ = type;
-  state_ = 0;
+  _inst = inst;
+  _master = _inst->getMaster();
+  _transform = _inst->getTransform();
+  _type = type;
+  _state = 0;
 }
 
 void dbInstShapeItr::begin(dbInst* inst,
                            IteratorType type,
                            const dbTransform& t)
 {
-  inst_ = inst;
-  master_ = inst_->getMaster();
-  transform_ = inst_->getTransform();
-  transform_.concat(t);
-  type_ = type;
-  state_ = 0;
+  _inst = inst;
+  _master = _inst->getMaster();
+  _transform = _inst->getTransform();
+  _transform.concat(t);
+  _type = type;
+  _state = 0;
 }
 
 void dbInstShapeItr::getViaBox(dbBox* box, dbShape& shape)
 {
   Rect b = box->getBox();
-  b.moveDelta(via_pt_.getX(), via_pt_.getY());
-  transform_.apply(b);
-  shape.setViaBox(via_, box->getTechLayer(), b);
+  b.moveDelta(_via_pt.getX(), _via_pt.getY());
+  _transform.apply(b);
+  shape.setViaBox(_via, box->getTechLayer(), b);
 }
 
 void dbInstShapeItr::getShape(dbBox* box, dbShape& shape)
 {
   Rect r = box->getBox();
-  transform_.apply(r);
+  _transform.apply(r);
 
   dbTechVia* via = box->getTechVia();
 
@@ -75,101 +76,101 @@ bool dbInstShapeItr::next(dbShape& shape)
 {
 next_state:
 
-  switch (state_) {
+  switch (_state) {
     case INIT: {
-      if (type_ == OBSTRUCTIONS) {
-        boxes_ = master_->getObstructions();
-        box_itr_ = boxes_.begin();
-        state_ = OBS_ITR;
+      if (_type == OBSTRUCTIONS) {
+        _boxes = _master->getObstructions();
+        _box_itr = _boxes.begin();
+        _state = OBS_ITR;
       } else {
-        mterms_ = master_->getMTerms();
-        mterm_itr_ = mterms_.begin();
-        state_ = MTERM_ITR;
+        _mterms = _master->getMTerms();
+        _mterm_itr = _mterms.begin();
+        _state = MTERM_ITR;
       }
 
       goto next_state;
     }
 
     case MTERM_ITR: {
-      if (mterm_itr_ == mterms_.end()) {
-        state_ = PINS_DONE;
+      if (_mterm_itr == _mterms.end()) {
+        _state = PINS_DONE;
       } else {
-        dbMTerm* mterm = *mterm_itr_;
-        ++mterm_itr_;
-        mpins_ = mterm->getMPins();
-        mpin_itr_ = mpins_.begin();
-        state_ = MPIN_ITR;
+        dbMTerm* mterm = *_mterm_itr;
+        ++_mterm_itr;
+        _mpins = mterm->getMPins();
+        _mpin_itr = _mpins.begin();
+        _state = MPIN_ITR;
       }
 
       goto next_state;
     }
 
     case MPIN_ITR: {
-      if (mpin_itr_ == mpins_.end()) {
-        state_ = MTERM_ITR;
+      if (_mpin_itr == _mpins.end()) {
+        _state = MTERM_ITR;
       } else {
-        _mpin_ = *mpin_itr_;
-        ++mpin_itr_;
-        boxes_ = _mpin_->getGeometry();
-        box_itr_ = boxes_.begin();
-        state_ = MBOX_ITR;
+        _mpin = *_mpin_itr;
+        ++_mpin_itr;
+        _boxes = _mpin->getGeometry();
+        _box_itr = _boxes.begin();
+        _state = MBOX_ITR;
       }
 
       goto next_state;
     }
 
     case MBOX_ITR: {
-      if (box_itr_ == boxes_.end()) {
-        state_ = MPIN_ITR;
+      if (_box_itr == _boxes.end()) {
+        _state = MPIN_ITR;
       } else {
-        dbBox* box = *box_itr_;
-        ++box_itr_;
+        dbBox* box = *_box_itr;
+        ++_box_itr;
 
-        if ((expand_vias_ == false) || (box->isVia() == false)) {
+        if ((_expand_vias == false) || (box->isVia() == false)) {
           getShape(box, shape);
           return true;
         }
 
-        via_pt_ = box->getViaXY();
-        via_ = box->getTechVia();
-        assert(via_);
-        via_boxes_ = via_->getBoxes();
-        via_box_itr_ = via_boxes_.begin();
-        prev_state_ = MBOX_ITR;
-        state_ = VIA_BOX_ITR;
+        _via_pt = box->getViaXY();
+        _via = box->getTechVia();
+        assert(_via);
+        _via_boxes = _via->getBoxes();
+        _via_box_itr = _via_boxes.begin();
+        _prev_state = MBOX_ITR;
+        _state = VIA_BOX_ITR;
       }
 
       goto next_state;
     }
 
     case OBS_ITR: {
-      if (box_itr_ == boxes_.end()) {
+      if (_box_itr == _boxes.end()) {
         return false;
       }
-      dbBox* box = *box_itr_;
-      ++box_itr_;
+      dbBox* box = *_box_itr;
+      ++_box_itr;
 
-      if ((expand_vias_ == false) || (box->isVia() == false)) {
+      if ((_expand_vias == false) || (box->isVia() == false)) {
         getShape(box, shape);
         return true;
       }
 
-      via_pt_ = box->getViaXY();
-      via_ = box->getTechVia();
-      assert(via_);
-      via_boxes_ = via_->getBoxes();
-      via_box_itr_ = via_boxes_.begin();
-      prev_state_ = OBS_ITR;
-      state_ = VIA_BOX_ITR;
+      _via_pt = box->getViaXY();
+      _via = box->getTechVia();
+      assert(_via);
+      _via_boxes = _via->getBoxes();
+      _via_box_itr = _via_boxes.begin();
+      _prev_state = OBS_ITR;
+      _state = VIA_BOX_ITR;
       goto next_state;
     }
 
     case VIA_BOX_ITR: {
-      if (via_box_itr_ == via_boxes_.end()) {
-        state_ = prev_state_;
+      if (_via_box_itr == _via_boxes.end()) {
+        _state = _prev_state;
       } else {
-        dbBox* box = *via_box_itr_;
-        ++via_box_itr_;
+        dbBox* box = *_via_box_itr;
+        ++_via_box_itr;
         getViaBox(box, shape);
         return true;
       }
@@ -178,9 +179,9 @@ next_state:
     }
 
     case PINS_DONE: {
-      if (type_ == ALL) {
-        type_ = OBSTRUCTIONS;
-        state_ = INIT;
+      if (_type == ALL) {
+        _type = OBSTRUCTIONS;
+        _state = INIT;
         goto next_state;
       }
 

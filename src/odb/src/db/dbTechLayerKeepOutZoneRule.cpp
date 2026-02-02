@@ -19,19 +19,19 @@ template class dbTable<_dbTechLayerKeepOutZoneRule>;
 bool _dbTechLayerKeepOutZoneRule::operator==(
     const _dbTechLayerKeepOutZoneRule& rhs) const
 {
-  if (flags_.same_mask != rhs.flags_.same_mask) {
+  if (flags_.same_mask_ != rhs.flags_.same_mask_) {
     return false;
   }
-  if (flags_.same_metal != rhs.flags_.same_metal) {
+  if (flags_.same_metal_ != rhs.flags_.same_metal_) {
     return false;
   }
-  if (flags_.diff_metal != rhs.flags_.diff_metal) {
+  if (flags_.diff_metal_ != rhs.flags_.diff_metal_) {
     return false;
   }
-  if (flags_.except_aligned_side != rhs.flags_.except_aligned_side) {
+  if (flags_.except_aligned_side_ != rhs.flags_.except_aligned_side_) {
     return false;
   }
-  if (flags_.except_aligned_end != rhs.flags_.except_aligned_end) {
+  if (flags_.except_aligned_end_ != rhs.flags_.except_aligned_end_) {
     return false;
   }
   if (first_cut_class_ != rhs.first_cut_class_) {
@@ -280,70 +280,70 @@ void dbTechLayerKeepOutZoneRule::setSameMask(bool same_mask)
 {
   _dbTechLayerKeepOutZoneRule* obj = (_dbTechLayerKeepOutZoneRule*) this;
 
-  obj->flags_.same_mask = same_mask;
+  obj->flags_.same_mask_ = same_mask;
 }
 
 bool dbTechLayerKeepOutZoneRule::isSameMask() const
 {
   _dbTechLayerKeepOutZoneRule* obj = (_dbTechLayerKeepOutZoneRule*) this;
 
-  return obj->flags_.same_mask;
+  return obj->flags_.same_mask_;
 }
 
 void dbTechLayerKeepOutZoneRule::setSameMetal(bool same_metal)
 {
   _dbTechLayerKeepOutZoneRule* obj = (_dbTechLayerKeepOutZoneRule*) this;
 
-  obj->flags_.same_metal = same_metal;
+  obj->flags_.same_metal_ = same_metal;
 }
 
 bool dbTechLayerKeepOutZoneRule::isSameMetal() const
 {
   _dbTechLayerKeepOutZoneRule* obj = (_dbTechLayerKeepOutZoneRule*) this;
 
-  return obj->flags_.same_metal;
+  return obj->flags_.same_metal_;
 }
 
 void dbTechLayerKeepOutZoneRule::setDiffMetal(bool diff_metal)
 {
   _dbTechLayerKeepOutZoneRule* obj = (_dbTechLayerKeepOutZoneRule*) this;
 
-  obj->flags_.diff_metal = diff_metal;
+  obj->flags_.diff_metal_ = diff_metal;
 }
 
 bool dbTechLayerKeepOutZoneRule::isDiffMetal() const
 {
   _dbTechLayerKeepOutZoneRule* obj = (_dbTechLayerKeepOutZoneRule*) this;
 
-  return obj->flags_.diff_metal;
+  return obj->flags_.diff_metal_;
 }
 
 void dbTechLayerKeepOutZoneRule::setExceptAlignedSide(bool except_aligned_side)
 {
   _dbTechLayerKeepOutZoneRule* obj = (_dbTechLayerKeepOutZoneRule*) this;
 
-  obj->flags_.except_aligned_side = except_aligned_side;
+  obj->flags_.except_aligned_side_ = except_aligned_side;
 }
 
 bool dbTechLayerKeepOutZoneRule::isExceptAlignedSide() const
 {
   _dbTechLayerKeepOutZoneRule* obj = (_dbTechLayerKeepOutZoneRule*) this;
 
-  return obj->flags_.except_aligned_side;
+  return obj->flags_.except_aligned_side_;
 }
 
 void dbTechLayerKeepOutZoneRule::setExceptAlignedEnd(bool except_aligned_end)
 {
   _dbTechLayerKeepOutZoneRule* obj = (_dbTechLayerKeepOutZoneRule*) this;
 
-  obj->flags_.except_aligned_end = except_aligned_end;
+  obj->flags_.except_aligned_end_ = except_aligned_end;
 }
 
 bool dbTechLayerKeepOutZoneRule::isExceptAlignedEnd() const
 {
   _dbTechLayerKeepOutZoneRule* obj = (_dbTechLayerKeepOutZoneRule*) this;
 
-  return obj->flags_.except_aligned_end;
+  return obj->flags_.except_aligned_end_;
 }
 
 // User Code Begin dbTechLayerKeepOutZoneRulePublicMethods

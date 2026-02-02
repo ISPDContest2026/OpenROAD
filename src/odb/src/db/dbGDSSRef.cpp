@@ -22,10 +22,10 @@ template class dbTable<_dbGDSSRef>;
 
 bool _dbGDSSRef::operator==(const _dbGDSSRef& rhs) const
 {
-  if (origin_ != rhs.origin_) {
+  if (_origin != rhs._origin) {
     return false;
   }
-  if (structure_ != rhs.structure_) {
+  if (_structure != rhs._structure) {
     return false;
   }
 
@@ -43,19 +43,19 @@ _dbGDSSRef::_dbGDSSRef(_dbDatabase* db)
 
 dbIStream& operator>>(dbIStream& stream, _dbGDSSRef& obj)
 {
-  stream >> obj.origin_;
-  stream >> obj.propattr_;
-  stream >> obj.transform_;
-  stream >> obj.structure_;
+  stream >> obj._origin;
+  stream >> obj._propattr;
+  stream >> obj._transform;
+  stream >> obj._structure;
   return stream;
 }
 
 dbOStream& operator<<(dbOStream& stream, const _dbGDSSRef& obj)
 {
-  stream << obj.origin_;
-  stream << obj.propattr_;
-  stream << obj.transform_;
-  stream << obj.structure_;
+  stream << obj._origin;
+  stream << obj._propattr;
+  stream << obj._transform;
+  stream << obj._structure;
   return stream;
 }
 
@@ -65,8 +65,8 @@ void _dbGDSSRef::collectMemInfo(MemInfo& info)
   info.size += sizeof(*this);
 
   // User Code Begin collectMemInfo
-  info.children_["propattr"].add(propattr_);
-  for (auto& [i, s] : propattr_) {
+  info.children_["propattr"].add(_propattr);
+  for (auto& [i, s] : _propattr) {
     info.children_["propattr"].add(s);
   }
   // User Code End collectMemInfo
@@ -82,26 +82,26 @@ void dbGDSSRef::setOrigin(Point origin)
 {
   _dbGDSSRef* obj = (_dbGDSSRef*) this;
 
-  obj->origin_ = origin;
+  obj->_origin = origin;
 }
 
 Point dbGDSSRef::getOrigin() const
 {
   _dbGDSSRef* obj = (_dbGDSSRef*) this;
-  return obj->origin_;
+  return obj->_origin;
 }
 
 void dbGDSSRef::setTransform(dbGDSSTrans transform)
 {
   _dbGDSSRef* obj = (_dbGDSSRef*) this;
 
-  obj->transform_ = transform;
+  obj->_transform = transform;
 }
 
 dbGDSSTrans dbGDSSRef::getTransform() const
 {
   _dbGDSSRef* obj = (_dbGDSSRef*) this;
-  return obj->transform_;
+  return obj->_transform;
 }
 
 // User Code Begin dbGDSSRefPublicMethods
@@ -109,25 +109,25 @@ dbGDSSTrans dbGDSSRef::getTransform() const
 dbGDSStructure* dbGDSSRef::getStructure() const
 {
   _dbGDSSRef* obj = (_dbGDSSRef*) this;
-  if (obj->structure_ == 0) {
+  if (obj->_structure == 0) {
     return nullptr;
   }
   _dbGDSStructure* parent = (_dbGDSStructure*) obj->getOwner();
   _dbGDSLib* lib = (_dbGDSLib*) parent->getOwner();
-  return (dbGDSStructure*) lib->gdsstructure_tbl_->getPtr(obj->structure_);
+  return (dbGDSStructure*) lib->_gdsstructure_tbl->getPtr(obj->_structure);
 }
 
 std::vector<std::pair<std::int16_t, std::string>>& dbGDSSRef::getPropattr()
 {
   auto* obj = (_dbGDSSRef*) this;
-  return obj->propattr_;
+  return obj->_propattr;
 }
 
 dbGDSSRef* dbGDSSRef::create(dbGDSStructure* parent, dbGDSStructure* child)
 {
   auto* obj = (_dbGDSStructure*) parent;
   _dbGDSSRef* sref = obj->srefs_->create();
-  sref->structure_ = child->getImpl()->getOID();
+  sref->_structure = child->getImpl()->getOID();
   return (dbGDSSRef*) sref;
 }
 

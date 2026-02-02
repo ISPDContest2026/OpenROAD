@@ -18,10 +18,10 @@ template class dbTable<_dbTechLayerWidthTableRule>;
 bool _dbTechLayerWidthTableRule::operator==(
     const _dbTechLayerWidthTableRule& rhs) const
 {
-  if (flags_.wrong_direction != rhs.flags_.wrong_direction) {
+  if (flags_.wrong_direction_ != rhs.flags_.wrong_direction_) {
     return false;
   }
-  if (flags_.orthogonal != rhs.flags_.orthogonal) {
+  if (flags_.orthogonal_ != rhs.flags_.orthogonal_) {
     return false;
   }
 
@@ -79,28 +79,28 @@ void dbTechLayerWidthTableRule::setWrongDirection(bool wrong_direction)
 {
   _dbTechLayerWidthTableRule* obj = (_dbTechLayerWidthTableRule*) this;
 
-  obj->flags_.wrong_direction = wrong_direction;
+  obj->flags_.wrong_direction_ = wrong_direction;
 }
 
 bool dbTechLayerWidthTableRule::isWrongDirection() const
 {
   _dbTechLayerWidthTableRule* obj = (_dbTechLayerWidthTableRule*) this;
 
-  return obj->flags_.wrong_direction;
+  return obj->flags_.wrong_direction_;
 }
 
 void dbTechLayerWidthTableRule::setOrthogonal(bool orthogonal)
 {
   _dbTechLayerWidthTableRule* obj = (_dbTechLayerWidthTableRule*) this;
 
-  obj->flags_.orthogonal = orthogonal;
+  obj->flags_.orthogonal_ = orthogonal;
 }
 
 bool dbTechLayerWidthTableRule::isOrthogonal() const
 {
   _dbTechLayerWidthTableRule* obj = (_dbTechLayerWidthTableRule*) this;
 
-  return obj->flags_.orthogonal;
+  return obj->flags_.orthogonal_;
 }
 
 // User Code Begin dbTechLayerWidthTableRulePublicMethods
@@ -138,7 +138,7 @@ void dbTechLayerWidthTableRule::destroy(dbTechLayerWidthTableRule* rule)
   _dbTechLayer* layer = (_dbTechLayer*) rule->getImpl()->getOwner();
   if (rule->isWrongDirection()) {
     // reset wrong way width
-    layer->wrong_way_width_ = layer->width_;
+    layer->wrong_way_width_ = layer->_width;
   }
   dbProperty::destroyProperties(rule);
   layer->width_table_rules_tbl_->destroy((_dbTechLayerWidthTableRule*) rule);

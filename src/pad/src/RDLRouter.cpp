@@ -28,7 +28,6 @@
 #include "odb/db.h"
 #include "odb/dbObject.h"
 #include "odb/dbTransform.h"
-#include "odb/dbTypes.h"
 #include "odb/geom.h"
 #include "pad/ICeWall.h"
 #include "utl/Logger.h"
@@ -667,14 +666,7 @@ void RDLRouter::route(const std::vector<odb::dbNet*>& nets)
 
   // remove old routes
   for (const auto& route : routes_) {
-    auto swires = route->getNet()->getSWires();
-    for (auto itr = swires.begin(); itr != swires.end();) {
-      if ((*itr)->getWireType() == odb::dbWireType::FIXED) {
-        itr++;
-        continue;
-      }
-      itr = odb::dbSWire::destroy(itr);
-    }
+    route->getNet()->destroySWires();
   }
 
   for (const auto& route : routes_) {
@@ -1803,13 +1795,11 @@ void RDLRouter::populateObstructions(const std::vector<odb::dbNet*>& nets)
   // Get already routed nets obstructions, excluding those that will be routed
   // now
   for (auto* net : block_->getNets()) {
-    const bool is_routing_net = std::ranges::find(nets, net) != nets.end();
+    if (std::find(nets.begin(), nets.end(), net) != nets.end()) {
+      continue;
+    }
 
     for (auto* swire : net->getSWires()) {
-      if (is_routing_net && swire->getWireType() != odb::dbWireType::FIXED) {
-        continue;
-      }
-
       for (auto* box : swire->getWires()) {
         if (box->getTechLayer() != layer_) {
           continue;

@@ -12,36 +12,36 @@
 	    "flags":["no-set","no-get"]
 	},
 	{
-	    "name":"parent_",
+	    "name":"_parent",
 	    "type":"dbId<_dbModule>",
 	    "flags":["no-set"],
 	    "parent":"dbBlock"    },
 	{
-	    "name":"module_next_",
+	    "name":"_module_next",
 	    "type":"dbId<_dbModInst>",
 	    "flags":["no-get","no-set"],
 	    "parent":"dbBlock"
 	},
 	{
-	    "name":"master_",
+	    "name":"_master",
 	    "type":"dbId<_dbModule>",
 	    "flags":["no-set"],
 	    "parent":"dbBlock"
 	},
 	{
-	    "name":"group_next_",
+	    "name":"_group_next",
 	    "type":"dbId<_dbModInst>",
 	    "flags":["no-get","no-set"],
 	    "parent":"dbBlock"
 	},
 	{
-	    "name":"group_",
+	    "name":"_group",
 	    "type":"dbId<_dbGroup>",
 	    "flags":["no-set"],
 	    "parent":"dbBlock"
 	},
 	{
-      	    "name":"moditerms_",
+      	    "name":"_moditerms",
 	    "type":"dbId<_dbModITerm >",
 	    "flags":["no-get","no-set","no-serial"],	
 	    "parent":"dbBlock"

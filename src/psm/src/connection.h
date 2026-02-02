@@ -131,10 +131,7 @@ class TermConnection : public Connection
  public:
   TermConnection(Node* node0, Node* node1);
 
-  Resistance getResistance(const ResistanceMap& res_map) const override
-  {
-    return kResistance;
-  }
+  Resistance getResistance(const ResistanceMap& res_map) const override;
   bool isValid() const override { return true; }
 
   void mergeWith(const Connection* other) override {}
@@ -143,25 +140,6 @@ class TermConnection : public Connection
 
  private:
   static constexpr Resistance kResistance = 0.001;
-};
-
-class FixedResistanceConnection : public Connection
-{
- public:
-  FixedResistanceConnection(Node* node0, Node* node1, Resistance resistance);
-
-  Resistance getResistance(const ResistanceMap& res_map) const override
-  {
-    return res_;
-  };
-  bool isValid() const override { return true; }
-
-  void mergeWith(const Connection* other) override {}
-
-  std::string describe() const override;
-
- private:
-  Resistance res_;
 };
 
 }  // namespace psm

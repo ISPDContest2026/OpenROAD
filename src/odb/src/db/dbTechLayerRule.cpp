@@ -22,26 +22,26 @@ template class dbTable<_dbTechLayerRule>;
 
 _dbTechLayerRule::_dbTechLayerRule(_dbDatabase*, const _dbTechLayerRule& r)
     : flags_(r.flags_),
-      width_(r.width_),
-      spacing_(r.spacing_),
-      resistance_(r.resistance_),
-      capacitance_(r.capacitance_),
-      edge_capacitance_(r.edge_capacitance_),
-      wire_extension_(r.wire_extension_),
-      non_default_rule_(r.non_default_rule_),
-      layer_(r.layer_)
+      _width(r._width),
+      _spacing(r._spacing),
+      _resistance(r._resistance),
+      _capacitance(r._capacitance),
+      _edge_capacitance(r._edge_capacitance),
+      _wire_extension(r._wire_extension),
+      _non_default_rule(r._non_default_rule),
+      _layer(r._layer)
 {
 }
 
 _dbTechLayerRule::_dbTechLayerRule(_dbDatabase*)
 {
-  flags_.spare_bits = 0;
-  width_ = 0;
-  spacing_ = 0;
-  resistance_ = 0.0;
-  capacitance_ = 0.0;
-  edge_capacitance_ = 0.0;
-  wire_extension_ = 0;
+  flags_._spare_bits = 0;
+  _width = 0;
+  _spacing = 0;
+  _resistance = 0.0;
+  _capacitance = 0.0;
+  _edge_capacitance = 0.0;
+  _wire_extension = 0;
 }
 
 _dbTechLayerRule::~_dbTechLayerRule()
@@ -52,14 +52,14 @@ dbOStream& operator<<(dbOStream& stream, const _dbTechLayerRule& rule)
 {
   uint* bit_field = (uint*) &rule.flags_;
   stream << *bit_field;
-  stream << rule.width_;
-  stream << rule.spacing_;
-  stream << rule.resistance_;
-  stream << rule.capacitance_;
-  stream << rule.edge_capacitance_;
-  stream << rule.wire_extension_;
-  stream << rule.non_default_rule_;
-  stream << rule.layer_;
+  stream << rule._width;
+  stream << rule._spacing;
+  stream << rule._resistance;
+  stream << rule._capacitance;
+  stream << rule._edge_capacitance;
+  stream << rule._wire_extension;
+  stream << rule._non_default_rule;
+  stream << rule._layer;
   return stream;
 }
 
@@ -67,48 +67,48 @@ dbIStream& operator>>(dbIStream& stream, _dbTechLayerRule& rule)
 {
   uint* bit_field = (uint*) &rule.flags_;
   stream >> *bit_field;
-  stream >> rule.width_;
-  stream >> rule.spacing_;
-  stream >> rule.resistance_;
-  stream >> rule.capacitance_;
-  stream >> rule.edge_capacitance_;
-  stream >> rule.wire_extension_;
-  stream >> rule.non_default_rule_;
-  stream >> rule.layer_;
+  stream >> rule._width;
+  stream >> rule._spacing;
+  stream >> rule._resistance;
+  stream >> rule._capacitance;
+  stream >> rule._edge_capacitance;
+  stream >> rule._wire_extension;
+  stream >> rule._non_default_rule;
+  stream >> rule._layer;
   return stream;
 }
 
 bool _dbTechLayerRule::operator==(const _dbTechLayerRule& rhs) const
 {
-  if (width_ != rhs.width_) {
+  if (_width != rhs._width) {
     return false;
   }
 
-  if (spacing_ != rhs.spacing_) {
+  if (_spacing != rhs._spacing) {
     return false;
   }
 
-  if (resistance_ != rhs.resistance_) {
+  if (_resistance != rhs._resistance) {
     return false;
   }
 
-  if (capacitance_ != rhs.capacitance_) {
+  if (_capacitance != rhs._capacitance) {
     return false;
   }
 
-  if (edge_capacitance_ != rhs.edge_capacitance_) {
+  if (_edge_capacitance != rhs._edge_capacitance) {
     return false;
   }
 
-  if (wire_extension_ != rhs.wire_extension_) {
+  if (_wire_extension != rhs._wire_extension) {
     return false;
   }
 
-  if (non_default_rule_ != rhs.non_default_rule_) {
+  if (_non_default_rule != rhs._non_default_rule) {
     return false;
   }
 
-  if (layer_ != rhs.layer_) {
+  if (_layer != rhs._layer) {
     return false;
   }
 
@@ -117,7 +117,7 @@ bool _dbTechLayerRule::operator==(const _dbTechLayerRule& rhs) const
 
 _dbTech* _dbTechLayerRule::getTech()
 {
-  if (flags_.block_rule == 0) {
+  if (flags_._block_rule == 0) {
     return (_dbTech*) getOwner();
   }
 
@@ -126,7 +126,7 @@ _dbTech* _dbTechLayerRule::getTech()
 
 _dbBlock* _dbTechLayerRule::getBlock()
 {
-  assert(flags_.block_rule == 1);
+  assert(flags_._block_rule == 1);
   return (_dbBlock*) getOwner();
 }
 
@@ -140,103 +140,103 @@ dbTechLayer* dbTechLayerRule::getLayer()
 {
   _dbTechLayerRule* rule = (_dbTechLayerRule*) this;
   _dbTech* tech = rule->getTech();
-  return (dbTechLayer*) tech->layer_tbl_->getPtr(rule->layer_);
+  return (dbTechLayer*) tech->_layer_tbl->getPtr(rule->_layer);
 }
 
 dbTechNonDefaultRule* dbTechLayerRule::getNonDefaultRule()
 {
   _dbTechLayerRule* rule = (_dbTechLayerRule*) this;
 
-  if (rule->non_default_rule_ == 0) {
+  if (rule->_non_default_rule == 0) {
     return nullptr;
   }
 
   if (isBlockRule()) {
     _dbBlock* block = rule->getBlock();
-    return (dbTechNonDefaultRule*) block->non_default_rule_tbl_->getPtr(
-        rule->non_default_rule_);
+    return (dbTechNonDefaultRule*) block->_non_default_rule_tbl->getPtr(
+        rule->_non_default_rule);
   }
   _dbTech* tech = rule->getTech();
-  return (dbTechNonDefaultRule*) tech->non_default_rule_tbl_->getPtr(
-      rule->non_default_rule_);
+  return (dbTechNonDefaultRule*) tech->_non_default_rule_tbl->getPtr(
+      rule->_non_default_rule);
 }
 
 bool dbTechLayerRule::isBlockRule()
 {
   _dbTechLayerRule* rule = (_dbTechLayerRule*) this;
-  return rule->flags_.block_rule == 1;
+  return rule->flags_._block_rule == 1;
 }
 
 int dbTechLayerRule::getWidth()
 {
   _dbTechLayerRule* rule = (_dbTechLayerRule*) this;
-  return rule->width_;
+  return rule->_width;
 }
 
 void dbTechLayerRule::setWidth(int width)
 {
   _dbTechLayerRule* rule = (_dbTechLayerRule*) this;
-  rule->width_ = width;
+  rule->_width = width;
 }
 
 int dbTechLayerRule::getSpacing()
 {
   _dbTechLayerRule* rule = (_dbTechLayerRule*) this;
-  return rule->spacing_;
+  return rule->_spacing;
 }
 
 void dbTechLayerRule::setSpacing(int spacing)
 {
   _dbTechLayerRule* rule = (_dbTechLayerRule*) this;
-  rule->spacing_ = spacing;
+  rule->_spacing = spacing;
 }
 
 double dbTechLayerRule::getEdgeCapacitance()
 {
   _dbTechLayerRule* rule = (_dbTechLayerRule*) this;
-  return rule->edge_capacitance_;
+  return rule->_edge_capacitance;
 }
 
 void dbTechLayerRule::setEdgeCapacitance(double cap)
 {
   _dbTechLayerRule* rule = (_dbTechLayerRule*) this;
-  rule->edge_capacitance_ = cap;
+  rule->_edge_capacitance = cap;
 }
 
 uint dbTechLayerRule::getWireExtension()
 {
   _dbTechLayerRule* rule = (_dbTechLayerRule*) this;
-  return rule->wire_extension_;
+  return rule->_wire_extension;
 }
 
 void dbTechLayerRule::setWireExtension(uint ext)
 {
   _dbTechLayerRule* rule = (_dbTechLayerRule*) this;
-  rule->wire_extension_ = ext;
+  rule->_wire_extension = ext;
 }
 
 double dbTechLayerRule::getResistance()
 {
   _dbTechLayerRule* rule = (_dbTechLayerRule*) this;
-  return rule->resistance_;
+  return rule->_resistance;
 }
 
 void dbTechLayerRule::setResistance(double resistance)
 {
   _dbTechLayerRule* rule = (_dbTechLayerRule*) this;
-  rule->resistance_ = resistance;
+  rule->_resistance = resistance;
 }
 
 double dbTechLayerRule::getCapacitance()
 {
   _dbTechLayerRule* rule = (_dbTechLayerRule*) this;
-  return rule->capacitance_;
+  return rule->_capacitance;
 }
 
 void dbTechLayerRule::setCapacitance(double capacitance)
 {
   _dbTechLayerRule* rule = (_dbTechLayerRule*) this;
-  rule->capacitance_ = capacitance;
+  rule->_capacitance = capacitance;
 }
 
 dbTechLayerRule* dbTechLayerRule::create(dbTechNonDefaultRule* rule_,
@@ -246,36 +246,36 @@ dbTechLayerRule* dbTechLayerRule::create(dbTechNonDefaultRule* rule_,
   _dbTechLayer* layer = (_dbTechLayer*) layer_;
 
   auto make_layer = [layer, rule](auto& tbl) -> dbTechLayerRule* {
-    if (rule->layer_rules_[layer->number_] != 0) {
+    if (rule->_layer_rules[layer->_number] != 0) {
       return nullptr;
     }
 
     _dbTechLayerRule* layer_rule = tbl->create();
-    layer_rule->non_default_rule_ = rule->getOID();
-    layer_rule->layer_ = layer->getOID();
-    layer_rule->flags_.block_rule = rule->flags_.block_rule;
-    rule->layer_rules_[layer->number_] = layer_rule->getOID();
+    layer_rule->_non_default_rule = rule->getOID();
+    layer_rule->_layer = layer->getOID();
+    layer_rule->flags_._block_rule = rule->flags_._block_rule;
+    rule->_layer_rules[layer->_number] = layer_rule->getOID();
     return (dbTechLayerRule*) layer_rule;
   };
 
-  if (rule->flags_.block_rule) {
+  if (rule->flags_._block_rule) {
     _dbBlock* block = rule->getBlock();
-    return make_layer(block->layer_rule_tbl_);
+    return make_layer(block->_layer_rule_tbl);
   }
   _dbTech* tech = rule->getTech();
-  return make_layer(tech->layer_rule_tbl_);
+  return make_layer(tech->_layer_rule_tbl);
 }
 
 dbTechLayerRule* dbTechLayerRule::getTechLayerRule(dbTech* tech_, uint dbid_)
 {
   _dbTech* tech = (_dbTech*) tech_;
-  return (dbTechLayerRule*) tech->layer_rule_tbl_->getPtr(dbid_);
+  return (dbTechLayerRule*) tech->_layer_rule_tbl->getPtr(dbid_);
 }
 
 dbTechLayerRule* dbTechLayerRule::getTechLayerRule(dbBlock* block_, uint dbid_)
 {
   _dbBlock* block = (_dbBlock*) block_;
-  return (dbTechLayerRule*) block->layer_rule_tbl_->getPtr(dbid_);
+  return (dbTechLayerRule*) block->_layer_rule_tbl->getPtr(dbid_);
 }
 
 void _dbTechLayerRule::collectMemInfo(MemInfo& info)

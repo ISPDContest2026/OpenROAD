@@ -121,8 +121,6 @@ class FastRouteCore
   void clearNetsToRoute() { net_ids_.clear(); }
   void initEdges();
   void init3DEdges();
-  void initLowerBoundCapacities();
-  void setEdgeCapacity(int x1, int y1, int x2, int y2, int layer, int capacity);
   int getDbNetLayerEdgeCost(odb::dbNet* db_net, int layer);
   void initEdgesCapacityPerLayer();
   void setNumAdjustments(int nAdjustments);
@@ -274,7 +272,6 @@ class FastRouteCore
   NetRouteMap getPlanarRoutes();
   void getPlanarRoute(odb::dbNet* db_net, GRoute& route);
   void get3DRoute(odb::dbNet* db_net, GRoute& route);
-  void setIncrementalGrt(bool is_incremental);
 
  private:
   int getEdgeCapacity(FrNet* net, int x1, int y1, EdgeDirection direction);
@@ -517,7 +514,6 @@ class FastRouteCore
   void printEdge(int netID, int edgeID);
   void ConvertToFull3DType2();
   void fillVIA();
-  void ensurePinCoverage();
   void getViaStackRange(int netID,
                         int nodeID,
                         int16_t& bot_pin_l,
@@ -618,7 +614,6 @@ class FastRouteCore
   bool resistance_aware_ = false;
   bool enable_resistance_aware_ = false;
   bool is_3d_step_ = false;
-  bool is_incremental_grt_ = false;
   int num_adjust_;
   int v_capacity_;
   int h_capacity_;

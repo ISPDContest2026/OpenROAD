@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "odb/ZException.h"
 #include "odb/dbStream.h"
 #include "odb/odb.h"
 
@@ -32,8 +33,8 @@ class dbAttrTable
   bool operator!=(const dbAttrTable<T>& rhs) const { return !(this == rhs); }
 
  private:
-  unsigned int page_cnt_ = 0;
-  T** pages_ = nullptr;
+  unsigned int _page_cnt = 0;
+  T** _pages = nullptr;
 
   static constexpr uint page_size = 32;
   static constexpr uint page_shift = 5;
@@ -53,16 +54,16 @@ inline T dbAttrTable<T>::getAttr(const uint id) const
   // pages. (which would populate the table).
   const unsigned int page = (id & ~(page_size - 1)) >> page_shift;
 
-  if (page >= page_cnt_) {  // Page not present...
+  if (page >= _page_cnt) {  // Page not present...
     return T();
   }
 
-  if (pages_[page] == nullptr) {  // Page not present
+  if (_pages[page] == nullptr) {  // Page not present
     return T();
   }
 
   const unsigned int offset = id & (page_size - 1);
-  return pages_[page][offset];
+  return _pages[page][offset];
 }
 
 template <typename T>
@@ -77,60 +78,60 @@ inline void dbAttrTable<T>::setAttr(const uint id, const T& attr)
 template <typename T>
 inline void dbAttrTable<T>::clear()
 {
-  if (pages_) {
-    for (int i = 0; i < page_cnt_; ++i) {
-      delete[] pages_[i];
+  if (_pages) {
+    for (int i = 0; i < _page_cnt; ++i) {
+      delete[] _pages[i];
     }
 
-    delete[] pages_;
+    delete[] _pages;
   }
 
-  pages_ = nullptr;
-  page_cnt_ = 0;
+  _pages = nullptr;
+  _page_cnt = 0;
 }
 
 template <typename T>
 inline T* dbAttrTable<T>::getPage(const uint page)
 {
-  if (page >= page_cnt_) {
+  if (page >= _page_cnt) {
     resizePageTable(page);
   }
 
-  if (pages_[page] == nullptr) {
-    pages_[page] = new T[page_size];
+  if (_pages[page] == nullptr) {
+    _pages[page] = new T[page_size];
 
     for (int i = 0; i < page_size; ++i) {
-      pages_[page][i] = 0U;
+      _pages[page][i] = 0U;
     }
   }
 
-  return pages_[page];
+  return _pages[page];
 }
 
 template <typename T>
 inline void dbAttrTable<T>::resizePageTable(const uint page)
 {
-  T** old_pages = pages_;
-  unsigned int old_page_cnt = page_cnt_;
+  T** old_pages = _pages;
+  unsigned int old_page_cnt = _page_cnt;
 
-  if (page_cnt_ == 0) {
-    page_cnt_ = 1;
+  if (_page_cnt == 0) {
+    _page_cnt = 1;
   }
 
-  while (page >= page_cnt_) {
-    page_cnt_ *= 2;
+  while (page >= _page_cnt) {
+    _page_cnt *= 2;
   }
 
-  pages_ = new T*[page_cnt_];
+  _pages = new T*[_page_cnt];
 
   unsigned int i;
 
   for (i = 0; i < old_page_cnt; ++i) {
-    pages_[i] = old_pages[i];
+    _pages[i] = old_pages[i];
   }
 
-  for (; i < page_cnt_; ++i) {
-    pages_[i] = nullptr;
+  for (; i < _page_cnt; ++i) {
+    _pages[i] = nullptr;
   }
 
   delete[] old_pages;
@@ -139,11 +140,11 @@ inline void dbAttrTable<T>::resizePageTable(const uint page)
 template <typename T>
 inline bool dbAttrTable<T>::operator==(const dbAttrTable<T>& rhs) const
 {
-  if (page_cnt_ != rhs.page_cnt_) {
+  if (_page_cnt != rhs._page_cnt) {
     return false;
   }
 
-  const uint n = page_cnt_ * page_size;
+  const uint n = _page_cnt * page_size;
 
   for (int i = 0; i < n; ++i) {
     if (getAttr(i) != rhs.getAttr(i)) {
@@ -157,10 +158,10 @@ inline bool dbAttrTable<T>::operator==(const dbAttrTable<T>& rhs) const
 template <typename T>
 inline dbOStream& operator<<(dbOStream& stream, const dbAttrTable<T>& t)
 {
-  stream << t.page_cnt_;
+  stream << t._page_cnt;
 
-  for (int i = 0; i < t.page_cnt_; ++i) {
-    if (t.pages_[i] == nullptr) {
+  for (int i = 0; i < t._page_cnt; ++i) {
+    if (t._pages[i] == nullptr) {
       stream << 0U;
     } else {
       stream << (i + 1);
@@ -168,7 +169,7 @@ inline dbOStream& operator<<(dbOStream& stream, const dbAttrTable<T>& t)
       uint j;
 
       for (j = 0; j < dbAttrTable<T>::page_size; ++j) {
-        stream << t.pages_[i][j];
+        stream << t._pages[i][j];
       }
     }
   }
@@ -181,26 +182,26 @@ inline dbIStream& operator>>(dbIStream& stream, dbAttrTable<T>& t)
 {
   t.clear();
 
-  stream >> t.page_cnt_;
+  stream >> t._page_cnt;
 
-  if (t.page_cnt_ == 0) {
+  if (t._page_cnt == 0) {
     return stream;
   }
 
-  t.pages_ = new T*[t.page_cnt_];
+  t._pages = new T*[t._page_cnt];
 
-  for (int i = 0; i < t.page_cnt_; ++i) {
+  for (int i = 0; i < t._page_cnt; ++i) {
     uint p;
     stream >> p;
 
     if (p == 0U) {
-      t.pages_[i] = nullptr;
+      t._pages[i] = nullptr;
     } else {
-      t.pages_[i] = new T[dbAttrTable<T>::page_size];
+      t._pages[i] = new T[dbAttrTable<T>::page_size];
       uint j;
 
       for (j = 0; j < dbAttrTable<T>::page_size; j++) {
-        stream >> t.pages_[i][j];
+        stream >> t._pages[i][j];
       }
     }
   }

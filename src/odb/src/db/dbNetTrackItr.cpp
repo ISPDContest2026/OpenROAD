@@ -7,7 +7,6 @@
 #include "dbNetTrack.h"
 #include "dbTable.h"
 #include "dbTable.hpp"
-#include "odb/odb.h"
 // User Code Begin Includes
 #include "dbNet.h"
 // User Code End Includes
@@ -20,12 +19,12 @@ namespace odb {
 //
 ////////////////////////////////////////////////////////////////////
 
-bool dbNetTrackItr::reversible() const
+bool dbNetTrackItr::reversible()
 {
   return true;
 }
 
-bool dbNetTrackItr::orderReversed() const
+bool dbNetTrackItr::orderReversed()
 {
   return true;
 }
@@ -38,7 +37,7 @@ void dbNetTrackItr::reverse(dbObject* parent)
   uint list = 0;
 
   while (id != 0) {
-    _dbNetTrack* _child = net_tracks_tbl_->getPtr(id);
+    _dbNetTrack* _child = _net_tracks_tbl->getPtr(id);
     uint n = _child->track_next_;
     _child->track_next_ = list;
     list = id;
@@ -48,12 +47,12 @@ void dbNetTrackItr::reverse(dbObject* parent)
   // User Code End reverse
 }
 
-uint dbNetTrackItr::sequential() const
+uint dbNetTrackItr::sequential()
 {
   return 0;
 }
 
-uint dbNetTrackItr::size(dbObject* parent) const
+uint dbNetTrackItr::size(dbObject* parent)
 {
   uint id;
   uint cnt = 0;
@@ -66,7 +65,7 @@ uint dbNetTrackItr::size(dbObject* parent) const
   return cnt;
 }
 
-uint dbNetTrackItr::begin(dbObject* parent) const
+uint dbNetTrackItr::begin(dbObject* parent)
 {
   // User Code Begin begin
   _dbNet* _parent = (_dbNet*) parent;
@@ -74,22 +73,22 @@ uint dbNetTrackItr::begin(dbObject* parent) const
   // User Code End begin
 }
 
-uint dbNetTrackItr::end(dbObject* /* unused: parent */) const
+uint dbNetTrackItr::end(dbObject* /* unused: parent */)
 {
   return 0;
 }
 
-uint dbNetTrackItr::next(uint id, ...) const
+uint dbNetTrackItr::next(uint id, ...)
 {
   // User Code Begin next
-  _dbNetTrack* _track = net_tracks_tbl_->getPtr(id);
+  _dbNetTrack* _track = _net_tracks_tbl->getPtr(id);
   return _track->track_next_;
   // User Code End next
 }
 
 dbObject* dbNetTrackItr::getObject(uint id, ...)
 {
-  return net_tracks_tbl_->getPtr(id);
+  return _net_tracks_tbl->getPtr(id);
 }
 }  // namespace odb
    // Generator Code End Cpp

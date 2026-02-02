@@ -22,6 +22,11 @@ class dbTech;
 
 class defin
 {
+  definReader* _reader;
+
+  // Protects the DefParser namespace that has static variables
+  static std::mutex _def_mutex;
+
  public:
   enum MODE
   {
@@ -47,12 +52,6 @@ class defin
                 const char* def_file,
                 dbChip* chip,
                 bool issue_callback = true);
-
- private:
-  definReader* reader_;
-
-  // Protects the DefParser namespace that has static variables
-  static std::mutex def_mutex_;
 };
 
 }  // namespace odb

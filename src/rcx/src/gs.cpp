@@ -7,8 +7,8 @@
 #include <cstring>
 
 #include "gseq.h"
-#include "rcx/array1.h"
-#include "rcx/util.h"
+#include "odb/array1.h"
+#include "odb/util.h"
 
 namespace rcx {
 
@@ -33,7 +33,7 @@ static constexpr int GS_NONE = 3;
 static constexpr int GS_ROW = 1;
 static constexpr int GS_COLUMN = 0;
 
-gs::gs(AthPool<SEQ>* pool)
+gs::gs(odb::AthPool<SEQ>* pool)
 {
   init_ = INIT;
 
@@ -292,7 +292,7 @@ uint gs::getSeq(int* ll,
                 int* ur,
                 const uint order,
                 const uint plane,
-                Ath__array1D<SEQ*>* array)
+                odb::Ath__array1D<SEQ*>* array)
 {
   if (!checkPlane(plane)) {
     return 0;

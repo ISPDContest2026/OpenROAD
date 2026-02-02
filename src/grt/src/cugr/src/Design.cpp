@@ -1,14 +1,11 @@
 #include "Design.h"
 
 #include <iostream>
-#include <set>
 #include <vector>
 
 #include "CUGR.h"
 #include "GeoTypes.h"
 #include "Netlist.h"
-#include "db_sta/dbNetwork.hh"
-#include "db_sta/dbSta.hh"
 #include "odb/db.h"
 #include "odb/dbShape.h"
 #include "odb/dbTypes.h"
@@ -19,19 +16,15 @@ namespace grt {
 
 Design::Design(odb::dbDatabase* db,
                utl::Logger* logger,
-               sta::dbSta* sta,
                const Constants& constants,
                const int min_routing_layer,
-               const int max_routing_layer,
-               const std::set<odb::dbNet*>& clock_nets)
+               const int max_routing_layer)
     : block_(db->getChip()->getBlock()),
       tech_(db->getTech()),
       logger_(logger),
-      sta_(sta),
       constants_(constants),
       min_routing_layer_(min_routing_layer),
-      max_routing_layer_(max_routing_layer),
-      clock_nets_(clock_nets)
+      max_routing_layer_(max_routing_layer)
 {
   read();
   setUnitCosts();
@@ -137,15 +130,7 @@ void Design::readNetlist()
       pins.emplace_back(pin_count, db_iterm, pin_shapes);
       pin_count++;
     }
-
-    LayerRange layer_range
-        = {.min_layer = min_routing_layer_, .max_layer = max_routing_layer_};
-    if (clock_nets_.find(db_net) != clock_nets_.end()) {
-      layer_range.min_layer = block_->getMinLayerForClock() - 1;
-      layer_range.max_layer = block_->getMaxLayerForClock() - 1;
-    }
-
-    nets_.emplace_back(net_index, db_net, pins, layer_range);
+    nets_.emplace_back(net_index, db_net, pins);
     net_index++;
   }
 }

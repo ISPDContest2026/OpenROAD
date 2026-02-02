@@ -24,15 +24,15 @@
     },
     {
       "type": "bit",
-      "name": "class_valid"
+      "name": "class_valid_"
     },
     {
       "type": "bit",
-      "name": "corner_only"
+      "name": "corner_only_"
     },
     {
       "type": "bit",
-      "name": "except_within"
+      "name": "except_within_"
     },
     {
       "type": "int",

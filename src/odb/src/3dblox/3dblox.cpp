@@ -17,7 +17,6 @@
 #include "dbvParser.h"
 #include "dbvWriter.h"
 #include "dbxParser.h"
-#include "dbxWriter.h"
 #include "objects.h"
 #include "odb/db.h"
 #include "odb/dbTransform.h"
@@ -89,6 +88,7 @@ void ThreeDBlox::readDbx(const std::string& dbx_file)
   }
   calculateSize(db_->getChip());
   db_->triggerPostRead3Dbx(chip);
+  check();
 }
 
 void ThreeDBlox::check()
@@ -179,26 +179,20 @@ void ThreeDBlox::writeDbx(const std::string& dbx_file, odb::dbChip* chip)
   if (chip == nullptr) {
     return;
   }
-  ///////////Results Directory Path ///////////
+  // TODO: implement
   std::string current_dir_path = getResultsDirectoryPath(dbx_file);
-  ////////////////////////////////////////////
-
   writeDbv(current_dir_path + chip->getName() + ".3dbv", chip);
-
-  DbxWriter writer(logger_, db_);
-  writer.writeChiplet(dbx_file, chip);
 }
 
 void ThreeDBlox::calculateSize(dbChip* chip)
 {
-  Cuboid cuboid;
-  cuboid.mergeInit();
+  Rect box;
+  box.mergeInit();
   for (auto inst : chip->getChipInsts()) {
-    cuboid.merge(inst->getCuboid());
+    box.merge(inst->getBBox());
   }
-  chip->setWidth(cuboid.dx());
-  chip->setHeight(cuboid.dy());
-  chip->setThickness(cuboid.dz());
+  chip->setWidth(box.dx());
+  chip->setHeight(box.dy());
 }
 
 void ThreeDBlox::readHeaderIncludes(const std::vector<std::string>& includes)
@@ -302,33 +296,21 @@ void ThreeDBlox::createChiplet(const ChipletDef& chiplet)
                         chip,
                         /*issue_callback*/ false);
   }
-  if (chiplet.design_width != -1.0) {
-    chip->setWidth(chiplet.design_width * db_->getDbuPerMicron());
-  }
-  if (chiplet.design_height != -1.0) {
-    chip->setHeight(chiplet.design_height * db_->getDbuPerMicron());
-  }
-  if (chiplet.thickness != -1.0) {
-    chip->setThickness(chiplet.thickness * db_->getDbuPerMicron());
-  }
-  if (chiplet.shrink != -1.0) {
-    chip->setShrink(chiplet.shrink);
-  }
+  chip->setWidth(chiplet.design_width * db_->getDbuPerMicron());
+  chip->setHeight(chiplet.design_height * db_->getDbuPerMicron());
+  chip->setThickness(chiplet.thickness * db_->getDbuPerMicron());
+  chip->setShrink(chiplet.shrink);
   chip->setTsv(chiplet.tsv);
 
-  if (chiplet.scribe_line_right != -1.0) {
-    chip->setScribeLineEast(chiplet.scribe_line_right * db_->getDbuPerMicron());
-    chip->setScribeLineWest(chiplet.scribe_line_left * db_->getDbuPerMicron());
-    chip->setScribeLineNorth(chiplet.scribe_line_top * db_->getDbuPerMicron());
-    chip->setScribeLineSouth(chiplet.scribe_line_bottom
-                             * db_->getDbuPerMicron());
-  }
-  if (chiplet.seal_ring_right != -1.0) {
-    chip->setSealRingEast(chiplet.seal_ring_right * db_->getDbuPerMicron());
-    chip->setSealRingWest(chiplet.seal_ring_left * db_->getDbuPerMicron());
-    chip->setSealRingNorth(chiplet.seal_ring_top * db_->getDbuPerMicron());
-    chip->setSealRingSouth(chiplet.seal_ring_bottom * db_->getDbuPerMicron());
-  }
+  chip->setScribeLineEast(chiplet.scribe_line_right * db_->getDbuPerMicron());
+  chip->setScribeLineWest(chiplet.scribe_line_left * db_->getDbuPerMicron());
+  chip->setScribeLineNorth(chiplet.scribe_line_top * db_->getDbuPerMicron());
+  chip->setScribeLineSouth(chiplet.scribe_line_bottom * db_->getDbuPerMicron());
+
+  chip->setSealRingEast(chiplet.seal_ring_right * db_->getDbuPerMicron());
+  chip->setSealRingWest(chiplet.seal_ring_left * db_->getDbuPerMicron());
+  chip->setSealRingNorth(chiplet.seal_ring_top * db_->getDbuPerMicron());
+  chip->setSealRingSouth(chiplet.seal_ring_bottom * db_->getDbuPerMicron());
 
   chip->setOffset(Point(chiplet.offset.x * db_->getDbuPerMicron(),
                         chiplet.offset.y * db_->getDbuPerMicron()));
@@ -336,12 +318,8 @@ void ThreeDBlox::createChiplet(const ChipletDef& chiplet)
       && chip->getBlock() == nullptr) {
     // blackbox stage, create block
     auto block = odb::dbBlock::create(chip, chiplet.name.c_str());
-    const int x_min = chip->getScribeLineWest() + chip->getSealRingWest();
-    const int y_min = chip->getScribeLineSouth() + chip->getSealRingSouth();
-    const int x_max = x_min + chip->getWidth();
-    const int y_max = y_min + chip->getHeight();
-    block->setDieArea(Rect(x_min, y_min, x_max, y_max));
-    block->setCoreArea(Rect(x_min, y_min, x_max, y_max));
+    block->setDieArea(Rect(0, 0, chip->getWidth(), chip->getHeight()));
+    block->setCoreArea(Rect(0, 0, chip->getWidth(), chip->getHeight()));
   }
   for (const auto& [_, region] : chiplet.regions) {
     createRegion(region, chip);
@@ -421,11 +399,8 @@ void ThreeDBlox::createBump(const BumpMapEntry& entry,
   auto bump = dbChipBump::create(chip_region, inst);
   Rect bbox;
   inst->getMaster()->getPlacementBoundary(bbox);
-  int x = (entry.x * db_->getDbuPerMicron()) - bbox.xCenter()
-          + chip->getOffset().x();
-  int y = (entry.y * db_->getDbuPerMicron()) - bbox.yCenter()
-          + chip->getOffset().y();
-  inst->setOrigin(x, y);
+  inst->setOrigin((entry.x * db_->getDbuPerMicron()) - bbox.xCenter(),
+                  (entry.y * db_->getDbuPerMicron()) - bbox.yCenter());
   inst->setPlacementStatus(dbPlacementStatus::FIRM);
   if (entry.net_name != "-") {
     auto net = block->findNet(entry.net_name.c_str());
@@ -473,6 +448,9 @@ void ThreeDBlox::createChipInst(const ChipletInst& chip_inst)
                    chip_inst.name);
   }
   dbChipInst* inst = dbChipInst::create(db_->getChip(), chip, chip_inst.name);
+  inst->setLoc(Point3D(chip_inst.loc.x * db_->getDbuPerMicron(),
+                       chip_inst.loc.y * db_->getDbuPerMicron(),
+                       chip_inst.z * db_->getDbuPerMicron()));
   auto orient_str = chip_inst.orient;
   if (dup_orient_map.find(orient_str) != dup_orient_map.end()) {
     orient_str = dup_orient_map[orient_str];
@@ -486,9 +464,6 @@ void ThreeDBlox::createChipInst(const ChipletInst& chip_inst)
                    chip_inst.name);
   }
   inst->setOrient(orient.value());
-  inst->setLoc(Point3D(chip_inst.loc.x * db_->getDbuPerMicron(),
-                       chip_inst.loc.y * db_->getDbuPerMicron(),
-                       chip_inst.z * db_->getDbuPerMicron()));
 }
 std::vector<std::string> splitPath(const std::string& path)
 {

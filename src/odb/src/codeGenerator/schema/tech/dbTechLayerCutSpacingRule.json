@@ -4,7 +4,7 @@
   "fields": [
     {
       "type": "bit",
-      "name": "center_to_center"
+      "name": "center_to_center_"
     },
     {
       "type": "int",
@@ -13,19 +13,19 @@
     },
     {
       "type": "bit",
-      "name": "same_net"
+      "name": "same_net_"
     },
     {
       "type": "bit",
-      "name": "same_metal"
+      "name": "same_metal_"
     },
     {
       "type": "bit",
-      "name": "same_via"
+      "name": "same_via_"
     },
     {
       "type": "uint",
-      "name": "cut_spacing_type",
+      "name": "cut_spacing_type_",
       "flags": [
         "no-get",
         "no-set"
@@ -42,15 +42,15 @@
     },
     {
       "type": "bit",
-      "name": "stack"
+      "name": "stack_"
     },
     {
       "type": "bit",
-      "name": "orthogonal_spacing_valid"
+      "name": "orthogonal_spacing_valid_"
     },
     {
       "type": "bit",
-      "name": "above_width_enclosure_valid"
+      "name": "above_width_enclosure_valid_"
     },
     {
       "type": "int",
@@ -59,19 +59,19 @@
     },
     {
       "type": "bit",
-      "name": "short_edge_only"
+      "name": "short_edge_only_"
     },
     {
       "type": "bit",
-      "name": "concave_corner_width"
+      "name": "concave_corner_width_"
     },
     {
       "type": "bit",
-      "name": "concave_corner_parallel"
+      "name": "concave_corner_parallel_"
     },
     {
       "type": "bit",
-      "name": "concave_corner_edge_length"
+      "name": "concave_corner_edge_length_"
     },
     {
       "type": "int",
@@ -110,35 +110,35 @@
     },
     {
       "type": "bit",
-      "name": "concave_corner"
+      "name": "concave_corner_"
     },
     {
       "type": "bit",
-      "name": "extension_valid"
+      "name": "extension_valid_"
     },
     {
       "type": "bit",
-      "name": "non_eol_convex_corner"
+      "name": "non_eol_convex_corner_"
     },
     {
       "type": "bit",
-      "name": "eol_width_valid"
+      "name": "eol_width_valid_"
     },
     {
       "type": "bit",
-      "name": "min_length_valid"
+      "name": "min_length_valid_"
     },
     {
       "type": "bit",
-      "name": "above_width_valid"
+      "name": "above_width_valid_"
     },
     {
       "type": "bit",
-      "name": "mask_overlap"
+      "name": "mask_overlap_"
     },
     {
       "type": "bit",
-      "name": "wrong_direction"
+      "name": "wrong_direction_"
     },
     {
       "type": "int",
@@ -167,12 +167,12 @@
     },
     {
       "type": "uint",
-      "name": "adjacent_cuts",
+      "name": "adjacent_cuts_",
       "bits": 2
     },
     {
       "type": "bit",
-      "name": "exact_aligned"
+      "name": "exact_aligned_"
     },
     {
       "type": "uint",
@@ -194,19 +194,19 @@
     },
     {
       "type": "bit",
-      "name": "cut_class_to_all"
+      "name": "cut_class_to_all_"
     },
     {
       "type": "bit",
-      "name": "no_prl"
+      "name": "no_prl_"
     },
     {
       "type": "bit",
-      "name": "same_mask"
+      "name": "same_mask_"
     },
     {
       "type": "bit",
-      "name": "except_same_pgnet"
+      "name": "except_same_pgnet_"
     },
     {
       "type": "dbId<_dbTechLayerCutClassRule>",
@@ -218,55 +218,55 @@
     },
     {
       "type": "bit",
-      "name": "side_parallel_overlap"
+      "name": "side_parallel_overlap_"
     },
     {
       "type": "bit",
-      "name": "except_same_net"
+      "name": "except_same_net_"
     },
     {
       "type": "bit",
-      "name": "except_same_metal"
+      "name": "except_same_metal_"
     },
     {
       "type": "bit",
-      "name": "except_same_metal_overlap"
+      "name": "except_same_metal_overlap_"
     },
     {
       "type": "bit",
-      "name": "except_same_via"
+      "name": "except_same_via_"
     },
     {
       "type": "bit",
-      "name": "above"
+      "name": "above_"
     },
     {
       "type": "bit",
-      "name": "except_two_edges"
+      "name": "except_two_edges_"
     },
     {
       "type": "bit",
-      "name": "two_cuts_valid"
+      "name": "two_cuts_valid_"
     },
     {
       "type": "bit",
-      "name": "same_cut"
+      "name": "same_cut_"
     },
     {
       "type": "bit",
-      "name": "long_edge_only"
+      "name": "long_edge_only_"
     },
     {
       "type": "bit",
-      "name": "prl_valid"
+      "name": "prl_valid_"
     },
     {
       "type": "bit",
-      "name": "below"
+      "name": "below_"
     },
     {
       "type": "bit",
-      "name": "par_within_enclosure_valid"
+      "name": "par_within_enclosure_valid_"
     },
     {
       "type": "uint",

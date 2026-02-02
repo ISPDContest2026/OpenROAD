@@ -24,22 +24,22 @@ bool _dbBusPort::operator==(const _dbBusPort& rhs) const
   if (flags_ != rhs.flags_) {
     return false;
   }
-  if (from_ != rhs.from_) {
+  if (_from != rhs._from) {
     return false;
   }
-  if (to_ != rhs.to_) {
+  if (_to != rhs._to) {
     return false;
   }
-  if (port_ != rhs.port_) {
+  if (_port != rhs._port) {
     return false;
   }
-  if (members_ != rhs.members_) {
+  if (_members != rhs._members) {
     return false;
   }
-  if (last_ != rhs.last_) {
+  if (_last != rhs._last) {
     return false;
   }
-  if (parent_ != rhs.parent_) {
+  if (_parent != rhs._parent) {
     return false;
   }
 
@@ -54,8 +54,8 @@ bool _dbBusPort::operator<(const _dbBusPort& rhs) const
 _dbBusPort::_dbBusPort(_dbDatabase* db)
 {
   flags_ = 0;
-  from_ = 0;
-  to_ = 0;
+  _from = 0;
+  _to = 0;
 }
 
 dbIStream& operator>>(dbIStream& stream, _dbBusPort& obj)
@@ -64,22 +64,22 @@ dbIStream& operator>>(dbIStream& stream, _dbBusPort& obj)
     stream >> obj.flags_;
   }
   if (obj.getDatabase()->isSchema(db_schema_odb_busport)) {
-    stream >> obj.from_;
+    stream >> obj._from;
   }
   if (obj.getDatabase()->isSchema(db_schema_odb_busport)) {
-    stream >> obj.to_;
+    stream >> obj._to;
   }
   if (obj.getDatabase()->isSchema(db_schema_odb_busport)) {
-    stream >> obj.port_;
+    stream >> obj._port;
   }
   if (obj.getDatabase()->isSchema(db_schema_odb_busport)) {
-    stream >> obj.members_;
+    stream >> obj._members;
   }
   if (obj.getDatabase()->isSchema(db_schema_odb_busport)) {
-    stream >> obj.last_;
+    stream >> obj._last;
   }
   if (obj.getDatabase()->isSchema(db_schema_odb_busport)) {
-    stream >> obj.parent_;
+    stream >> obj._parent;
   }
   return stream;
 }
@@ -87,12 +87,12 @@ dbIStream& operator>>(dbIStream& stream, _dbBusPort& obj)
 dbOStream& operator<<(dbOStream& stream, const _dbBusPort& obj)
 {
   stream << obj.flags_;
-  stream << obj.from_;
-  stream << obj.to_;
-  stream << obj.port_;
-  stream << obj.members_;
-  stream << obj.last_;
-  stream << obj.parent_;
+  stream << obj._from;
+  stream << obj._to;
+  stream << obj._port;
+  stream << obj._members;
+  stream << obj._last;
+  stream << obj._parent;
   return stream;
 }
 
@@ -105,7 +105,7 @@ void _dbBusPort::collectMemInfo(MemInfo& info)
 _dbBusPort::~_dbBusPort()
 {
   // User Code Begin Destructor
-  delete members_iter_;
+  delete _members_iter;
   // User Code End Destructor
 }
 
@@ -118,67 +118,67 @@ _dbBusPort::~_dbBusPort()
 int dbBusPort::getFrom() const
 {
   _dbBusPort* obj = (_dbBusPort*) this;
-  return obj->from_;
+  return obj->_from;
 }
 
 int dbBusPort::getTo() const
 {
   _dbBusPort* obj = (_dbBusPort*) this;
-  return obj->to_;
+  return obj->_to;
 }
 
 dbModBTerm* dbBusPort::getPort() const
 {
   _dbBusPort* obj = (_dbBusPort*) this;
-  if (obj->port_ == 0) {
+  if (obj->_port == 0) {
     return nullptr;
   }
   _dbBlock* par = (_dbBlock*) obj->getOwner();
-  return (dbModBTerm*) par->modbterm_tbl_->getPtr(obj->port_);
+  return (dbModBTerm*) par->_modbterm_tbl->getPtr(obj->_port);
 }
 
 void dbBusPort::setMembers(dbModBTerm* members)
 {
   _dbBusPort* obj = (_dbBusPort*) this;
 
-  obj->members_ = members->getImpl()->getOID();
+  obj->_members = members->getImpl()->getOID();
 }
 
 dbModBTerm* dbBusPort::getMembers() const
 {
   _dbBusPort* obj = (_dbBusPort*) this;
-  if (obj->members_ == 0) {
+  if (obj->_members == 0) {
     return nullptr;
   }
   _dbBlock* par = (_dbBlock*) obj->getOwner();
-  return (dbModBTerm*) par->modbterm_tbl_->getPtr(obj->members_);
+  return (dbModBTerm*) par->_modbterm_tbl->getPtr(obj->_members);
 }
 
 void dbBusPort::setLast(dbModBTerm* last)
 {
   _dbBusPort* obj = (_dbBusPort*) this;
 
-  obj->last_ = last->getImpl()->getOID();
+  obj->_last = last->getImpl()->getOID();
 }
 
 dbModBTerm* dbBusPort::getLast() const
 {
   _dbBusPort* obj = (_dbBusPort*) this;
-  if (obj->last_ == 0) {
+  if (obj->_last == 0) {
     return nullptr;
   }
   _dbBlock* par = (_dbBlock*) obj->getOwner();
-  return (dbModBTerm*) par->modbterm_tbl_->getPtr(obj->last_);
+  return (dbModBTerm*) par->_modbterm_tbl->getPtr(obj->_last);
 }
 
 dbModule* dbBusPort::getParent() const
 {
   _dbBusPort* obj = (_dbBusPort*) this;
-  if (obj->parent_ == 0) {
+  if (obj->_parent == 0) {
     return nullptr;
   }
   _dbBlock* par = (_dbBlock*) obj->getOwner();
-  return (dbModule*) par->module_tbl_->getPtr(obj->parent_);
+  return (dbModule*) par->_module_tbl->getPtr(obj->_parent);
 }
 
 // User Code Begin dbBusPortPublicMethods
@@ -241,7 +241,7 @@ int dbBusPort::getSize() const
 bool dbBusPort::getUpdown() const
 {
   _dbBusPort* obj = (_dbBusPort*) this;
-  if (obj->to_ >= obj->from_) {
+  if (obj->_to >= obj->_from) {
     return true;
   }
   return false;
@@ -254,23 +254,23 @@ dbBusPort* dbBusPort::create(dbModule* parentModule,
 {
   _dbModule* module = (_dbModule*) parentModule;
   _dbBlock* block = (_dbBlock*) module->getOwner();
-  _dbBusPort* busport = block->busport_tbl_->create();
-  busport->port_ = port->getId();
-  busport->from_ = from_ix;
-  busport->to_ = to_ix;
+  _dbBusPort* busport = block->_busport_tbl->create();
+  busport->_port = port->getId();
+  busport->_from = from_ix;
+  busport->_to = to_ix;
   busport->flags_ = 0U;
-  busport->parent_ = module->getOID();
+  busport->_parent = module->getOID();
   return (dbBusPort*) busport;
 }
 
 dbSet<dbModBTerm> dbBusPort::getBusPortMembers()
 {
   _dbBusPort* obj = (_dbBusPort*) this;
-  if (obj->members_iter_ == nullptr) {
+  if (obj->_members_iter == nullptr) {
     _dbBlock* block = (_dbBlock*) obj->getOwner();
-    obj->members_iter_ = new dbModuleBusPortModBTermItr(block->modbterm_tbl_);
+    obj->_members_iter = new dbModuleBusPortModBTermItr(block->_modbterm_tbl);
   }
-  return dbSet<dbModBTerm>(this, obj->members_iter_);
+  return dbSet<dbModBTerm>(this, obj->_members_iter);
 }
 
 // User Code End dbBusPortPublicMethods

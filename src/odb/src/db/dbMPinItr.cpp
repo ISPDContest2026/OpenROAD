@@ -18,12 +18,12 @@ namespace odb {
 //
 ////////////////////////////////////////////////////////////////////
 
-bool dbMPinItr::reversible() const
+bool dbMPinItr::reversible()
 {
   return true;
 }
 
-bool dbMPinItr::orderReversed() const
+bool dbMPinItr::orderReversed()
 {
   return true;
 }
@@ -31,26 +31,26 @@ bool dbMPinItr::orderReversed() const
 void dbMPinItr::reverse(dbObject* parent)
 {
   _dbMTerm* mterm = (_dbMTerm*) parent;
-  uint id = mterm->pins_;
+  uint id = mterm->_pins;
   uint list = 0;
 
   while (id != 0) {
     _dbMPin* pin = _mpin_tbl->getPtr(id);
-    uint n = pin->next_mpin_;
-    pin->next_mpin_ = list;
+    uint n = pin->_next_mpin;
+    pin->_next_mpin = list;
     list = id;
     id = n;
   }
 
-  mterm->pins_ = list;
+  mterm->_pins = list;
 }
 
-uint dbMPinItr::sequential() const
+uint dbMPinItr::sequential()
 {
   return 0;
 }
 
-uint dbMPinItr::size(dbObject* parent) const
+uint dbMPinItr::size(dbObject* parent)
 {
   uint id;
   uint cnt = 0;
@@ -63,21 +63,21 @@ uint dbMPinItr::size(dbObject* parent) const
   return cnt;
 }
 
-uint dbMPinItr::begin(dbObject* parent) const
+uint dbMPinItr::begin(dbObject* parent)
 {
   _dbMTerm* mterm = (_dbMTerm*) parent;
-  return mterm->pins_;
+  return mterm->_pins;
 }
 
-uint dbMPinItr::end(dbObject* /* unused: parent */) const
+uint dbMPinItr::end(dbObject* /* unused: parent */)
 {
   return 0;
 }
 
-uint dbMPinItr::next(uint id, ...) const
+uint dbMPinItr::next(uint id, ...)
 {
   _dbMPin* mpin = _mpin_tbl->getPtr(id);
-  return mpin->next_mpin_;
+  return mpin->_next_mpin;
 }
 
 dbObject* dbMPinItr::getObject(uint id, ...)

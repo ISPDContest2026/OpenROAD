@@ -136,20 +136,20 @@ class GDSReader
   dbGDSTextPres processTextPres();
 
   /** Current filestream */
-  std::ifstream file_;
+  std::ifstream _file;
   /** Most recently read record */
-  record_t r_;
+  record_t _r;
   /** Current ODB Database */
-  dbDatabase* db_ = nullptr;
+  dbDatabase* _db = nullptr;
   /** Current GDS Lib object */
-  dbGDSLib* lib_ = nullptr;
+  dbGDSLib* _lib = nullptr;
   /** An sref may refer to a structure that isn't yet built while
       reading the gds.  We will make an empty structure but it isn't
       yet defined.  We keep track of defined structures to catch any
       duplicates.*/
-  std::set<dbGDSStructure*> defined_;
+  std::set<dbGDSStructure*> _defined;
 
-  utl::Logger* logger_{nullptr};
+  utl::Logger* _logger{nullptr};
 };
 
 }  // namespace odb::gds

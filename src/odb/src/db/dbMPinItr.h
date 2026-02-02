@@ -13,21 +13,20 @@ class _dbMPin;
 
 class dbMPinItr : public dbIterator
 {
+  dbTable<_dbMPin, 4>* _mpin_tbl;
+
  public:
   dbMPinItr(dbTable<_dbMPin, 4>* mpin_tbl) { _mpin_tbl = mpin_tbl; }
 
-  bool reversible() const override;
-  bool orderReversed() const override;
+  bool reversible() override;
+  bool orderReversed() override;
   void reverse(dbObject* parent) override;
-  uint sequential() const override;
-  uint size(dbObject* parent) const override;
-  uint begin(dbObject* parent) const override;
-  uint end(dbObject* parent) const override;
-  uint next(uint id, ...) const override;
+  uint sequential() override;
+  uint size(dbObject* parent) override;
+  uint begin(dbObject* parent) override;
+  uint end(dbObject* parent) override;
+  uint next(uint id, ...) override;
   dbObject* getObject(uint id, ...) override;
-
- private:
-  dbTable<_dbMPin, 4>* _mpin_tbl;
 };
 
 }  // namespace odb
