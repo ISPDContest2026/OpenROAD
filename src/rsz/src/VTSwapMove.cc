@@ -143,7 +143,7 @@ bool VTSwapSpeedMove::isSwappable(const Path*& drvr_path,
   }
 
   LibertyCellSeq equiv_cells = resizer_->getVTEquivCells(drvr_cell);
-  best_cell = equiv_cells.empty() ? nullptr : equiv_cells.back();
+  best_cell = equiv_cells.empty() ? nullptr : equiv_cells.front();
   if (best_cell == drvr_cell) {
     best_cell = nullptr;
   }
