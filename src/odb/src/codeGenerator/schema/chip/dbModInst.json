@@ -1,0 +1,55 @@
+{
+    "name":"dbModInst",
+    "fields":[
+	{
+	    "name":"name_",
+	    "type":"char *",
+	    "flags":["no-set"]
+	},
+	{
+	    "name":"next_entry_",
+	    "type":"dbId<_dbModInst>",
+	    "flags":["no-set","no-get"]
+	},
+	{
+	    "name":"_parent",
+	    "type":"dbId<_dbModule>",
+	    "flags":["no-set"],
+	    "parent":"dbBlock"    },
+	{
+	    "name":"_module_next",
+	    "type":"dbId<_dbModInst>",
+	    "flags":["no-get","no-set"],
+	    "parent":"dbBlock"
+	},
+	{
+	    "name":"_master",
+	    "type":"dbId<_dbModule>",
+	    "flags":["no-set"],
+	    "parent":"dbBlock"
+	},
+	{
+	    "name":"_group_next",
+	    "type":"dbId<_dbModInst>",
+	    "flags":["no-get","no-set"],
+	    "parent":"dbBlock"
+	},
+	{
+	    "name":"_group",
+	    "type":"dbId<_dbGroup>",
+	    "flags":["no-set"],
+	    "parent":"dbBlock"
+	},
+	{
+      	    "name":"_moditerms",
+	    "type":"dbId<_dbModITerm >",
+	    "flags":["no-get","no-set","no-serial"],	
+	    "parent":"dbBlock"
+	}
+    ],
+    "cpp_includes":["dbBlock.h","dbModule.h","dbHashTable.hpp", "dbModITerm.h", "dbJournal.h"],
+    "h_includes": [
+	"dbVector.h",
+	"odb/dbSet.h"
+    ]
+}
