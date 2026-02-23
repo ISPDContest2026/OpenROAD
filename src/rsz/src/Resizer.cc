@@ -5302,8 +5302,9 @@ float Resizer::getTNS() {
 // 主演算法入口
 void Resizer::myContestAlgorithm(int max_iterations) {
   resizePreamble(); // 初始化與 Preamble 檢查
-  
+  vt_swap_speed_move_->equiv_selection = max_iterations;
   logger_->report("Orz: 開始執行 Buffer Chain 優化 (SizeDown & Unbuffer)...");
+  
 
   // 取得初始狀態
   float init_tns = getTNS();
