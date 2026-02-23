@@ -11,6 +11,7 @@ class VTSwapSpeedMove : public BaseMove
 {
  public:
   using BaseMove::BaseMove;
+  int equiv_selection = 2;
 
   bool doMove(const Path* drvr_path,
               int drvr_index,
