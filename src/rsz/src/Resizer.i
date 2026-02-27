@@ -660,11 +660,11 @@ fully_rebuffer(Pin *pin)
 }
 
 // 這就是你在 Python 會呼叫的函式名稱
-void
+int
 run_my_contest_algo(int max_iterations)
 {
   rsz::Resizer *resizer = ord::getResizer();
-  resizer->myContestAlgorithm(max_iterations);
+  return resizer->myContestAlgorithm(max_iterations);
 }
 
 } // namespace

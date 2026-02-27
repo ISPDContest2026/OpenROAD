@@ -5300,12 +5300,13 @@ float Resizer::getTNS() {
 }
 
 // 主演算法入口
-void Resizer::myContestAlgorithm(int max_iterations) {
+int Resizer::myContestAlgorithm(int max_iterations) {
   resizePreamble(); // 初始化與 Preamble 檢查
   vt_swap_speed_move_->equiv_selection = max_iterations;
+  logger_->report("Odb: 現在有 {} 個 components~~~~", /*db_->getChip()->getChipInsts().size*/ db_->getChip()->getBlock()->getInsts().size());
   logger_->report("Orz: 開始執行 Buffer Chain 優化 (SizeDown & Unbuffer)...");
   
-
+  /*
   // 取得初始狀態
   float init_tns = getTNS();
   logger_->report("Orz: 初始狀態 -> TNS: {:.6f}", init_tns);
@@ -5465,7 +5466,7 @@ void Resizer::myContestAlgorithm(int max_iterations) {
             }
         }
       }
-    */    
+       
     } // end for buffers
     
     if (move_count == 0) {
@@ -5475,7 +5476,9 @@ void Resizer::myContestAlgorithm(int max_iterations) {
   }
   sta_->graphDelayCalc()->delaysInvalid();
   sta_->updateTiming(true); // true = force full update
-  logger_->report("Orz: 優化完成。最終 TNS: {:.6f}", getTNS());
+  logger_->report("Orz: 優化完成。最終 TNS: {:.6f}", getTNS());*/
+
+  return 8787;
 }
 
 }  // namespace rsz
