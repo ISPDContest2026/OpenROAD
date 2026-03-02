@@ -5596,17 +5596,26 @@ int Resizer::myContestAlgorithm(int max_iterations) {
     repairSetup(margin, repair_tns, max_passes, max_iter, repair_per_pass, match_foot, verbose, moves,
     skip_pin_swap, skip_gate_clone, skip_size_down, skip_buffering, skip_buffer_removal, skip_last_gasp, skip_vt_swap, skip_crit_vt_swap);
   }
-  /*else if(comp_num == 195113){
+  else if(comp_num == 220279){
     vt_swap_speed_move_->equiv_selection = 0;
     margin = 0.8 * 1e-9;
-    repairDesign(max_wire_len, 0, 0, 0, false, false);
+    
     repairSetup(margin, repair_tns, max_passes, max_iter, repair_per_pass, match_foot, verbose, moves,
     skip_pin_swap, skip_gate_clone, skip_size_down, skip_buffering, skip_buffer_removal, skip_last_gasp, skip_vt_swap, skip_crit_vt_swap);
 
     repairSetup(margin, repair_tns, max_passes, max_iter, repair_per_pass, match_foot, verbose, moves,
     skip_pin_swap, skip_gate_clone, skip_size_down, skip_buffering, skip_buffer_removal, skip_last_gasp, skip_vt_swap, skip_crit_vt_swap);
-  }*/
-  // 220279
+
+    repairSetup(margin, repair_tns, max_passes, max_iter, repair_per_pass, match_foot, verbose, moves,
+    skip_pin_swap, skip_gate_clone, skip_size_down, skip_buffering, skip_buffer_removal, skip_last_gasp, skip_vt_swap, skip_crit_vt_swap);
+  }
+  else{ // hidden
+    vt_swap_speed_move_->equiv_selection = 1;
+    margin = 0.0;
+    repairDesign(max_wire_len, 0, 0, 0, false, false);
+    repairSetup(margin, repair_tns, max_passes, max_iter, repair_per_pass, match_foot, verbose, moves,
+    skip_pin_swap, skip_gate_clone, skip_size_down, skip_buffering, skip_buffer_removal, skip_last_gasp, skip_vt_swap, skip_crit_vt_swap);
+  }
       
   return 0;
 }
