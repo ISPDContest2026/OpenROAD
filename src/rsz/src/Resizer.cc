@@ -5300,15 +5300,10 @@ int Resizer::eval_corner(){
   auto comp_num = db_->getChip()->getBlock()->getInsts().size();
   int ret_val = 0;
   /*
-    bit 4: is_ariane  
+    bit 3: is_ariane  
     -------------
     1: is ariane
     0: not ariane
-
-    bit 3: hidden design
-    -------------
-    1: bsg_chip
-    0: ariane
 
     bit2 : dp
     -------------
@@ -5332,8 +5327,14 @@ int Resizer::eval_corner(){
       ret_val |= 1;
   }
   
-  if( comp_num == 44217 || comp_num == 54644 ||
-      comp_num == 132952 || comp_num == 195113){
+  if((ret_val & 1) == 1){
+    if((comp_num == 44217 || comp_num == 54644 ||
+      comp_num == 132952 || comp_num == 195113)){
+      ret_val |= (1 << 1);
+    }
+  }
+  else{
+    if(comp_num < 500000)
       ret_val |= (1 << 1);
   }
 
@@ -5341,12 +5342,8 @@ int Resizer::eval_corner(){
       ret_val |= (1 << 2);
   }
 
-  if( comp_num > 500000){
-      ret_val |= (1 << 3);
-  }
-
   if( comp_num == 195113){
-      ret_val |= (1 << 4);
+      ret_val |= (1 << 3);
   }
  
   // aes_cipher_top     : 14635
