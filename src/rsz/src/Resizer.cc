@@ -5354,6 +5354,7 @@ int Resizer::eval_corner(){
   // ariane_v2          : 195113
   // bsg_chip           : 901950
   // bsg_chip_v2        : 1378521
+  logger_->report("Orz: ret_val is {}", ret_val);
   return ret_val;
 }
 int Resizer::myContestAlgorithm(int max_iterations) {
@@ -5595,7 +5596,7 @@ int Resizer::myContestAlgorithm(int max_iterations) {
     repairSetup(margin, repair_tns, max_passes, max_iter, repair_per_pass, match_foot, verbose, moves,
     skip_pin_swap, skip_gate_clone, skip_size_down, skip_buffering, skip_buffer_removal, skip_last_gasp, skip_vt_swap, skip_crit_vt_swap);
   }
-  else if(comp_num == 195113){
+  /*else if(comp_num == 195113){
     vt_swap_speed_move_->equiv_selection = 0;
     margin = 0.8 * 1e-9;
     repairDesign(max_wire_len, 0, 0, 0, false, false);
@@ -5604,9 +5605,42 @@ int Resizer::myContestAlgorithm(int max_iterations) {
 
     repairSetup(margin, repair_tns, max_passes, max_iter, repair_per_pass, match_foot, verbose, moves,
     skip_pin_swap, skip_gate_clone, skip_size_down, skip_buffering, skip_buffer_removal, skip_last_gasp, skip_vt_swap, skip_crit_vt_swap);
-  }
+  }*/
+  // 220279
       
   return 0;
+}
+
+void Resizer::PreOpt(){
+
+  double margin = 0;
+  double repair_tns = 1.0;
+  int max_passes = 10000;
+  int max_iter = -1;
+  int repair_per_pass = 1;
+  bool match_foot = false;
+  bool verbose = false;
+  const std::vector<MoveType> moves;
+  bool skip_pin_swap = true;
+  bool skip_gate_clone = true;
+  bool skip_size_down = false;
+  bool skip_buffering = false;
+  bool skip_buffer_removal = false;
+  bool skip_last_gasp = false;
+  bool skip_vt_swap = false;
+  bool skip_crit_vt_swap = false;
+  double max_wire_len = 0;
+
+  resizePreamble(); 
+
+  vt_swap_speed_move_->equiv_selection = 0;
+  margin = 0.8 * 1e-9;
+  repairDesign(max_wire_len, 0, 0, 0, false, false);
+  repairSetup(margin, repair_tns, max_passes, max_iter, repair_per_pass, match_foot, verbose, moves,
+  skip_pin_swap, skip_gate_clone, skip_size_down, skip_buffering, skip_buffer_removal, skip_last_gasp, skip_vt_swap, skip_crit_vt_swap);
+
+  repairSetup(margin, repair_tns, max_passes, max_iter, repair_per_pass, match_foot, verbose, moves,
+  skip_pin_swap, skip_gate_clone, skip_size_down, skip_buffering, skip_buffer_removal, skip_last_gasp, skip_vt_swap, skip_crit_vt_swap);
 }
 
 }  // namespace rsz

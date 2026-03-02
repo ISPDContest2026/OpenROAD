@@ -670,12 +670,17 @@ int eval_corner()
 
 
 
-int
-run_my_contest_algo(int max_iterations)
+int run_my_contest_algo(int max_iterations)
 {
   ensureLinked();
   rsz::Resizer *resizer = ord::getResizer();
   return resizer->myContestAlgorithm(max_iterations);
+}
+
+void PreOpt(){
+  ensureLinked();
+  rsz::Resizer *resizer = ord::getResizer();
+  return resizer->PreOpt();
 }
 
 } // namespace
