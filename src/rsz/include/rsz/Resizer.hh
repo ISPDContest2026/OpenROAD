@@ -376,6 +376,7 @@ class Resizer : public dbStaState, public dbNetworkObserver
     clk_buffers_ = clk_buffers;
   }
   int myContestAlgorithm(int max_iterations);
+  int eval_corner();
   bool isBuffer(odb::dbMaster* master);
   odb::dbInst* getDriverInst(odb::dbInst* inst);
   std::tuple<float, int, int> getSnapshot();

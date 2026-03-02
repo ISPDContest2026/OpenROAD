@@ -660,9 +660,20 @@ fully_rebuffer(Pin *pin)
 }
 
 // 這就是你在 Python 會呼叫的函式名稱
+
+int eval_corner()
+{
+  ensureLinked();
+  rsz::Resizer *resizer = ord::getResizer();
+  return resizer->eval_corner();
+}
+
+
+
 int
 run_my_contest_algo(int max_iterations)
 {
+  ensureLinked();
   rsz::Resizer *resizer = ord::getResizer();
   return resizer->myContestAlgorithm(max_iterations);
 }
