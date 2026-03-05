@@ -5637,6 +5637,9 @@ int Resizer::myContestAlgorithm(int max_iterations) {
 
     repairSetup(margin, repair_tns, max_passes, max_iter, repair_per_pass, match_foot, verbose, moves,
     skip_pin_swap, skip_gate_clone, skip_size_down, skip_buffering, skip_buffer_removal, skip_last_gasp, skip_vt_swap, skip_crit_vt_swap);
+
+    repairSetup(margin, repair_tns, max_passes, max_iter, repair_per_pass, match_foot, verbose, moves,
+    skip_pin_swap, skip_gate_clone, skip_size_down, skip_buffering, skip_buffer_removal, skip_last_gasp, skip_vt_swap, skip_crit_vt_swap);
   }
   else{ // hidden
     vt_swap_speed_move_->equiv_selection = 1;
